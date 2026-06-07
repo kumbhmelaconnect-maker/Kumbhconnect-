@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Terms & Conditions — KumbhConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --sf:#C8410A;--gd:#C9920A;--gd2:#F0B429;
+  --cr:#FFFAF4;--cd:#FFF6ED;--cs:#FFF3E6;
+  --br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;
+  --fn:'Mukta','Khand',sans-serif;--r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
+.topbar{background:linear-gradient(135deg,#7B1616,#C8410A);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(123,22,22,.3)}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 12px;border-radius:20px;font-size:.75rem;cursor:pointer;font-family:var(--fn);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.topbar-title{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#fff}
+.topbar-sub{font-size:.6rem;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase}
+.hero{background:linear-gradient(160deg,#FFF3E6,#FFFAF4);padding:28px 20px 24px;text-align:center;border-bottom:2px solid var(--br)}
+.hero-icon{font-size:3rem;margin-bottom:10px}
+.hero-title{font-family:'Khand',sans-serif;font-size:1.8rem;font-weight:700;color:#7B1616;margin-bottom:6px}
+.hero-sub{font-size:.8rem;color:var(--t3);margin-bottom:10px}
+.hero-badge{display:inline-block;background:linear-gradient(90deg,#7B1616,#C8410A);color:#fff;font-size:.65rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px}
+.date-bar{background:var(--cd);border-bottom:1px solid var(--br);padding:9px 20px;display:flex;gap:16px;flex-wrap:wrap}
+.date-item{font-size:.7rem;color:var(--t3)}
+.date-item span{font-weight:700;color:var(--t2)}
+.lang-tabs{display:flex;gap:6px;padding:12px 18px;background:var(--cs);border-bottom:1px solid var(--br)}
+.ltab{padding:5px 14px;border-radius:16px;border:1.5px solid var(--br);background:#fff;color:var(--t2);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.ltab.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+.content{max-width:680px;margin:0 auto;padding:20px 18px 48px}
+.section{margin-bottom:24px;background:#fff;border-radius:var(--r);border:1px solid var(--br);overflow:hidden;box-shadow:0 2px 8px rgba(200,65,10,.05)}
+.sec-hdr{background:linear-gradient(135deg,var(--cs),#fff);padding:13px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:10px}
+.sec-icon{font-size:1.3rem}
+.sec-title{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:#7B1616}
+.sec-body{padding:14px 16px}
+.sec-body p{font-size:.82rem;color:var(--t2);margin-bottom:10px}
+.sec-body ul{padding-left:18px;margin-bottom:10px}
+.sec-body ul li{font-size:.82rem;color:var(--t2);margin-bottom:6px}
+.sec-body h4{font-family:'Khand',sans-serif;font-size:.88rem;font-weight:700;color:var(--t1);margin-bottom:6px;margin-top:12px}
+.highlight{background:linear-gradient(135deg,#FEF9EC,#FFF3E6);border:1.5px solid var(--gd2);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.highlight p{margin:0;font-size:.8rem;color:#78350F}
+.warn-box{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.warn-box p{margin:0;font-size:.8rem;color:#991B1B}
+.num-list{counter-reset:tc;padding-left:0;list-style:none}
+.num-list li{font-size:.82rem;color:var(--t2);margin-bottom:8px;padding-left:28px;position:relative;counter-increment:tc}
+.num-list li::before{content:counter(tc);position:absolute;left:0;top:1px;background:var(--sf);color:#fff;width:20px;height:20px;border-radius:50%;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Khand',sans-serif}
+.contact-box{background:linear-gradient(135deg,#7B1616,#C8410A);border-radius:var(--r);padding:20px;text-align:center;margin-top:24px}
+.contact-box h3{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#F0B429;margin-bottom:8px}
+.contact-box p{font-size:.78rem;color:rgba(255,255,255,.85);margin-bottom:12px}
+.contact-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.clink-btn{padding:8px 18px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:var(--fn);cursor:pointer;text-decoration:none}
+.clink-wa{background:#25D366;color:#fff}
+.clink-mail{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
+.footer{text-align:center;padding:20px 18px;border-top:1px solid var(--br);font-size:.68rem;color:var(--t3)}
+.footer strong{color:var(--sf)}
+.lang-block{display:none}.lang-block.on{display:block}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">← मागे</a>
+  <div>
+    <div class="topbar-title">Terms & Conditions</div>
+    <div class="topbar-sub">KumbhConnect · अटी व शर्ती</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-icon">📜</div>
+  <div class="hero-title">अटी व शर्ती</div>
+  <div class="hero-sub">Terms & Conditions — KumbhConnect Platform</div>
+  <div class="hero-badge">📋 Version 1.0 · जून २०२६</div>
+</div>
+
+<div class="date-bar">
+  <div class="date-item">📅 लागू तारीख: <span>जून १, २०२६</span></div>
+  <div class="date-item">🔄 शेवटचे अपडेट: <span>जून ७, २०२६</span></div>
+  <div class="date-item">🌐 Platform: <span>KumbhConnect PWA</span></div>
+</div>
+
+<div class="lang-tabs">
+  <button class="ltab on" onclick="setLang('mr',this)">मराठी</button>
+  <button class="ltab" onclick="setLang('hi',this)">हिंदी</button>
+  <button class="ltab" onclick="setLang('en',this)">English</button>
+</div>
+
+<div class="content">
+
+<!-- ===== MARATHI ===== -->
+<div id="lang-mr" class="lang-block on">
+
+  <div class="highlight">
+    <p>🙏 KumbhConnect वापरण्यापूर्वी कृपया या अटी काळजीपूर्वक वाचा. हे App वापरणे म्हणजे तुम्ही या अटींशी सहमत आहात असे मानले जाते.</p>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏛️</span><div class="sec-title">Platform बद्दल</div></div>
+    <div class="sec-body">
+      <p><strong>KumbhConnect</strong> हे नाशिक–त्र्यंबकेश्वर सिंहस्थ कुंभमेळा २०२७ साठी बनवलेले Digital Pilgrimage Assistance Platform आहे.</p>
+      <ul>
+        <li>Founder: <strong>Prasad Arvind Bhalekar</strong></li>
+        <li>Platform Type: Progressive Web App (PWA)</li>
+        <li>उद्देश: यात्रेकरूंना माहिती, मार्गदर्शन व आपत्कालीन सहाय्य</li>
+        <li>Login आवश्यक नाही — सर्वांसाठी मुक्त</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">✅</span><div class="sec-title">सेवा वापराच्या अटी</div></div>
+    <div class="sec-body">
+      <ul class="num-list">
+        <li>KumbhConnect फक्त <strong>वैयक्तिक, गैर-व्यावसायिक</strong> वापरासाठी आहे.</li>
+        <li>Platform वरील माहिती <strong>सामान्य मार्गदर्शनासाठी</strong> आहे — अधिकृत सरकारी स्त्रोत नाही.</li>
+        <li>SOS / Grievance System केवळ <strong>खऱ्या आणीबाणीसाठी</strong> वापरा.</li>
+        <li>खोटी तक्रार किंवा खोटे SOS पाठवणे <strong>कायदेशीर गुन्हा</strong> आहे.</li>
+        <li>Platform वरील Guide/Business माहिती <strong>verified</strong> असली तरी प्रत्यक्ष भेटीत बदल शक्य आहे.</li>
+        <li>User ने दिलेली माहिती (तक्रार, नाव, फोन) <strong>संबंधित अधिकाऱ्यांना</strong> पाठवली जाऊ शकते.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚨</span><div class="sec-title">SOS & Grievance System अटी</div></div>
+    <div class="sec-body">
+      <div class="warn-box">
+        <p>⚠️ <strong>महत्त्वाचे:</strong> खोट्या SOS साठी भारतीय दंड संहिता (IPC) अंतर्गत कारवाई होऊ शकते.</p>
+      </div>
+      <ul>
+        <li>SOS System फक्त <strong>खऱ्या आपत्कालीन परिस्थितीत</strong> वापरा</li>
+        <li>Ticket ID generate झाल्यानंतर ती तक्रार <strong>Police/Guide कडे</strong> जाते</li>
+        <li>Grievance Form मध्ये दिलेली माहिती <strong>अचूक</strong> असणे आवश्यक आहे</li>
+        <li>Platform SOS पाठवण्यास मदत करतो — प्रत्यक्ष Response साठी <strong>संबंधित यंत्रणा</strong> जबाबदार आहे</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🗺️</span><div class="sec-title">Map & Location माहिती</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>Map वरील सर्व verified locations <strong>KumbhConnect Team</strong> ने तपासलेल्या आहेत</li>
+        <li>Google Maps links थेट Google LLC कडे redirect होतात — त्यांच्या अटी लागू</li>
+        <li>Location coordinates अचूक असले तरी <strong>प्रत्यक्ष भेटीत GPS error</strong> शक्य आहे</li>
+        <li>Business/Guide माहिती बदलल्यास <strong>कृपया आम्हाला कळवा</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📸</span><div class="sec-title">Content & Images</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>Platform वरील images <strong>KumbhConnect साठी authorized</strong> आहेत</li>
+        <li>Imgbb hosted images — संबंधित मंदिर/स्थळाच्या प्रतिमा</li>
+        <li>कोणताही content copy करण्यापूर्वी <strong>परवानगी घ्या</strong></li>
+        <li>User uploaded photos (तक्रारीत) फक्त <strong>तक्रार निपटारासाठी</strong> वापरल्या जातात</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">⚖️</span><div class="sec-title">जबाबदारी मर्यादा</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect खालील गोष्टींसाठी जबाबदार नाही:</p>
+      <ul>
+        <li>Network/Internet नसल्यामुळे SOS न पोहोचणे</li>
+        <li>WhatsApp/Call अनुपलब्धतेमुळे संपर्क न होणे</li>
+        <li>Third-party services (Google Maps, WhatsApp) च्या अटी</li>
+        <li>Platform वापरकर्त्याच्या चुकीमुळे होणारे नुकसान</li>
+        <li>कुंभमेळा Schedules मध्ये सरकारी बदल</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔄</span><div class="sec-title">अटींमध्ये बदल</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect या अटी <strong>पूर्वसूचनाशिवाय</strong> बदलू शकतो. बदल झाल्यास Platform वर नोटिफिकेशन दाखवले जाईल. Platform वापर सुरू ठेवणे म्हणजे नव्या अटींना सहमती.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏛️</span><div class="sec-title">न्यायक्षेत्र</div></div>
+    <div class="sec-body">
+      <p>या अटी <strong>भारतीय कायद्यानुसार</strong> लागू आहेत. कोणताही वाद असल्यास नाशिक न्यायालयाचे न्यायक्षेत्र लागू राहील.</p>
+    </div>
+  </div>
+
+</div><!-- end lang-mr -->
+
+<!-- ===== ENGLISH ===== -->
+<div id="lang-en" class="lang-block">
+
+  <div class="highlight">
+    <p>🙏 Please read these Terms carefully before using KumbhConnect. By using this app, you agree to these terms.</p>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏛️</span><div class="sec-title">About the Platform</div></div>
+    <div class="sec-body">
+      <p><strong>KumbhConnect</strong> is a Digital Pilgrimage Assistance Platform for the Nashik–Trimbakeshwar Simhastha Kumbh Mela 2027.</p>
+      <ul>
+        <li>Founder: <strong>Prasad Arvind Bhalekar</strong></li>
+        <li>Platform Type: Progressive Web App (PWA)</li>
+        <li>Purpose: Information, guidance, and emergency assistance for pilgrims</li>
+        <li>No login required — free for all</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">✅</span><div class="sec-title">Terms of Use</div></div>
+    <div class="sec-body">
+      <ul class="num-list">
+        <li>KumbhConnect is for <strong>personal, non-commercial</strong> use only.</li>
+        <li>Information on the platform is for <strong>general guidance</strong> — not an official government source.</li>
+        <li>Use the SOS/Grievance System only for <strong>genuine emergencies</strong>.</li>
+        <li>Filing false SOS or complaints is a <strong>punishable offence</strong> under Indian law.</li>
+        <li>Location data and guide information may change — verify before visiting.</li>
+        <li>Information you provide (complaint, name, phone) may be shared with <strong>relevant authorities</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚨</span><div class="sec-title">SOS & Grievance Terms</div></div>
+    <div class="sec-body">
+      <div class="warn-box">
+        <p>⚠️ <strong>Important:</strong> False SOS submissions may result in action under the Indian Penal Code (IPC).</p>
+      </div>
+      <ul>
+        <li>Use the SOS system only for <strong>genuine emergencies</strong></li>
+        <li>Once a Ticket ID is generated, the complaint is forwarded to Police/Guide</li>
+        <li>Information in the Grievance Form must be <strong>accurate</strong></li>
+        <li>KumbhConnect facilitates SOS — actual response is the responsibility of <strong>concerned authorities</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">⚖️</span><div class="sec-title">Limitation of Liability</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect is not responsible for:</p>
+      <ul>
+        <li>SOS not reaching due to no network/internet</li>
+        <li>Contact failures due to WhatsApp/Call unavailability</li>
+        <li>Terms of third-party services (Google Maps, WhatsApp)</li>
+        <li>Losses due to user error</li>
+        <li>Government changes to Kumbh Mela schedules</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏛️</span><div class="sec-title">Jurisdiction</div></div>
+    <div class="sec-body">
+      <p>These terms are governed by <strong>Indian law</strong>. Any disputes shall be subject to the jurisdiction of courts in Nashik, Maharashtra.</p>
+    </div>
+  </div>
+
+</div><!-- end lang-en -->
+
+<!-- ===== HINDI ===== -->
+<div id="lang-hi" class="lang-block">
+
+  <div class="highlight">
+    <p>🙏 KumbhConnect का उपयोग करने से पहले कृपया इन शर्तों को ध्यान से पढ़ें। App का उपयोग करना इन शर्तों से सहमति माना जाएगा।</p>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">✅</span><div class="sec-title">उपयोग की शर्तें</div></div>
+    <div class="sec-body">
+      <ul class="num-list">
+        <li>KumbhConnect केवल <strong>व्यक्तिगत, गैर-व्यावसायिक</strong> उपयोग के लिए है।</li>
+        <li>SOS System केवल <strong>वास्तविक आपात स्थिति</strong> में उपयोग करें।</li>
+        <li>झूठी शिकायत या झूठा SOS <strong>दंडनीय अपराध</strong> है।</li>
+        <li>Platform पर दी गई जानकारी सामान्य मार्गदर्शन के लिए है।</li>
+        <li>आपके द्वारा दी गई जानकारी संबंधित अधिकारियों को भेजी जा सकती है।</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">⚖️</span><div class="sec-title">न्यायक्षेत्र</div></div>
+    <div class="sec-body">
+      <p>ये शर्तें <strong>भारतीय कानून</strong> के अनुसार लागू हैं। कोई भी विवाद नासिक न्यायालय के न्यायक्षेत्र में होगा।</p>
+    </div>
+  </div>
+
+</div><!-- end lang-hi -->
+
+<!-- CONTACT -->
+<div class="contact-box">
+  <h3>📞 संपर्क करा / Contact Us</h3>
+  <p>अटींबाबत कोणताही प्रश्न असल्यास संपर्क करा</p>
+  <div class="contact-links">
+    <a href="https://wa.me/917499354042?text=KumbhConnect%20Terms%20Query" class="clink-btn clink-wa" target="_blank">💬 WhatsApp</a>
+    <a href="mailto:kumbhmelaconnect@gmail.com?subject=Terms%20Query%20-%20KumbhConnect" class="clink-btn clink-mail">📧 Email</a>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<div class="footer">
+  <div>🕉️ <strong>KumbhConnect</strong> — नाशिक–त्र्यंबकेश्वर कुंभमेळा डिजिटल साथी</div>
+  <div style="margin-top:5px">Founder: Prasad Arvind Bhalekar &nbsp;·&nbsp; © 2026 KumbhConnect. All rights reserved.</div>
+  <div style="margin-top:5px">
+    <a href="index.html" style="color:var(--sf);text-decoration:none">← परत जा</a>
+    &nbsp;·&nbsp;
+    <a href="privacy-policy.html" style="color:var(--sf);text-decoration:none">Privacy Policy</a>
+  </div>
+</div>
+
+<script>
+function setLang(lang, el) {
+  document.querySelectorAll('.lang-block').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.ltab').forEach(b => b.classList.remove('on'));
+  document.getElementById('lang-' + lang).classList.add('on');
+  if (el) el.classList.add('on');
+}
+</script>
+</body>
+</html>
