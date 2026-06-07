@@ -1,16 +1,17 @@
 {
-  "name": "KumbhConnect — Smart Pilgrimage Platform",
+  "name": "KumbhConnect – Smart Pilgrimage Platform",
   "short_name": "KumbhConnect",
-  "description": "नाशिक-त्र्यंबकेश्वर सिंहस्थ कुंभमेळा यात्री सहाय्यता मंच — Digital Pilgrimage Companion",
-  "start_url": "/kumbhconnect/",
-  "scope": "/kumbhconnect/",
+  "description": "नाशिक–त्र्यंबकेश्वर कुंभमेळा यात्रेकरू सहाय्यता मंच",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FFFAF4",
+  "background_color": "#FFF4F4",
   "theme_color": "#C8410A",
   "lang": "mr",
   "dir": "ltr",
   "id": "kumbhconnect-pwa-v2",
+
   "icons": [
     {
       "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png",
@@ -25,43 +26,75 @@
       "purpose": "maskable any"
     }
   ],
+
   "shortcuts": [
     {
-      "name": "🆘 SOS आपत्कालीन",
+      "name": "SOS मदत",
       "short_name": "SOS",
-      "url": "/kumbhconnect/?page=sos",
-      "description": "Emergency SOS — तात्काळ मदत",
-      "icons": [{ "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png", "sizes": "96x96" }]
+      "url": "./?page=sos",
+      "description": "आपत्कालीन मदत",
+      "icons": [
+        {
+          "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "🧭 गाईड भाड्याने",
+      "name": "Guide सेवा",
       "short_name": "Guide",
-      "url": "/kumbhconnect/?page=hire",
-      "description": "Hire a Kumbh Mela Guide",
-      "icons": [{ "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png", "sizes": "96x96" }]
+      "url": "./?page=hire",
+      "description": "कुंभमेळा गाईड बुक करा",
+      "icons": [
+        {
+          "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "🗺️ नकाशा",
+      "name": "Map",
       "short_name": "Map",
-      "url": "/kumbhconnect/?page=map",
-      "description": "Interactive Kumbh Mela Map",
-      "icons": [{ "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png", "sizes": "96x96" }]
+      "url": "./?page=map",
+      "description": "कुंभमेळा नकाशा",
+      "icons": [
+        {
+          "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "📅 कुंभ Calendar",
+      "name": "Calendar",
       "short_name": "Calendar",
-      "url": "/kumbhconnect/?page=calendar",
-      "description": "Kumbh Mela Important Dates",
-      "icons": [{ "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png", "sizes": "96x96" }]
+      "url": "./?page=calendar",
+      "description": "महत्त्वाच्या तारखा",
+      "icons": [
+        {
+          "src": "https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
-  "categories": ["travel", "utilities", "navigation", "lifestyle"],
+
+  "categories": [
+    "travel",
+    "navigation",
+    "utilities",
+    "lifestyle"
+  ],
+
   "prefer_related_applications": false,
   "related_applications": [],
-  "screenshots": [],
+
   "share_target": {
-    "action": "/kumbhconnect/",
+    "action": "./",
     "method": "GET",
-    "params": { "title": "title", "text": "text", "url": "url" }
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
   }
 }
