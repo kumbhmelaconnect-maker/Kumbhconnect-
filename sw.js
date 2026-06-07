@@ -1,35 +1,40 @@
 // ================================================================
-// KumbhConnect — Service Worker v4
-// GitHub: kumbhmelaconnect-maker.github.io/kumbhconnect
+// KumbhConnect — Service Worker v4.1
+// GitHub Pages: kumbhmelaconnect-maker.github.io/Kumbhconnect-/
 // Founder: Prasad Arvind Bhalekar
-// Updated: June 2026
+// Fix: Relative paths — no hardcoded BASE
 // ================================================================
 
-const CACHE   = 'kumbhconnect-v4';
-const BASE    = '/kumbhconnect';
+const CACHE = 'kumbhconnect-v4';
+
+// Detect base path automatically from SW location
+const SW_URL   = self.location.href;
+const BASE_URL = SW_URL.substring(0, SW_URL.lastIndexOf('/') + 1);
 
 const STATIC = [
-  BASE + '/',
-  BASE + '/index.html',
-  BASE + '/privacy-policy.html',
-  BASE + '/terms.html',
-  BASE + '/manifest.json',
+  BASE_URL,
+  BASE_URL + 'index.html',
+  BASE_URL + 'privacy-policy.html',
+  BASE_URL + 'terms.html',
+  BASE_URL + 'manifest.json',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Mukta:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap',
 ];
 
 // ================================================================
-// INSTALL — Pre-cache all static files
+// INSTALL
 // ================================================================
 self.addEventListener('install', e => {
-  console.log('[KC SW v4] Installing...');
+  console.log('[KC SW v4.1] Installing... BASE:', BASE_URL);
   e.waitUntil(
     caches.open(CACHE).then(c =>
       Promise.allSettled(
-        STATIC.map(url => c.add(url).catch(err =>
-          console.warn('[SW] Skip cache:', url.split('/').pop(), err.message)
-        ))
+        STATIC.map(url =>
+          c.add(url).catch(err =>
+            console.warn('[SW] Skip cache:', url.split('/').pop() || url, err.message)
+          )
+        )
       )
     )
   );
@@ -37,10 +42,10 @@ self.addEventListener('install', e => {
 });
 
 // ================================================================
-// ACTIVATE — Remove old caches
+// ACTIVATE
 // ================================================================
 self.addEventListener('activate', e => {
-  console.log('[KC SW v4] Activating...');
+  console.log('[KC SW v4.1] Activating...');
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
@@ -55,14 +60,14 @@ self.addEventListener('activate', e => {
 });
 
 // ================================================================
-// FETCH — Cache First for assets, Network First for HTML
+// FETCH — Network First for HTML, Cache First for assets
 // ================================================================
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
   const url = e.request.url;
 
-  // Skip — never cache these
+  // Skip — never cache these external calls
   if (
     url.includes('firestore') ||
     url.includes('script.google.com') ||
@@ -73,9 +78,13 @@ self.addEventListener('fetch', e => {
     url.includes('ibb.co')
   ) return;
 
-  // HTML pages — Network First (always get latest), fallback to cache
-  if (e.request.headers.get('accept')?.includes('text/html') ||
-      url.endsWith('.html') || url.endsWith('/')) {
+  // HTML pages — Network First, fallback to cache
+  if (
+    e.request.headers.get('accept')?.includes('text/html') ||
+    url.endsWith('.html') ||
+    url.endsWith('/')   ||
+    url === BASE_URL.slice(0,-1) // handle no-trailing-slash
+  ) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
@@ -87,7 +96,10 @@ self.addEventListener('fetch', e => {
         })
         .catch(() =>
           caches.match(e.request)
-            .then(cached => cached || caches.match(BASE + '/index.html'))
+            .then(cached => cached ||
+              caches.match(BASE_URL + 'index.html') ||
+              caches.match(BASE_URL)
+            )
         )
     );
     return;
@@ -102,10 +114,9 @@ self.addEventListener('fetch', e => {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
         return res;
-      }).catch(() => {
-        // Return empty 503 for non-HTML offline failures
-        return new Response('', { status: 503, statusText: 'Offline' });
-      });
+      }).catch(() =>
+        new Response('', { status: 503, statusText: 'Offline' })
+      );
     })
   );
 });
@@ -121,7 +132,7 @@ self.addEventListener('push', e => {
       icon  : 'https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png',
       badge : 'https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png',
       tag   : 'kc-notif',
-      data  : data.url || BASE + '/'
+      data  : data.url || BASE_URL
     })
   );
 });
@@ -130,24 +141,18 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(
     clients.matchAll({ type: 'window' }).then(wcs => {
-      for (const c of wcs) {
-        if ('focus' in c) return c.focus();
-      }
+      for (const c of wcs) { if ('focus' in c) return c.focus(); }
       if (clients.openWindow) return clients.openWindow(e.notification.data);
     })
   );
 });
 
 // ================================================================
-// BACKGROUND SYNC (Future: queue offline SOS)
+// BACKGROUND SYNC
 // ================================================================
 self.addEventListener('sync', e => {
-  if (e.tag === 'kc-sos-queue') {
-    console.log('[SW] Background sync: SOS queue');
-  }
-  if (e.tag === 'kc-analytics') {
-    console.log('[SW] Background sync: Analytics');
-  }
+  if (e.tag === 'kc-sos-queue')   console.log('[SW] Sync: SOS queue');
+  if (e.tag === 'kc-analytics')   console.log('[SW] Sync: Analytics');
 });
 
-console.log('[KumbhConnect SW v4] Loaded ✓');
+console.log('[KumbhConnect SW v4.1] Loaded ✓ BASE:', BASE_URL);
