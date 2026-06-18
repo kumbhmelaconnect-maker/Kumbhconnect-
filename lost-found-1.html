@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Lost & Found — KumbhConnect</title>
+<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
+.app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:88px}
+@media(min-width:700px){body{background:#EDE5D8}}
+
+.topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
+.topbar-title{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:var(--sf)}
+.lbtn{padding:4px 10px;border-radius:6px;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);font-size:.68rem;font-weight:700;cursor:pointer;font-family:var(--fn);transition:all .15s}
+.lbtn.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+.hero{background:linear-gradient(150deg,#7C3AED 0%,#4C1D95 100%);padding:22px 16px 26px;position:relative;overflow:hidden}
+.hero::before{content:'🔍';position:absolute;right:-8px;bottom:-10px;font-size:110px;opacity:.1}
+.hero h1{font-family:'Khand',sans-serif;font-size:1.75rem;font-weight:700;color:#fff;margin-bottom:6px}
+.hero p{color:rgba(255,255,255,.82);font-size:.82rem;line-height:1.5}
+.hero-notice{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:var(--r2);padding:9px 12px;margin-top:12px;font-size:.72rem;color:#fff;line-height:1.5}
+
+/* TABS */
+.tabs{display:flex;padding:12px 14px;gap:8px;background:var(--wh);border-bottom:1px solid var(--br)}
+.tab{flex:1;padding:10px 8px;border-radius:var(--r2);border:1.5px solid var(--br);font-family:'Khand',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;text-align:center;color:var(--t2);background:var(--cs);transition:all .2s}
+.tab.on{background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border-color:var(--sf)}
+
+.panel{display:none;padding:14px}
+.panel.on{display:block;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* FORM */
+.form-card{background:var(--wh);border:1.5px solid var(--br);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.fg{margin-bottom:13px}
+.fg label{font-size:.72rem;font-weight:700;color:var(--t2);display:block;margin-bottom:5px}
+.fg label .req{color:#B91C1C}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 12px;border:1.5px solid var(--br);border-radius:var(--r2);font-family:var(--fn);font-size:.85rem;background:var(--cs);color:var(--t1);outline:none;transition:border .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sf);background:var(--wh)}
+.fg textarea{resize:vertical;min-height:80px}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.fg-row{grid-template-columns:1fr}}
+
+.photo-upload{border:2px dashed var(--br);border-radius:var(--r2);padding:16px;text-align:center;cursor:pointer;background:var(--cs);transition:all .2s}
+.photo-upload:hover{border-color:var(--sf)}
+.photo-upload input{display:none}
+.photo-preview{max-width:100%;border-radius:var(--r2);margin-top:10px;display:none;max-height:160px;object-fit:cover;width:100%}
+
+.btn-submit{width:100%;padding:13px;border:none;border-radius:var(--r);background:linear-gradient(90deg,#7C3AED,#4C1D95);color:#fff;font-family:'Khand',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.btn-submit:hover{opacity:.9}
+.btn-wa{width:100%;padding:12px;border:none;border-radius:var(--r);background:#25D366;color:#fff;font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* SEARCH PANEL */
+.search-box{display:flex;align-items:center;gap:8px;background:var(--cs);border:1.5px solid var(--br);border-radius:var(--r);padding:10px 13px;margin-bottom:14px}
+.search-box input{flex:1;border:none;background:transparent;font-family:var(--fn);font-size:.88rem;color:var(--t1);outline:none}
+
+.lf-card{background:var(--wh);border:1.5px solid var(--br);border-radius:var(--r);padding:13px;margin-bottom:10px;display:flex;gap:12px;box-shadow:var(--sh)}
+.lf-ic{width:48px;height:48px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.lf-type{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:10px;margin-bottom:4px;display:inline-block}
+.lf-name{font-size:.85rem;font-weight:700;color:var(--t1);font-family:'Mukta',sans-serif}
+.lf-loc{font-size:.68rem;color:var(--t3);margin-top:3px}
+.lf-date{font-size:.62rem;color:var(--t3)}
+.lf-contact{margin-top:8px;padding:7px 10px;border-radius:8px;border:none;background:var(--sf);color:#fff;font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fn)}
+
+/* HELPLINE */
+.helpline-card{background:linear-gradient(135deg,#FEF2F2,#FEE2E2);border:1.5px solid #FECACA;border-radius:var(--r);padding:14px;margin-bottom:14px}
+.hl-title{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:#B91C1C;margin-bottom:10px}
+.hl-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #FECACA}
+.hl-row:last-child{border:none}
+.hl-name{font-size:.82rem;font-weight:700;color:var(--t1)}
+.hl-num{font-size:.75rem;color:#B91C1C;font-weight:600}
+.call-btn{padding:5px 12px;border-radius:8px;border:none;background:#B91C1C;color:#fff;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fn)}
+
+/* SUCCESS */
+.success-box{display:none;text-align:center;padding:22px 14px}
+.success-box.show{display:block}
+
+.botnav{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1px solid var(--br);display:flex;justify-content:center;align-items:center;padding:8px 16px 12px;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+.back-home{display:flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border:none;border-radius:var(--r);font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A0800;color:#fff;padding:9px 18px;border-radius:var(--r2);font-size:.8rem;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app-wrap">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="back-btn">←</a>
+  <div style="flex:1">
+    <div class="topbar-title" data-i18n="page_title">🔍 हरवले & सापडले</div>
+    <div style="font-size:.6rem;color:var(--t3);letter-spacing:1px;text-transform:uppercase">Lost & Found</div>
+  </div>
+  <div style="display:flex;gap:4px">
+    <button class="lbtn on" id="lbtn-mr" onclick="setLang('mr',this)">म</button>
+    <button class="lbtn" id="lbtn-hi" onclick="setLang('hi',this)">हि</button>
+    <button class="lbtn" id="lbtn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1 data-i18n="hero_title">🔍 हरवले & सापडले</h1>
+  <p data-i18n="hero_desc">कुंभमेळ्यात हरवलेल्या व्यक्ती / वस्तू नोंदवा. तात्काळ मदतीसाठी SOS वापरा.</p>
+  <div class="hero-notice" data-i18n="hero_notice">
+    ⚠️ KumbhConnect केवळ माहिती शेअर करण्याची सुविधा देतो. वस्तू / व्यक्ती मिळण्याची हमी नाही. आपत्कालीन परिस्थितीत 100 / 112 कॉल करा.
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" id="tab-lost" onclick="switchTab('lost',this)" data-i18n="tab_lost">🚨 हरवले</div>
+  <div class="tab" id="tab-found" onclick="switchTab('found',this)" data-i18n="tab_found">✅ सापडले</div>
+  <div class="tab" id="tab-search" onclick="switchTab('search',this)" data-i18n="tab_search">🔍 शोधा</div>
+</div>
+
+<!-- REPORT LOST -->
+<div class="panel on" id="panel-lost">
+  <div class="helpline-card">
+    <div class="hl-title" data-i18n="hl_title">🆘 तात्काळ Emergency संपर्क</div>
+    <div class="hl-row"><div><div class="hl-name" data-i18n="hl_police">पोलीस Control Room</div><div class="hl-num">100</div></div><button class="call-btn" onclick="call('100')">📞 कॉल</button></div>
+    <div class="hl-row"><div><div class="hl-name" data-i18n="hl_emergency">Emergency</div><div class="hl-num">112</div></div><button class="call-btn" onclick="call('112')">📞 कॉल</button></div>
+    <div class="hl-row"><div><div class="hl-name" data-i18n="hl_nashik">नाशिक PCR</div><div class="hl-num">0253-2325700</div></div><button class="call-btn" onclick="call('02532325700')">📞 कॉल</button></div>
+  </div>
+
+  <div class="form-card" id="lost-form">
+    <div style="font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:13px" data-i18n="lost_form_title">📋 हरवलेली वस्तू / व्यक्ती नोंदवा</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px">
+      <div onclick="setLostType('person',this)" id="lt-person" style="padding:11px;border:1.5px solid var(--sf);border-radius:var(--r2);text-align:center;cursor:pointer;background:var(--cs)"><div style="font-size:20px">👤</div><div style="font-size:.72rem;font-weight:700;color:var(--sf)" data-i18n="lt_person">व्यक्ती</div></div>
+      <div onclick="setLostType('item',this)" id="lt-item" style="padding:11px;border:1.5px solid var(--br);border-radius:var(--r2);text-align:center;cursor:pointer;background:var(--cd)"><div style="font-size:20px">🎒</div><div style="font-size:.72rem;font-weight:700;color:var(--t2)" data-i18n="lt_item">वस्तू</div></div>
+    </div>
+
+    <div class="fg-row">
+      <div class="fg"><label data-i18n="f_reporter">तुमचे नाव <span class="req">*</span></label><input id="l-reporter" type="text" placeholder="तुमचे नाव"/></div>
+      <div class="fg"><label data-i18n="f_mobile">मोबाईल <span class="req">*</span></label><input id="l-mobile" type="tel" placeholder="+91 00000 00000"/></div>
+    </div>
+    <div class="fg"><label data-i18n="f_what">हरवलेल्याचे नाव / वस्तू <span class="req">*</span></label><input id="l-what" type="text" placeholder="उदा. मुलाचे नाव, पर्स, मोबाईल..."/></div>
+    <div class="fg"><label data-i18n="f_desc">वर्णन / Description</label><textarea id="l-desc" placeholder="वय, रंग, वेशभूषा, ब्रँड..."></textarea></div>
+    <div class="fg-row">
+      <div class="fg"><label data-i18n="f_loc">ठिकाण <span class="req">*</span></label><input id="l-loc" type="text" placeholder="उदा. रामकुंड, CBS..."/></div>
+      <div class="fg"><label data-i18n="f_date">तारीख / वेळ</label><input id="l-date" type="datetime-local"/></div>
+    </div>
+    <div class="fg">
+      <label data-i18n="f_photo">📷 फोटो (ऐच्छिक)</label>
+      <div class="photo-upload" onclick="document.getElementById('l-photo-input').click()">
+        <div style="font-size:28px">📷</div>
+        <div style="font-size:.75rem;color:var(--t3);margin-top:6px" data-i18n="photo_tap">फोटो निवडण्यासाठी दाबा</div>
+        <input type="file" id="l-photo-input" accept="image/*" onchange="previewPhoto(this,'l-preview')"/>
+      </div>
+      <img id="l-preview" class="photo-preview"/>
+    </div>
+    <button class="btn-submit" onclick="submitLost()"><span>📤</span><span data-i18n="btn_lost">Email द्वारे पाठवा — Report करा</span></button>
+  </div>
+  <div class="success-box" id="lost-success">
+    <div style="font-size:52px;margin-bottom:12px">✅</div>
+    <div style="font-family:'Khand',sans-serif;font-size:1.2rem;font-weight:700;color:var(--gn);margin-bottom:8px" data-i18n="success_title">तक्रार नोंदवली!</div>
+    <div style="font-size:.82rem;color:var(--t2)" data-i18n="success_msg">KumbhConnect Guide आणि पोलीस यांना माहिती पाठवली गेली.</div>
+    <button onclick="resetLost()" style="margin-top:14px;padding:9px 20px;border:1.5px solid var(--sf);border-radius:var(--r2);background:transparent;color:var(--sf);font-family:var(--fn);font-size:.82rem;cursor:pointer" data-i18n="btn_again">नवीन अर्ज</button>
+  </div>
+</div>
+
+<!-- REPORT FOUND -->
+<div class="panel" id="panel-found">
+  <div class="form-card" id="found-form">
+    <div style="font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--gn);margin-bottom:13px" data-i18n="found_form_title">✅ सापडलेली वस्तू / व्यक्ती नोंदवा</div>
+    <div class="fg-row">
+      <div class="fg"><label data-i18n="f_finder">तुमचे नाव <span class="req">*</span></label><input id="fd-name" type="text" placeholder="तुमचे नाव"/></div>
+      <div class="fg"><label data-i18n="f_mobile">मोबाईल <span class="req">*</span></label><input id="fd-mobile" type="tel" placeholder="+91 00000 00000"/></div>
+    </div>
+    <div class="fg"><label data-i18n="f_found_what">काय सापडले <span class="req">*</span></label><input id="fd-what" type="text" placeholder="उदा. पर्स, मोबाईल, मुल..."/></div>
+    <div class="fg"><label data-i18n="f_desc">वर्णन</label><textarea id="fd-desc" placeholder="रंग, ब्रँड, विशेष चिन्हे..."></textarea></div>
+    <div class="fg-row">
+      <div class="fg"><label data-i18n="f_found_loc">सापडलेले ठिकाण <span class="req">*</span></label><input id="fd-loc" type="text" placeholder="उदा. काळाराम मंदिर जवळ..."/></div>
+      <div class="fg"><label data-i18n="f_date">तारीख / वेळ</label><input id="fd-date" type="datetime-local"/></div>
+    </div>
+    <div class="fg">
+      <label data-i18n="f_photo">📷 फोटो (ऐच्छिक)</label>
+      <div class="photo-upload" onclick="document.getElementById('fd-photo-input').click()">
+        <div style="font-size:28px">📷</div>
+        <div style="font-size:.75rem;color:var(--t3);margin-top:6px" data-i18n="photo_tap">फोटो निवडण्यासाठी दाबा</div>
+        <input type="file" id="fd-photo-input" accept="image/*" onchange="previewPhoto(this,'fd-preview')"/>
+      </div>
+      <img id="fd-preview" class="photo-preview"/>
+    </div>
+    <button class="btn-submit" style="background:linear-gradient(90deg,var(--gn),#065F46)" onclick="submitFound()"><span>📤</span><span data-i18n="btn_found">Email द्वारे पाठवा — Report Found</span></button>
+  </div>
+  <div class="success-box" id="found-success">
+    <div style="font-size:52px;margin-bottom:12px">🎉</div>
+    <div style="font-family:'Khand',sans-serif;font-size:1.2rem;font-weight:700;color:var(--gn);margin-bottom:8px" data-i18n="found_success">माहिती नोंदवली!</div>
+    <div style="font-size:.82rem;color:var(--t2)" data-i18n="found_success_msg">तुमची माहिती पाठवली गेली. मालक शोधण्यास मदत होईल.</div>
+    <button onclick="resetFound()" style="margin-top:14px;padding:9px 20px;border:1.5px solid var(--gn);border-radius:var(--r2);background:transparent;color:var(--gn);font-family:var(--fn);font-size:.82rem;cursor:pointer" data-i18n="btn_again">नवीन अर्ज</button>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="panel" id="panel-search">
+  <div class="search-box">
+    <span style="font-size:16px;color:#7C3AED">🔍</span>
+    <input type="text" placeholder="नाव, वस्तू, ठिकाण शोधा..." oninput="searchLF(this.value)"/>
+  </div>
+  <div style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1px solid #93C5FD;border-radius:var(--r);padding:14px;margin-bottom:14px;text-align:center">
+    <div style="font-size:36px;margin-bottom:8px">🔍</div>
+    <div style="font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;color:#1E40AF" data-i18n="search_info_title">Search Feature</div>
+    <div data-i18n="search_info_desc" style="font-size:.78rem;color:#1E40AF;margin-top:5px;line-height:1.5">
+      नोंदवलेल्या Lost & Found items आमच्या Guide Email वर उपलब्ध आहेत. Search करण्यासाठी खालील बटणावर दाबा.
+    </div>
+    <button onclick="searchWA()" style="margin-top:12px;padding:10px 20px;border:none;border-radius:var(--r2);background:#7C3AED;color:#fff;font-family:'Khand',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer" data-i18n="search_btn">Email वर Search करा 📧</button>
+  </div>
+  <div class="helpline-card">
+    <div class="hl-title" data-i18n="hl_title">🆘 तात्काळ Emergency संपर्क</div>
+    <div class="hl-row"><div><div class="hl-name">पोलीस</div><div class="hl-num">100</div></div><button class="call-btn" onclick="call('100')">📞</button></div>
+    <div class="hl-row"><div><div class="hl-name">Emergency</div><div class="hl-num">112</div></div><button class="call-btn" onclick="call('112')">📞</button></div>
+    <div class="hl-row"><div><div class="hl-name">Ambulance</div><div class="hl-num">108</div></div><button class="call-btn" onclick="call('108')">📞</button></div>
+    <div class="hl-row"><div><div class="hl-name">KumbhConnect Email</div><div class="hl-num">kumbhmelaconnect@gmail.com</div></div><button class="call-btn" onclick="window.location.href='mailto:kumbhmelaconnect@gmail.com'" style="background:var(--sf)">📧</button></div>
+  </div>
+</div>
+
+</div><!-- end app-wrap -->
+
+<div class="botnav">
+  <a href="index.html" class="back-home">🏠 &nbsp;<span data-i18n="home_btn">मुखपृष्ठ — Home</span></a>
+</div>
+<div id="toast"></div>
+
+<script>
+const I18N={
+  mr:{page_title:'🔍 हरवले & सापडले',hero_title:'🔍 हरवले & सापडले',hero_desc:'कुंभमेळ्यात हरवलेल्या व्यक्ती / वस्तू नोंदवा. तात्काळ मदतीसाठी SOS वापरा.',hero_notice:'⚠️ KumbhConnect केवळ माहिती शेअर करण्याची सुविधा देतो. वस्तू / व्यक्ती मिळण्याची हमी नाही. आपत्कालीन परिस्थितीत 100 / 112 कॉल करा.',tab_lost:'🚨 हरवले',tab_found:'✅ सापडले',tab_search:'🔍 शोधा',hl_title:'🆘 तात्काळ Emergency संपर्क',hl_police:'पोलीस Control Room',hl_emergency:'Emergency',hl_nashik:'नाशिक PCR',lost_form_title:'📋 हरवलेली वस्तू / व्यक्ती नोंदवा',lt_person:'व्यक्ती',lt_item:'वस्तू',f_reporter:'तुमचे नाव',f_mobile:'मोबाईल',f_what:'हरवलेल्याचे नाव / वस्तू',f_desc:'वर्णन / Description',f_loc:'ठिकाण',f_date:'तारीख / वेळ',f_photo:'📷 फोटो (ऐच्छिक)',photo_tap:'फोटो निवडण्यासाठी दाबा',btn_lost:'Email द्वारे पाठवा — Report करा',success_title:'तक्रार नोंदवली!',success_msg:'KumbhConnect Guide आणि पोलीस यांना माहिती पाठवली गेली.',found_form_title:'✅ सापडलेली वस्तू / व्यक्ती नोंदवा',f_finder:'तुमचे नाव',f_found_what:'काय सापडले',f_found_loc:'सापडलेले ठिकाण',btn_found:'Email द्वारे पाठवा — Report Found',found_success:'माहिती नोंदवली!',found_success_msg:'तुमची माहिती पाठवली गेली. मालक शोधण्यास मदत होईल.',search_info_title:'Search Feature',search_info_desc:'नोंदवलेल्या Lost & Found items आमच्या Guide Email वर उपलब्ध आहेत.',search_btn:'Email वर Search करा 📧',btn_again:'नवीन अर्ज',home_btn:'मुखपृष्ठ — Home'},
+  hi:{page_title:'🔍 खोया & पाया',hero_title:'🔍 खोया & पाया',hero_desc:'कुंभमेले में खोई हुई व्यक्ति / वस्तु दर्ज करें।',hero_notice:'⚠️ KumbhConnect केवल जानकारी साझा करने की सुविधा देता है। आपातकाल में 100 / 112 कॉल करें।',tab_lost:'🚨 खोया',tab_found:'✅ मिला',tab_search:'🔍 खोजें',hl_title:'🆘 आपातकालीन संपर्क',hl_police:'पुलिस Control Room',hl_emergency:'आपातकाल',hl_nashik:'नाशिक PCR',lost_form_title:'📋 खोई वस्तु / व्यक्ति दर्ज करें',lt_person:'व्यक्ति',lt_item:'वस्तु',f_reporter:'आपका नाम',f_mobile:'मोबाइल',f_what:'खोई वस्तु / व्यक्ति का नाम',f_desc:'विवरण',f_loc:'स्थान',f_date:'तारीख / समय',f_photo:'📷 फोटो (वैकल्पिक)',photo_tap:'फोटो चुनने के लिए दबाएं',btn_lost:'Email से भेजें',success_title:'दर्ज किया गया!',success_msg:'KumbhConnect Guide और पुलिस को जानकारी भेज दी गई।',found_form_title:'✅ मिली वस्तु / व्यक्ति दर्ज करें',f_finder:'आपका नाम',f_found_what:'क्या मिला',f_found_loc:'मिलने का स्थान',btn_found:'Email से भेजें',found_success:'जानकारी दर्ज की!',found_success_msg:'आपकी जानकारी भेज दी गई।',search_info_title:'Search Feature',search_info_desc:'दर्ज Lost & Found items हमारे Guide Email पर उपलब्ध हैं।',search_btn:'Email पर Search करें 📧',btn_again:'नया आवेदन',home_btn:'होम पेज — Home'},
+  en:{page_title:'🔍 Lost & Found',hero_title:'🔍 Lost & Found',hero_desc:'Report lost persons / items at Kumbh Mela. Use SOS for immediate help.',hero_notice:'⚠️ KumbhConnect only facilitates information sharing. Recovery not guaranteed. Call 100 / 112 in emergency.',tab_lost:'🚨 Report Lost',tab_found:'✅ Report Found',tab_search:'🔍 Search',hl_title:'🆘 Emergency Contacts',hl_police:'Police Control Room',hl_emergency:'Emergency',hl_nashik:'Nashik PCR',lost_form_title:'📋 Report Lost Person / Item',lt_person:'Person',lt_item:'Item',f_reporter:'Your Name',f_mobile:'Mobile',f_what:'Lost Person / Item Name',f_desc:'Description',f_loc:'Location',f_date:'Date / Time',f_photo:'📷 Photo (Optional)',photo_tap:'Tap to select photo',btn_lost:'Send via Email — Report',success_title:'Reported!',success_msg:'Information sent to KumbhConnect Guide and Police.',found_form_title:'✅ Report Found Person / Item',f_finder:'Your Name',f_found_what:'What did you find',f_found_loc:'Where found',btn_found:'Send via Email — Report Found',found_success:'Reported!',found_success_msg:'Your information has been submitted.',search_info_title:'Search Feature',search_info_desc:'Registered Lost & Found items are available on our Guide Email.',search_btn:'Search via Email 📧',btn_again:'New Report',home_btn:'Home Page'}
+};
+
+let _lang=localStorage.getItem('kc_lang')||'mr';
+let _lostType='person';
+
+function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]!==undefined)n.textContent=T[k];})}
+function switchTab(tab,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('panel-'+tab).classList.add('on');}
+function setLostType(type,el){_lostType=type;document.querySelectorAll('#lost-form .type-sel div').forEach(d=>d.style.borderColor='var(--br)');el.style.borderColor='var(--sf)';const lt_person_el=document.getElementById('lt-person');const lt_item_el=document.getElementById('lt-item');[lt_person_el,lt_item_el].forEach(e=>e&&(e.style.borderColor='var(--br)',e.style.background='var(--cd)'));if(el){el.style.borderColor='var(--sf)';el.style.background='var(--cs)';}}
+function previewPhoto(input,previewId){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=document.getElementById(previewId);if(img){img.src=e.target.result;img.style.display='block';}};r.readAsDataURL(f);}
+function call(n){window.location.href='tel:'+n;}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function submitLost(){
+  const reporter=document.getElementById('l-reporter').value.trim();
+  const mobile=document.getElementById('l-mobile').value.trim();
+  const what=document.getElementById('l-what').value.trim();
+  const loc=document.getElementById('l-loc').value.trim();
+  if(!reporter){toast('कृपया नाव भरा');return;}
+  if(!mobile){toast('कृपया मोबाईल नंबर भरा');return;}
+  if(!what){toast('कृपया हरवलेल्याची माहिती भरा');return;}
+  if(!loc){toast('कृपया ठिकाण भरा');return;}
+  const desc=document.getElementById('l-desc').value.trim();
+  const date=document.getElementById('l-date').value;
+  const typeLabel=_lostType==='person'?'हरवलेली व्यक्ती':'हरवलेली वस्तू';
+  const body=`प्रकार: ${typeLabel}\nनोंदवणारे: ${reporter}\nMobile: ${mobile}\nहरवले: ${what}\nवर्णन: ${desc||'–'}\nठिकाण: ${loc}\nवेळ: ${date||new Date().toLocaleString('mr-IN')}\n\n— KumbhConnect Lost & Found`;
+  window.location.href='mailto:kumbhmelaconnect@gmail.com?subject='+encodeURIComponent('Lost Report — '+what)+'&body='+encodeURIComponent(body);
+  document.getElementById('lost-form').style.display='none';
+  document.getElementById('lost-success').classList.add('show');
+}
+function submitFound(){
+  const name=document.getElementById('fd-name').value.trim();
+  const mobile=document.getElementById('fd-mobile').value.trim();
+  const what=document.getElementById('fd-what').value.trim();
+  const loc=document.getElementById('fd-loc').value.trim();
+  if(!name){toast('कृपया नाव भरा');return;}
+  if(!mobile){toast('कृपया मोबाईल नंबर भरा');return;}
+  if(!what){toast('काय सापडले ते सांगा');return;}
+  if(!loc){toast('कृपया ठिकाण भरा');return;}
+  const desc=document.getElementById('fd-desc').value.trim();
+  const date=document.getElementById('fd-date').value;
+  const body=`मिळवणारे: ${name}\nMobile: ${mobile}\nकाय सापडले: ${what}\nवर्णन: ${desc||'–'}\nठिकाण: ${loc}\nवेळ: ${date||new Date().toLocaleString('mr-IN')}\n\n— KumbhConnect Lost & Found`;
+  window.location.href='mailto:kumbhmelaconnect@gmail.com?subject='+encodeURIComponent('Found Report — '+what)+'&body='+encodeURIComponent(body);
+  document.getElementById('found-form').style.display='none';
+  document.getElementById('found-success').classList.add('show');
+}
+function resetLost(){document.getElementById('lost-form').style.display='block';document.getElementById('lost-success').classList.remove('show');['l-reporter','l-mobile','l-what','l-desc','l-loc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const prev=document.getElementById('l-preview');if(prev){prev.src='';prev.style.display='none';}}
+function resetFound(){document.getElementById('found-form').style.display='block';document.getElementById('found-success').classList.remove('show');['fd-name','fd-mobile','fd-what','fd-desc','fd-loc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const prev=document.getElementById('fd-preview');if(prev){prev.src='';prev.style.display='none';}}
+function searchWA(){window.location.href='mailto:kumbhmelaconnect@gmail.com?subject='+encodeURIComponent('Lost & Found Search Request')+'&body='+encodeURIComponent('नमस्कार! मला KumbhConnect Lost & Found मध्ये शोध घ्यायचा आहे.');}
+function searchLF(q){}
+
+document.addEventListener('DOMContentLoaded',()=>{const saved=localStorage.getItem('kc_lang')||'mr';setLang(saved,document.getElementById('lbtn-'+saved));const now=new Date();const fmt=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'T'+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');document.getElementById('l-date').value=fmt;document.getElementById('fd-date').value=fmt;});
+</script>
+</body>
+</html>

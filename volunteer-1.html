@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Volunteer — KumbhConnect</title>
+<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
+.app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:88px}
+@media(min-width:700px){body{background:#EDE5D8}}
+
+.topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
+.topbar-title{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:var(--sf)}
+.lbtn{padding:4px 10px;border-radius:6px;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);font-size:.68rem;font-weight:700;cursor:pointer;font-family:var(--fn);transition:all .15s}
+.lbtn.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,#059669 0%,#065F46 100%);padding:26px 16px 30px;position:relative;overflow:hidden}
+.hero::before{content:'🙋';position:absolute;right:-8px;bottom:-10px;font-size:120px;opacity:.1}
+.hero-tag{display:inline-block;background:rgba(255,255,255,.2);color:#fff;font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:10px;letter-spacing:1px}
+.hero h1{font-family:'Khand',sans-serif;font-size:1.9rem;font-weight:700;color:#fff;line-height:1.15;margin-bottom:8px}
+.hero h1 span{color:var(--gd2)}
+.hero p{color:rgba(255,255,255,.85);font-size:.85rem;line-height:1.6;max-width:480px}
+.hero-stats{display:flex;gap:20px;margin-top:16px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-n{font-family:'Khand',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gd2)}
+.hstat-l{font-size:.6rem;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1px}
+
+/* RESPONSIBILITIES */
+.section{padding:20px 16px}
+.sec-hdr{font-family:'Khand',sans-serif;font-size:1.2rem;font-weight:700;color:var(--t1);margin-bottom:6px}
+.sec-hdr span{color:var(--sf)}
+.divider{width:48px;height:3px;background:linear-gradient(90deg,#059669,var(--gd2));border-radius:3px;margin:6px 0 14px}
+.resp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+@media(min-width:500px){.resp-grid{grid-template-columns:repeat(3,1fr)}}
+.resp-card{background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);padding:13px 10px;text-align:center}
+.resp-ic{font-size:24px;margin-bottom:7px}
+.resp-name{font-size:.78rem;font-weight:700;color:var(--t1);font-family:'Mukta',sans-serif;line-height:1.3}
+
+/* BENEFITS */
+.ben-list{display:flex;flex-direction:column;gap:9px}
+.ben-row{display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,#ECFDF5,#D1FAE5);border:1px solid #6EE7B7;border-radius:var(--r2);padding:11px 13px}
+.ben-ic{font-size:20px;flex-shrink:0}
+.ben-txt{font-size:.82rem;font-weight:700;color:#065F46;font-family:'Mukta',sans-serif}
+
+/* FORM */
+.form-card{background:var(--wh);border:1.5px solid var(--br);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.fg{margin-bottom:13px}
+.fg label{font-size:.72rem;font-weight:700;color:var(--t2);display:block;margin-bottom:5px}
+.fg label .req{color:#B91C1C}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 12px;border:1.5px solid var(--br);border-radius:var(--r2);font-family:var(--fn);font-size:.85rem;background:var(--cs);color:var(--t1);outline:none;transition:border .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#059669;background:var(--wh)}
+.fg textarea{resize:vertical;min-height:80px}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.fg-row{grid-template-columns:1fr}}
+
+/* SKILLS CHECKBOXES */
+.skills-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.skill-chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--br);background:var(--cs);font-size:.72rem;font-weight:600;cursor:pointer;color:var(--t2);font-family:var(--fn);transition:all .2s;user-select:none}
+.skill-chip.sel{background:#059669;border-color:#059669;color:#fff}
+
+/* LANGUAGES */
+.lang-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.lang-chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--br);background:var(--cs);font-size:.72rem;font-weight:600;cursor:pointer;color:var(--t2);font-family:var(--fn);transition:all .2s;user-select:none}
+.lang-chip.sel{background:#059669;border-color:#059669;color:#fff}
+
+.btn-submit{width:100%;padding:13px;border:none;border-radius:var(--r);background:linear-gradient(90deg,#059669,#065F46);color:#fff;font-family:'Khand',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(5,150,105,.3);transition:all .2s}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
+.btn-wa{width:100%;padding:12px;border:none;border-radius:var(--r);background:#25D366;color:#fff;font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* SUCCESS */
+.success-box{display:none;text-align:center;padding:28px 16px;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:2px solid #15803D;border-radius:var(--r);margin-top:14px}
+.success-box.show{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+
+/* COUNTER */
+.vol-counter{background:linear-gradient(90deg,#059669,#065F46);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.vc-txt{color:#fff;font-size:.82rem}
+.vc-num{font-family:'Khand',sans-serif;font-size:1.4rem;font-weight:700;color:var(--gd2)}
+
+.botnav{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1px solid var(--br);display:flex;justify-content:center;align-items:center;padding:8px 16px 12px;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+.back-home{display:flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border:none;border-radius:var(--r);font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A0800;color:#fff;padding:9px 18px;border-radius:var(--r2);font-size:.8rem;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app-wrap">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="back-btn">←</a>
+  <div style="flex:1">
+    <div class="topbar-title" data-i18n="page_title">🙋 Volunteer नोंदणी</div>
+    <div style="font-size:.6rem;color:var(--t3);letter-spacing:1px;text-transform:uppercase">KumbhConnect Volunteer</div>
+  </div>
+  <div style="display:flex;gap:4px">
+    <button class="lbtn on" id="lbtn-mr" onclick="setLang('mr',this)">म</button>
+    <button class="lbtn" id="lbtn-hi" onclick="setLang('hi',this)">हि</button>
+    <button class="lbtn" id="lbtn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+</div>
+
+<!-- VOLUNTEER COUNTER -->
+<div class="vol-counter">
+  <div><div class="vc-txt" data-i18n="vc_txt">Registered Volunteers</div><div style="font-size:.65rem;color:rgba(255,255,255,.7)" data-i18n="vc_sub">कुंभमेळा २०२७</div></div>
+  <div class="vc-num">247+</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag" data-i18n="hero_tag">🌟 Volunteer बना — सेवा करा</div>
+  <h1 data-i18n="hero_title">कुंभ <span>Volunteer</span> व्हा</h1>
+  <p data-i18n="hero_desc">नाशिक–त्र्यंबकेश्वर कुंभमेळ्यात लाखो यात्रेकरूंसाठी सेवा करण्याची अद्वितीय संधी. एकत्र येऊ, सेवा करू!</p>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-n">मोफत</div><div class="hstat-l" data-i18n="stat_free">Registration</div></div>
+    <div class="hstat"><div class="hstat-n">🏅</div><div class="hstat-l" data-i18n="stat_cert">Certificate</div></div>
+    <div class="hstat"><div class="hstat-n">2027</div><div class="hstat-l" data-i18n="stat_kumbh">Kumbh Mela</div></div>
+  </div>
+</div>
+
+<!-- RESPONSIBILITIES -->
+<div class="section">
+  <div class="sec-hdr" data-i18n="resp_title">📋 Volunteer <span>जबाबदाऱ्या</span></div>
+  <div class="divider"></div>
+  <div class="resp-grid">
+    <div class="resp-card"><div class="resp-ic">🙏</div><div class="resp-name" data-i18n="r1">यात्रेकरूंना मदत</div></div>
+    <div class="resp-card"><div class="resp-ic">ℹ️</div><div class="resp-name" data-i18n="r2">माहिती सहाय्य</div></div>
+    <div class="resp-card"><div class="resp-ic">🆘</div><div class="resp-name" data-i18n="r3">आपत्काळी मार्गदर्शन</div></div>
+    <div class="resp-card"><div class="resp-ic">👥</div><div class="resp-name" data-i18n="r4">गर्दी नियंत्रण सहाय्य</div></div>
+    <div class="resp-card"><div class="resp-ic">🗺️</div><div class="resp-name" data-i18n="r5">मार्ग मार्गदर्शन</div></div>
+    <div class="resp-card"><div class="resp-ic">📸</div><div class="resp-name" data-i18n="r6">Digital Documentation</div></div>
+  </div>
+</div>
+
+<!-- BENEFITS -->
+<div class="section" style="padding-top:0">
+  <div class="sec-hdr" data-i18n="ben_title">🌟 <span>फायदे</span> — Benefits</div>
+  <div class="divider"></div>
+  <div class="ben-list">
+    <div class="ben-row"><div class="ben-ic">🏅</div><div class="ben-txt" data-i18n="b1">Digital Volunteer Recognition — Platform वर मान्यता</div></div>
+    <div class="ben-row"><div class="ben-ic">📜</div><div class="ben-txt" data-i18n="b2">Experience Certificate (लागू असल्यास)</div></div>
+    <div class="ben-row"><div class="ben-ic">🤝</div><div class="ben-txt" data-i18n="b3">Community Network & Networking</div></div>
+    <div class="ben-row"><div class="ben-ic">🕉️</div><div class="ben-txt" data-i18n="b4">कुंभमेळ्यात सेवेचे पुण्य</div></div>
+    <div class="ben-row"><div class="ben-ic">💼</div><div class="ben-txt" data-i18n="b5">Resume साठी Community Service अनुभव</div></div>
+  </div>
+</div>
+
+<!-- REGISTRATION FORM -->
+<div class="section" style="padding-top:0">
+  <div class="sec-hdr" data-i18n="form_title">📋 <span>नोंदणी</span> करा</div>
+  <div class="divider"></div>
+
+  <div class="form-card" id="vol-form">
+    <div class="fg-row">
+      <div class="fg">
+        <label data-i18n="f_name">पूर्ण नाव <span class="req">*</span></label>
+        <input type="text" id="v-name" placeholder="तुमचे पूर्ण नाव"/>
+      </div>
+      <div class="fg">
+        <label data-i18n="f_mobile">मोबाईल <span class="req">*</span></label>
+        <input type="tel" id="v-mobile" placeholder="+91 00000 00000"/>
+      </div>
+    </div>
+    <div class="fg-row">
+      <div class="fg">
+        <label data-i18n="f_email">ईमेल</label>
+        <input type="email" id="v-email" placeholder="your@email.com"/>
+      </div>
+      <div class="fg">
+        <label data-i18n="f_age">वय <span class="req">*</span></label>
+        <input type="number" id="v-age" placeholder="18" min="15" max="80"/>
+      </div>
+    </div>
+    <div class="fg-row">
+      <div class="fg">
+        <label data-i18n="f_city">शहर <span class="req">*</span></label>
+        <input type="text" id="v-city" placeholder="तुमचे शहर"/>
+      </div>
+      <div class="fg">
+        <label data-i18n="f_avail">उपलब्धता</label>
+        <select id="v-avail">
+          <option value="">-- निवडा --</option>
+          <option value="Full Time">Full Time</option>
+          <option value="Part Time">Part Time</option>
+          <option value="Weekends">Weekends Only</option>
+          <option value="Specific Dates">Specific Dates</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label data-i18n="f_langs">ज्ञात भाषा <span class="req">*</span></label>
+      <div class="lang-grid" id="langs-grid">
+        <div class="lang-chip sel" onclick="toggleChip(this)">मराठी</div>
+        <div class="lang-chip" onclick="toggleChip(this)">हिंदी</div>
+        <div class="lang-chip" onclick="toggleChip(this)">English</div>
+        <div class="lang-chip" onclick="toggleChip(this)">गुजराती</div>
+        <div class="lang-chip" onclick="toggleChip(this)">बंगाली</div>
+        <div class="lang-chip" onclick="toggleChip(this)">तेलुगू</div>
+        <div class="lang-chip" onclick="toggleChip(this)">तमिळ</div>
+        <div class="lang-chip" onclick="toggleChip(this)">इतर</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label data-i18n="f_skills">Skills / कौशल्ये <span class="req">*</span></label>
+      <div class="skills-grid" id="skills-grid">
+        <div class="skill-chip" onclick="toggleChip(this)">First Aid</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Navigation</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Photography</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Driving</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Medical</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Teaching</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Tech/IT</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Cooking</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Crowd Mgmt</div>
+        <div class="skill-chip" onclick="toggleChip(this)">Translation</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label data-i18n="f_msg">अतिरिक्त माहिती / Message</label>
+      <textarea id="v-msg" placeholder="तुमचा अनुभव, विशेष कौशल्ये किंवा अपेक्षा..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="submitVol()">
+      <span>🙋</span> <span data-i18n="btn_submit">Volunteer म्हणून नोंदणी करा</span>
+    </button>
+  </div>
+
+  <div class="success-box" id="vol-success">
+    <div style="font-size:56px;margin-bottom:12px">🎉</div>
+    <div style="font-family:'Khand',sans-serif;font-size:1.4rem;font-weight:700;color:#15803D;margin-bottom:8px" data-i18n="success_title">नोंदणी यशस्वी!</div>
+    <div style="font-size:.82rem;color:#065F46;line-height:1.6;margin-bottom:8px" data-i18n="success_msg">KumbhConnect Volunteer Team मध्ये आपले स्वागत आहे! आम्ही लवकरच संपर्क करू.</div>
+    <div style="font-size:.75rem;color:#065F46;font-weight:600" data-i18n="success_sub">🕉️ सेवा हीच पूजा — Service is Devotion</div>
+    <button onclick="resetVol()" style="margin-top:14px;padding:9px 20px;border:1.5px solid #15803D;border-radius:var(--r2);background:transparent;color:#15803D;font-family:var(--fn);font-size:.82rem;cursor:pointer" data-i18n="btn_again">नवीन नोंदणी</button>
+  </div>
+</div>
+
+</div>
+
+<div class="botnav">
+  <a href="index.html" class="back-home">🏠 &nbsp;<span data-i18n="home_btn">मुखपृष्ठ — Home</span></a>
+</div>
+<div id="toast"></div>
+
+<script>
+const I18N={
+  mr:{page_title:'🙋 Volunteer नोंदणी',hero_tag:'🌟 Volunteer बना — सेवा करा',hero_title:'कुंभ Volunteer व्हा',hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेळ्यात लाखो यात्रेकरूंसाठी सेवा करण्याची अद्वितीय संधी.',vc_txt:'Registered Volunteers',vc_sub:'कुंभमेळा २०२७',stat_free:'मोफत नोंदणी',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer जबाबदाऱ्या',r1:'यात्रेकरूंना मदत',r2:'माहिती सहाय्य',r3:'आपत्काळी मार्गदर्शन',r4:'गर्दी नियंत्रण सहाय्य',r5:'मार्ग मार्गदर्शन',r6:'Digital Documentation',ben_title:'🌟 फायदे',b1:'Digital Volunteer Recognition — Platform वर मान्यता',b2:'Experience Certificate (लागू असल्यास)',b3:'Community Network & Networking',b4:'कुंभमेळ्यात सेवेचे पुण्य',b5:'Resume साठी Community Service अनुभव',form_title:'📋 नोंदणी करा',f_name:'पूर्ण नाव',f_mobile:'मोबाईल',f_email:'ईमेल',f_age:'वय',f_city:'शहर',f_avail:'उपलब्धता',f_langs:'ज्ञात भाषा',f_skills:'Skills / कौशल्ये',f_msg:'अतिरिक्त माहिती',btn_submit:'Volunteer म्हणून नोंदणी करा',success_title:'नोंदणी यशस्वी!',success_msg:'KumbhConnect Volunteer Team मध्ये आपले स्वागत आहे!',success_sub:'🕉️ सेवा हीच पूजा — Service is Devotion',btn_again:'नवीन नोंदणी',home_btn:'मुखपृष्ठ — Home'},
+  hi:{page_title:'🙋 Volunteer पंजीकरण',hero_tag:'🌟 Volunteer बनें — सेवा करें',hero_title:'कुंभ Volunteer बनें',hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेले में लाखों तीर्थयात्रियों की सेवा का अनूठा अवसर।',vc_txt:'Registered Volunteers',vc_sub:'कुंभमेला २०२७',stat_free:'मुफ्त पंजीकरण',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer जिम्मेदारियां',r1:'तीर्थयात्रियों की मदद',r2:'जानकारी सहायता',r3:'आपातकालीन मार्गदर्शन',r4:'भीड़ नियंत्रण सहायता',r5:'मार्ग मार्गदर्शन',r6:'Digital Documentation',ben_title:'🌟 फायदे',b1:'Digital Volunteer Recognition — Platform पर मान्यता',b2:'Experience Certificate (लागू होने पर)',b3:'Community Network & Networking',b4:'कुंभमेले में सेवा का पुण्य',b5:'Resume के लिए Community Service अनुभव',form_title:'📋 पंजीकरण करें',f_name:'पूरा नाम',f_mobile:'मोबाइल',f_email:'ईमेल',f_age:'आयु',f_city:'शहर',f_avail:'उपलब्धता',f_langs:'ज्ञात भाषाएं',f_skills:'Skills / कौशल',f_msg:'अतिरिक्त जानकारी',btn_submit:'Volunteer के रूप में पंजीकरण करें',success_title:'पंजीकरण सफल!',success_msg:'KumbhConnect Volunteer Team में आपका स्वागत है!',success_sub:'🕉️ सेवा ही पूजा है',btn_again:'नया पंजीकरण',home_btn:'होम पेज — Home'},
+  en:{page_title:'🙋 Volunteer Registration',hero_tag:'🌟 Become a Volunteer — Serve',hero_title:'Become a Kumbh Volunteer',hero_desc:'A unique opportunity to serve millions of pilgrims at Nashik–Trimbakeshwar Kumbh Mela 2027.',vc_txt:'Registered Volunteers',vc_sub:'Kumbh Mela 2027',stat_free:'Free Registration',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer Responsibilities',r1:'Help Pilgrims',r2:'Information Assistance',r3:'Emergency Guidance',r4:'Crowd Support',r5:'Route Guidance',r6:'Digital Documentation',ben_title:'🌟 Benefits',b1:'Digital Volunteer Recognition on Platform',b2:'Experience Certificate (if applicable)',b3:'Community Network & Networking',b4:'Spiritual merit of service at Kumbh',b5:'Community Service experience for resume',form_title:'📋 Register Now',f_name:'Full Name',f_mobile:'Mobile',f_email:'Email',f_age:'Age',f_city:'City',f_avail:'Availability',f_langs:'Languages Known',f_skills:'Skills',f_msg:'Additional Information',btn_submit:'Register as Volunteer',success_title:'Registration Successful!',success_msg:'Welcome to KumbhConnect Volunteer Team!',success_sub:'🕉️ Service is Devotion',btn_again:'New Registration',home_btn:'Home Page'}
+};
+
+let _lang=localStorage.getItem('kc_lang')||'mr';
+function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]!==undefined)n.textContent=T[k];});}
+function toggleChip(el){el.classList.toggle('sel');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function getSelected(gridId){return Array.from(document.querySelectorAll('#'+gridId+' .sel')).map(e=>e.textContent).join(', ');}
+function submitVol(){
+  const name=document.getElementById('v-name').value.trim();
+  const mobile=document.getElementById('v-mobile').value.trim();
+  const age=document.getElementById('v-age').value.trim();
+  const city=document.getElementById('v-city').value.trim();
+  if(!name){toast('कृपया नाव भरा');return;}
+  if(!mobile){toast('कृपया मोबाईल नंबर भरा');return;}
+  if(!age){toast('कृपया वय भरा');return;}
+  const email=document.getElementById('v-email').value.trim();
+  const avail=document.getElementById('v-avail').value;
+  const langs=getSelected('langs-grid');
+  const skills=getSelected('skills-grid');
+  const msg2=document.getElementById('v-msg').value.trim();
+  const body=`नाव / Name: ${name}\nMobile: ${mobile}\nEmail: ${email||'–'}\nAge: ${age}\nCity: ${city||'–'}\nAvailability: ${avail||'–'}\nLanguages: ${langs||'–'}\nSkills: ${skills||'–'}\nMessage: ${msg2||'–'}\n\nDate: ${new Date().toLocaleString('mr-IN')}\n— KumbhConnect Volunteer Program`;
+  window.location.href='mailto:kumbhmelaconnect@gmail.com?subject='+encodeURIComponent('KumbhConnect Volunteer Registration — '+name)+'&body='+encodeURIComponent(body);
+  document.getElementById('vol-form').style.display='none';
+  document.getElementById('vol-success').classList.add('show');
+}
+function resetVol(){document.getElementById('vol-form').style.display='block';document.getElementById('vol-success').classList.remove('show');['v-name','v-mobile','v-email','v-age','v-city','v-msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('v-avail').selectedIndex=0;document.querySelectorAll('.lang-chip,.skill-chip').forEach(c=>c.classList.remove('sel'));document.querySelector('.lang-chip').classList.add('sel');}
+
+document.addEventListener('DOMContentLoaded',()=>{const saved=localStorage.getItem('kc_lang')||'mr';setLang(saved,document.getElementById('lbtn-'+saved));});
+</script>
+</body>
+</html>
