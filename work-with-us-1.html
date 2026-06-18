@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Work With Us — KumbhConnect</title>
+<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;
+  --gd:#C9920A;--gd2:#F0B429;
+  --cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;
+  --br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;
+  --wh:#FFFFFF;--gn:#15803D;
+  --r:14px;--r2:10px;
+  --fn:'Poppins','Mukta','Khand',sans-serif;
+  --sh:0 2px 12px rgba(200,65,10,.10);
+  --sh2:0 6px 24px rgba(123,22,22,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
+.topbar-title{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:var(--sf)}
+.topbar-sub{font-size:.6rem;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+
+/* ── LANG BAR ── */
+.lang-bar{background:var(--cs);border-bottom:1px solid var(--br);padding:7px 16px;display:flex;align-items:center;gap:6px}
+.lang-bar span{font-size:.68rem;color:var(--t3);margin-right:4px}
+.lbtn{padding:4px 10px;border-radius:6px;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);font-size:.68rem;font-weight:700;cursor:pointer;font-family:var(--fn);transition:all .15s}
+.lbtn.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(150deg,var(--sf) 0%,var(--mr) 100%);padding:28px 16px 32px;position:relative;overflow:hidden}
+.hero::before{content:'🙏';position:absolute;right:-10px;top:-10px;font-size:120px;opacity:.08}
+.hero-tag{display:inline-block;background:rgba(255,255,255,.2);color:#fff;font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:10px;letter-spacing:1px}
+.hero h1{font-family:'Khand',sans-serif;font-size:2rem;font-weight:700;color:#fff;line-height:1.15;margin-bottom:8px}
+.hero h1 span{color:var(--gd2)}
+.hero p{color:rgba(255,255,255,.85);font-size:.88rem;line-height:1.6;max-width:500px}
+.hero-stats{display:flex;gap:16px;margin-top:18px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-n{font-family:'Khand',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gd2)}
+.hstat-l{font-size:.62rem;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1px}
+
+/* ── SECTIONS ── */
+.section{padding:22px 16px}
+.sec-hdr{font-family:'Khand',sans-serif;font-size:1.25rem;font-weight:700;color:var(--t1);margin-bottom:6px}
+.sec-hdr span{color:var(--sf)}
+.sec-sub{font-size:.8rem;color:var(--t3);margin-bottom:16px}
+.divider{width:48px;height:3px;background:linear-gradient(90deg,var(--sf),var(--gd2));border-radius:3px;margin:6px 0 16px}
+
+/* ── ROLES GRID ── */
+.roles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){.roles-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.roles-grid{grid-template-columns:repeat(4,1fr)}}
+.role-card{background:var(--cd);border:1.5px solid var(--br);border-radius:var(--r);padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.role-card:hover,.role-card.sel{border-color:var(--sf);background:var(--cs);transform:translateY(-2px);box-shadow:var(--sh2)}
+.role-card.sel::after{content:'✓';position:absolute;top:6px;right:8px;font-size:.7rem;font-weight:700;color:var(--sf)}
+.role-ic{font-size:26px;margin-bottom:8px}
+.role-name{font-family:'Khand',sans-serif;font-size:.9rem;font-weight:700;color:var(--t1)}
+.role-desc{font-size:.62rem;color:var(--t3);margin-top:3px;line-height:1.4}
+
+/* ── BENEFITS ── */
+.benefits-list{display:flex;flex-direction:column;gap:10px}
+.ben-item{display:flex;align-items:flex-start;gap:12px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);padding:12px}
+.ben-ic{font-size:22px;flex-shrink:0}
+.ben-title{font-size:.85rem;font-weight:700;color:var(--t1);font-family:'Mukta',sans-serif}
+.ben-desc{font-size:.72rem;color:var(--t3);margin-top:2px;line-height:1.4}
+
+/* ── FORM ── */
+.form-card{background:var(--wh);border:1.5px solid var(--br);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+.fg{margin-bottom:14px}
+.fg label{font-size:.72rem;font-weight:700;color:var(--t2);display:block;margin-bottom:5px}
+.fg label span{color:#B91C1C}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 12px;border:1.5px solid var(--br);border-radius:var(--r2);font-family:var(--fn);font-size:.88rem;background:var(--cs);color:var(--t1);outline:none;transition:border .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sf);background:var(--wh);box-shadow:0 0 0 3px rgba(200,65,10,.08)}
+.fg textarea{resize:vertical;min-height:90px}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.fg-row{grid-template-columns:1fr}}
+.btn-submit{width:100%;padding:13px;border:none;border-radius:var(--r);background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;font-family:'Khand',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 16px rgba(200,65,10,.3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{opacity:.92;transform:translateY(-1px)}
+.btn-wa{width:100%;padding:12px;border:none;border-radius:var(--r);background:#25D366;color:#fff;font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+
+/* ── SUCCESS ── */
+.success-box{display:none;text-align:center;padding:22px;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:2px solid #15803D;border-radius:var(--r)}
+.success-box.show{display:block}
+.success-ic{font-size:52px;margin-bottom:12px}
+
+/* ── CONTACT INFO ── */
+.contact-box{background:linear-gradient(135deg,var(--cd),var(--cs));border:1.5px solid var(--gd2);border-radius:var(--r);padding:16px;margin-top:14px}
+.cinfo-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)}
+.cinfo-row:last-child{border:none}
+.cinfo-ic{font-size:18px;flex-shrink:0}
+.cinfo-label{font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.cinfo-val{font-size:.82rem;font-weight:700;color:var(--t1)}
+.cinfo-val a{color:var(--sf);text-decoration:none}
+
+/* ── BOTTOM NAV ── */
+.botnav{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1px solid var(--br);display:flex;justify-content:center;align-items:center;padding:8px 16px 12px;gap:0;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+.back-home{display:flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border:none;border-radius:var(--r);font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A0800;color:#fff;padding:9px 18px;border-radius:var(--r2);font-size:.8rem;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── APP WRAPPER ── */
+.app-wrap{max-width:640px;margin:0 auto;min-height:100vh;background:var(--cr);padding-bottom:80px}
+@media(min-width:700px){body{background:#EDE5D8}}
+</style>
+</head>
+<body>
+<div class="app-wrap">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="back-btn">←</a>
+  <div>
+    <div class="topbar-title">🤝 Work With Us</div>
+    <div class="topbar-sub">KumbhConnect Team</div>
+  </div>
+  <div style="margin-left:auto">
+    <div style="display:flex;gap:4px">
+      <button class="lbtn on" id="lbtn-mr" onclick="setLang('mr',this)">म</button>
+      <button class="lbtn" id="lbtn-hi" onclick="setLang('hi',this)">हि</button>
+      <button class="lbtn" id="lbtn-en" onclick="setLang('en',this)">EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag" data-i18n="hero_tag">🌟 Join Our Mission</div>
+  <h1 data-i18n="hero_title">KumbhConnect सोबत <span data-i18n="hero_span">काम करा</span></h1>
+  <p data-i18n="hero_desc">नाशिक–त्र्यंबकेश्वर कुंभमेळ्यात लाखो यात्रेकरूंना मदत करण्यासाठी आमच्या टीममध्ये सामील व्हा.</p>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-n">50+</div><div class="hstat-l" data-i18n="stat_roles">Roles</div></div>
+    <div class="hstat"><div class="hstat-n">Free</div><div class="hstat-l" data-i18n="stat_join">Join</div></div>
+    <div class="hstat"><div class="hstat-n">2027</div><div class="hstat-l" data-i18n="stat_event">Kumbh</div></div>
+  </div>
+</div>
+
+<!-- OPPORTUNITIES -->
+<div class="section">
+  <div class="sec-hdr" data-i18n="opp_title">🎯 संधी निवडा <span data-i18n="opp_span">— Role Select करा</span></div>
+  <div class="divider"></div>
+  <div class="roles-grid" id="roles-grid">
+    <div class="role-card" onclick="selectRole(this,'volunteer')" data-role="volunteer">
+      <div class="role-ic">🙋</div>
+      <div class="role-name" data-i18n="role_vol">Volunteer</div>
+      <div class="role-desc" data-i18n="role_vol_d">यात्रेकरूंना मदत</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'guide')" data-role="guide">
+      <div class="role-ic">🧭</div>
+      <div class="role-name" data-i18n="role_guide">Local Guide</div>
+      <div class="role-desc" data-i18n="role_guide_d">क्षेत्र माहिती द्या</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'content')" data-role="content">
+      <div class="role-ic">✍️</div>
+      <div class="role-name" data-i18n="role_content">Content Writer</div>
+      <div class="role-desc" data-i18n="role_content_d">माहिती लिहा</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'photo')" data-role="photo">
+      <div class="role-ic">📸</div>
+      <div class="role-name" data-i18n="role_photo">Photographer</div>
+      <div class="role-desc" data-i18n="role_photo_d">फोटो / व्हिडिओ</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'medical')" data-role="medical">
+      <div class="role-ic">🏥</div>
+      <div class="role-name" data-i18n="role_medical">Medical Vol.</div>
+      <div class="role-desc" data-i18n="role_medical_d">वैद्यकीय सहाय्य</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'tourism')" data-role="tourism">
+      <div class="role-ic">🏨</div>
+      <div class="role-name" data-i18n="role_tourism">Tourism Partner</div>
+      <div class="role-desc" data-i18n="role_tourism_d">पर्यटन भागीदार</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'temple')" data-role="temple">
+      <div class="role-ic">🛕</div>
+      <div class="role-name" data-i18n="role_temple">Temple Info</div>
+      <div class="role-desc" data-i18n="role_temple_d">मंदिर माहिती</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'ngo')" data-role="ngo">
+      <div class="role-ic">🤲</div>
+      <div class="role-name" data-i18n="role_ngo">NGO Partner</div>
+      <div class="role-desc" data-i18n="role_ngo_d">सामाजिक कार्य</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'sponsor')" data-role="sponsor">
+      <div class="role-ic">💼</div>
+      <div class="role-name" data-i18n="role_sponsor">Sponsor</div>
+      <div class="role-desc" data-i18n="role_sponsor_d">प्रायोजकत्व</div>
+    </div>
+    <div class="role-card" onclick="selectRole(this,'business')" data-role="business">
+      <div class="role-ic">🏢</div>
+      <div class="role-name" data-i18n="role_biz">Business Listing</div>
+      <div class="role-desc" data-i18n="role_biz_d">व्यवसाय नोंदणी</div>
+    </div>
+  </div>
+</div>
+
+<!-- BENEFITS -->
+<div class="section" style="padding-top:0">
+  <div class="sec-hdr" data-i18n="ben_title">🌟 फायदे <span>— Benefits</span></div>
+  <div class="divider"></div>
+  <div class="benefits-list">
+    <div class="ben-item">
+      <div class="ben-ic">🏅</div>
+      <div><div class="ben-title" data-i18n="ben1">Digital Volunteer Recognition</div><div class="ben-desc" data-i18n="ben1d">KumbhConnect Platform वर नाव व प्रोफाइल</div></div>
+    </div>
+    <div class="ben-item">
+      <div class="ben-ic">📜</div>
+      <div><div class="ben-title" data-i18n="ben2">Experience Certificate</div><div class="ben-desc" data-i18n="ben2d">लागू असल्यास अनुभव प्रमाणपत्र</div></div>
+    </div>
+    <div class="ben-item">
+      <div class="ben-ic">🤝</div>
+      <div><div class="ben-title" data-i18n="ben3">Networking Opportunities</div><div class="ben-desc" data-i18n="ben3d">नाशिक–त्र्यंबकेश्वर Community Network</div></div>
+    </div>
+    <div class="ben-item">
+      <div class="ben-ic">🕉️</div>
+      <div><div class="ben-title" data-i18n="ben4">Cultural Contribution</div><div class="ben-desc" data-i18n="ben4d">कुंभमेळ्यात सांस्कृतिक सेवा</div></div>
+    </div>
+    <div class="ben-item">
+      <div class="ben-ic">💻</div>
+      <div><div class="ben-title" data-i18n="ben5">Community Service</div><div class="ben-desc" data-i18n="ben5d">लाखो यात्रेकरूंना डिजिटल मदत</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLICATION FORM -->
+<div class="section" style="padding-top:0">
+  <div class="sec-hdr" data-i18n="form_title">📋 अर्ज करा <span>— Apply Now</span></div>
+  <div class="divider"></div>
+
+  <div class="form-card" id="apply-form">
+    <div class="fg-row">
+      <div class="fg">
+        <label data-i18n="f_name">पूर्ण नाव <span>*</span></label>
+        <input type="text" id="f-name" placeholder="तुमचे पूर्ण नाव"/>
+      </div>
+      <div class="fg">
+        <label data-i18n="f_mobile">मोबाईल <span>*</span></label>
+        <input type="tel" id="f-mobile" placeholder="+91 00000 00000"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label data-i18n="f_email">ईमेल</label>
+      <input type="email" id="f-email" placeholder="your@email.com"/>
+    </div>
+    <div class="fg-row">
+      <div class="fg">
+        <label data-i18n="f_city">शहर <span>*</span></label>
+        <input type="text" id="f-city" placeholder="तुमचे शहर"/>
+      </div>
+      <div class="fg">
+        <label data-i18n="f_role">Role निवडा <span>*</span></label>
+        <select id="f-role">
+          <option value="">-- निवडा --</option>
+          <option value="Volunteer">Volunteer</option>
+          <option value="Local Guide">Local Guide</option>
+          <option value="Content Writer">Content Writer</option>
+          <option value="Photographer/Videographer">Photographer/Videographer</option>
+          <option value="Medical Volunteer">Medical Volunteer</option>
+          <option value="Tourism Partner">Tourism Partner</option>
+          <option value="Temple Info Contributor">Temple Info Contributor</option>
+          <option value="NGO Partner">NGO Partner</option>
+          <option value="Sponsor/Advertiser">Sponsor/Advertiser</option>
+          <option value="Business Listing">Business Listing</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label data-i18n="f_exp">अनुभव / Experience</label>
+      <input type="text" id="f-exp" placeholder="उदा. 2 वर्षे गाईड अनुभव..."/>
+    </div>
+    <div class="fg">
+      <label data-i18n="f_msg">संदेश / Message</label>
+      <textarea id="f-msg" placeholder="तुमची माहिती व अपेक्षा येथे लिहा..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="submitForm()">
+      <span>📤</span> <span data-i18n="btn_submit">अर्ज पाठवा — Apply Now</span>
+    </button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-box" id="success-box">
+    <div class="success-ic">✅</div>
+    <div style="font-family:'Khand',sans-serif;font-size:1.3rem;font-weight:700;color:#15803D;margin-bottom:8px" data-i18n="success_title">अर्ज यशस्वीरित्या पाठवला!</div>
+    <div style="font-size:.82rem;color:#065F46;line-height:1.6" data-i18n="success_msg">KumbhConnect टीम लवकरच तुमच्याशी संपर्क करेल. धन्यवाद!</div>
+    <button onclick="resetForm()" style="margin-top:14px;padding:9px 20px;border:1.5px solid #15803D;border-radius:var(--r2);background:transparent;color:#15803D;font-family:var(--fn);font-size:.82rem;cursor:pointer" data-i18n="btn_again">नवीन अर्ज करा</button>
+  </div>
+</div>
+
+<!-- CONTACT INFO -->
+<div class="section" style="padding-top:0;padding-bottom:28px">
+  <div class="sec-hdr" data-i18n="contact_title">📬 संपर्क माहिती</div>
+  <div class="divider"></div>
+  <div class="contact-box">
+    <div class="cinfo-row">
+      <div class="cinfo-ic">📧</div>
+      <div><div class="cinfo-label" data-i18n="c_email_l">Email</div><div class="cinfo-val"><a href="mailto:kumbhmelaconnect@gmail.com">kumbhmelaconnect@gmail.com</a></div></div>
+    </div>
+    <div class="cinfo-row">
+      <div class="cinfo-ic">👤</div>
+      <div><div class="cinfo-label" data-i18n="c_founder_l">Founder</div><div class="cinfo-val">Prasad Arvind Bhalekar</div></div>
+    </div>
+    <div class="cinfo-row">
+      <div class="cinfo-ic">🌐</div>
+      <div><div class="cinfo-label">Platform</div><div class="cinfo-val">KumbhConnect — Smart Pilgrimage Platform</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end app-wrap -->
+
+<!-- BOTTOM NAV -->
+<div class="botnav">
+  <a href="index.html" class="back-home">🏠 &nbsp;<span data-i18n="home_btn">मुखपृष्ठ — Home</span></a>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const I18N = {
+  mr:{
+    hero_tag:'🌟 आमच्या टीममध्ये सामील व्हा',
+    hero_title:'KumbhConnect सोबत ',hero_span:'काम करा',
+    hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेळ्यात लाखो यात्रेकरूंना मदत करण्यासाठी आमच्या टीममध्ये सामील व्हा.',
+    stat_roles:'Roles',stat_join:'मोफत',stat_event:'कुंभ २०२७',
+    opp_title:'🎯 संधी निवडा',opp_span:'— Role Select करा',
+    role_vol:'Volunteer',role_vol_d:'यात्रेकरूंना मदत',
+    role_guide:'Local Guide',role_guide_d:'क्षेत्र माहिती द्या',
+    role_content:'Content Writer',role_content_d:'माहिती लिहा',
+    role_photo:'Photographer',role_photo_d:'फोटो / व्हिडिओ',
+    role_medical:'Medical Vol.',role_medical_d:'वैद्यकीय सहाय्य',
+    role_tourism:'Tourism Partner',role_tourism_d:'पर्यटन भागीदार',
+    role_temple:'Temple Info',role_temple_d:'मंदिर माहिती',
+    role_ngo:'NGO Partner',role_ngo_d:'सामाजिक कार्य',
+    role_sponsor:'Sponsor',role_sponsor_d:'प्रायोजकत्व',
+    role_biz:'Business Listing',role_biz_d:'व्यवसाय नोंदणी',
+    ben_title:'🌟 फायदे',
+    ben1:'Digital Volunteer Recognition',ben1d:'KumbhConnect Platform वर नाव व प्रोफाइल',
+    ben2:'Experience Certificate',ben2d:'लागू असल्यास अनुभव प्रमाणपत्र',
+    ben3:'Networking Opportunities',ben3d:'नाशिक–त्र्यंबकेश्वर Community Network',
+    ben4:'Cultural Contribution',ben4d:'कुंभमेळ्यात सांस्कृतिक सेवा',
+    ben5:'Community Service',ben5d:'लाखो यात्रेकरूंना डिजिटल मदत',
+    form_title:'📋 अर्ज करा',
+    f_name:'पूर्ण नाव',f_mobile:'मोबाईल',f_email:'ईमेल',f_city:'शहर',
+    f_role:'Role निवडा',f_exp:'अनुभव',f_msg:'संदेश',
+    btn_submit:'अर्ज पाठवा — Apply Now',
+    success_title:'अर्ज यशस्वीरित्या पाठवला!',
+    success_msg:'KumbhConnect टीम लवकरच तुमच्याशी संपर्क करेल. धन्यवाद!',
+    btn_again:'नवीन अर्ज करा',
+    contact_title:'📬 संपर्क माहिती',
+    c_email_l:'Email',c_founder_l:'Founder',
+    home_btn:'मुखपृष्ठ — Home'
+  },
+  hi:{
+    hero_tag:'🌟 हमारी टीम से जुड़ें',
+    hero_title:'KumbhConnect के साथ ',hero_span:'काम करें',
+    hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेले में लाखों तीर्थयात्रियों की मदद करने के लिए हमारी टीम से जुड़ें।',
+    stat_roles:'Roles',stat_join:'मुफ़्त',stat_event:'कुंभ २०२७',
+    opp_title:'🎯 अवसर चुनें',opp_span:'— Role चुनें',
+    role_vol:'Volunteer',role_vol_d:'तीर्थयात्रियों की मदद',
+    role_guide:'Local Guide',role_guide_d:'क्षेत्र की जानकारी दें',
+    role_content:'Content Writer',role_content_d:'जानकारी लिखें',
+    role_photo:'Photographer',role_photo_d:'फोटो / वीडियो',
+    role_medical:'Medical Vol.',role_medical_d:'चिकित्सा सहायता',
+    role_tourism:'Tourism Partner',role_tourism_d:'पर्यटन भागीदार',
+    role_temple:'Temple Info',role_temple_d:'मंदिर जानकारी',
+    role_ngo:'NGO Partner',role_ngo_d:'सामाजिक कार्य',
+    role_sponsor:'Sponsor',role_sponsor_d:'प्रायोजन',
+    role_biz:'Business Listing',role_biz_d:'व्यापार पंजीकरण',
+    ben_title:'🌟 फायदे',
+    ben1:'Digital Volunteer Recognition',ben1d:'KumbhConnect Platform पर नाम व प्रोफाइल',
+    ben2:'Experience Certificate',ben2d:'लागू होने पर अनुभव प्रमाणपत्र',
+    ben3:'Networking Opportunities',ben3d:'नाशिक–त्र्यंबकेश्वर Community Network',
+    ben4:'Cultural Contribution',ben4d:'कुंभमेले में सांस्कृतिक सेवा',
+    ben5:'Community Service',ben5d:'लाखों यात्रियों को डिजिटल मदद',
+    form_title:'📋 आवेदन करें',
+    f_name:'पूरा नाम',f_mobile:'मोबाइल',f_email:'ईमेल',f_city:'शहर',
+    f_role:'Role चुनें',f_exp:'अनुभव',f_msg:'संदेश',
+    btn_submit:'आवेदन भेजें — Apply Now',
+    success_title:'आवेदन सफलतापूर्वक भेजा!',
+    success_msg:'KumbhConnect टीम जल्द ही आपसे संपर्क करेगी। धन्यवाद!',
+    btn_again:'नया आवेदन करें',
+    contact_title:'📬 संपर्क जानकारी',
+    c_email_l:'ईमेल',c_founder_l:'संस्थापक',
+    home_btn:'होम पेज — Home'
+  },
+  en:{
+    hero_tag:'🌟 Join Our Mission',
+    hero_title:'Work With ',hero_span:'KumbhConnect',
+    hero_desc:'Join our team to help millions of pilgrims visiting Nashik–Trimbakeshwar Kumbh Mela 2027.',
+    stat_roles:'Roles',stat_join:'Free',stat_event:'Kumbh 2027',
+    opp_title:'🎯 Choose Opportunity',opp_span:'— Select Your Role',
+    role_vol:'Volunteer',role_vol_d:'Help pilgrims',
+    role_guide:'Local Guide',role_guide_d:'Share local knowledge',
+    role_content:'Content Writer',role_content_d:'Write information',
+    role_photo:'Photographer',role_photo_d:'Photo / Video',
+    role_medical:'Medical Vol.',role_medical_d:'Medical assistance',
+    role_tourism:'Tourism Partner',role_tourism_d:'Tourism partnership',
+    role_temple:'Temple Info',role_temple_d:'Temple information',
+    role_ngo:'NGO Partner',role_ngo_d:'Social work',
+    role_sponsor:'Sponsor',role_sponsor_d:'Sponsorship',
+    role_biz:'Business Listing',role_biz_d:'Business registration',
+    ben_title:'🌟 Benefits',
+    ben1:'Digital Volunteer Recognition',ben1d:'Name & profile on KumbhConnect Platform',
+    ben2:'Experience Certificate',ben2d:'Certificate if applicable',
+    ben3:'Networking Opportunities',ben3d:'Nashik–Trimbakeshwar Community Network',
+    ben4:'Cultural Contribution',ben4d:'Cultural service at Kumbh Mela',
+    ben5:'Community Service',ben5d:'Digital help to millions of pilgrims',
+    form_title:'📋 Apply Now',
+    f_name:'Full Name',f_mobile:'Mobile',f_email:'Email',f_city:'City',
+    f_role:'Select Role',f_exp:'Experience',f_msg:'Message',
+    btn_submit:'Submit Application',
+    success_title:'Application Submitted!',
+    success_msg:'KumbhConnect team will contact you soon. Thank you!',
+    btn_again:'Apply Again',
+    contact_title:'📬 Contact Information',
+    c_email_l:'Email',c_founder_l:'Founder',
+    home_btn:'Home Page'
+  }
+};
+
+let _lang = localStorage.getItem('kc_lang') || 'mr';
+
+function setLang(lang, el) {
+  _lang = lang;
+  localStorage.setItem('kc_lang', lang);
+  document.querySelectorAll('.lbtn').forEach(b => b.classList.remove('on'));
+  if (el) el.classList.add('on');
+  else { const b = document.getElementById('lbtn-'+lang); if(b) b.classList.add('on'); }
+  const T = I18N[lang] || I18N.mr;
+  document.querySelectorAll('[data-i18n]').forEach(n => {
+    const k = n.getAttribute('data-i18n');
+    if (T[k] !== undefined) n.textContent = T[k];
+  });
+}
+
+function selectRole(el, role) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  const sel = document.getElementById('f-role');
+  if (sel) {
+    const opts = sel.options;
+    for (let i = 0; i < opts.length; i++) {
+      if (opts[i].value.toLowerCase().includes(role.toLowerCase())) {
+        sel.selectedIndex = i; break;
+      }
+    }
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function submitForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const mob = document.getElementById('f-mobile').value.trim();
+  const city = document.getElementById('f-city').value.trim();
+  const role = document.getElementById('f-role').value;
+  if (!name) { toast('कृपया नाव भरा'); return; }
+  if (!mob) { toast('कृपया मोबाईल नंबर भरा'); return; }
+  if (!role) { toast('कृपया Role निवडा'); return; }
+  // Send via Email
+  const email = document.getElementById('f-email').value.trim();
+  const exp = document.getElementById('f-exp').value.trim();
+  const msg2 = document.getElementById('f-msg').value.trim();
+  const body = `नाव / Name: ${name}\nMobile: ${mob}\nEmail: ${email||'–'}\nCity: ${city||'–'}\nRole: ${role}\nExperience: ${exp||'–'}\nMessage: ${msg2||'–'}\n\nDate: ${new Date().toLocaleString('mr-IN')}\n— KumbhConnect Platform`;
+  window.location.href = `mailto:kumbhmelaconnect@gmail.com?subject=${encodeURIComponent('KumbhConnect Application — '+role+' — '+name)}&body=${encodeURIComponent(body)}`;
+  document.getElementById('apply-form').style.display = 'none';
+  document.getElementById('success-box').classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('apply-form').style.display = 'block';
+  document.getElementById('apply-form').reset?.();
+  document.getElementById('success-box').classList.remove('show');
+  ['f-name','f-mobile','f-email','f-city','f-exp','f-msg'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('f-role').selectedIndex = 0;
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('kc_lang') || 'mr';
+  setLang(saved, document.getElementById('lbtn-'+saved));
+});
+</script>
+</body>
+</html>
