@@ -5,14 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
 <meta name="theme-color" content="#C8410A"/>
 <title>Volunteer — KumbhConnect</title>
-<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="icon" href="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
 .app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:88px}
-@media(min-width:700px){body{background:#EDE5D8}}
+@media(min-width:700px){
+  body{background:#EDE5D8}
+  .app-wrap{box-shadow:0 8px 60px rgba(0,0,0,.16);border-radius:20px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden}
+  .topbar{border-radius:20px 20px 0 0}
+}
+@media(min-width:1024px){
+  .app-wrap{max-width:680px}
+}
 
 .topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
 .back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
@@ -96,6 +103,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 <!-- TOP BAR -->
 <div class="topbar">
   <a href="index.html" class="back-btn">←</a>
+  <img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'"/>
   <div style="flex:1">
     <div class="topbar-title" data-i18n="page_title">🙋 Volunteer नोंदणी</div>
     <div style="font-size:.6rem;color:var(--t3);letter-spacing:1px;text-transform:uppercase">KumbhConnect Volunteer</div>
@@ -161,7 +169,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
     <div class="fg-row">
       <div class="fg">
         <label data-i18n="f_name">पूर्ण नाव <span class="req">*</span></label>
-        <input type="text" id="v-name" placeholder="तुमचे पूर्ण नाव"/>
+        <input type="text" id="v-name" data-i18n-ph="ph_name" placeholder="तुमचे पूर्ण नाव"/>
       </div>
       <div class="fg">
         <label data-i18n="f_mobile">मोबाईल <span class="req">*</span></label>
@@ -181,16 +189,16 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
     <div class="fg-row">
       <div class="fg">
         <label data-i18n="f_city">शहर <span class="req">*</span></label>
-        <input type="text" id="v-city" placeholder="तुमचे शहर"/>
+        <input type="text" id="v-city" data-i18n-ph="ph_city" placeholder="तुमचे शहर"/>
       </div>
       <div class="fg">
         <label data-i18n="f_avail">उपलब्धता</label>
         <select id="v-avail">
-          <option value="">-- निवडा --</option>
-          <option value="Full Time">Full Time</option>
-          <option value="Part Time">Part Time</option>
-          <option value="Weekends">Weekends Only</option>
-          <option value="Specific Dates">Specific Dates</option>
+          <option value="" data-i18n="opt_select">-- निवडा --</option>
+          <option value="Full Time" data-i18n="opt_fulltime">Full Time</option>
+          <option value="Part Time" data-i18n="opt_parttime">Part Time</option>
+          <option value="Weekends" data-i18n="opt_weekends">Weekends Only</option>
+          <option value="Specific Dates" data-i18n="opt_specific">Specific Dates</option>
         </select>
       </div>
     </div>
@@ -205,7 +213,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
         <div class="lang-chip" onclick="toggleChip(this)">बंगाली</div>
         <div class="lang-chip" onclick="toggleChip(this)">तेलुगू</div>
         <div class="lang-chip" onclick="toggleChip(this)">तमिळ</div>
-        <div class="lang-chip" onclick="toggleChip(this)">इतर</div>
+        <div class="lang-chip" onclick="toggleChip(this)" data-i18n="lang_other">इतर</div>
       </div>
     </div>
 
@@ -227,7 +235,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
     <div class="fg">
       <label data-i18n="f_msg">अतिरिक्त माहिती / Message</label>
-      <textarea id="v-msg" placeholder="तुमचा अनुभव, विशेष कौशल्ये किंवा अपेक्षा..."></textarea>
+      <textarea id="v-msg" data-i18n-ph="ph_msg" placeholder="तुमचा अनुभव, विशेष कौशल्ये किंवा अपेक्षा..."></textarea>
     </div>
 
     <button class="btn-submit" onclick="submitVol()">
@@ -253,13 +261,13 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
 <script>
 const I18N={
-  mr:{page_title:'🙋 Volunteer नोंदणी',hero_tag:'🌟 Volunteer बना — सेवा करा',hero_title:'कुंभ Volunteer व्हा',hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेळ्यात लाखो यात्रेकरूंसाठी सेवा करण्याची अद्वितीय संधी.',vc_txt:'Registered Volunteers',vc_sub:'कुंभमेळा २०२७',stat_free:'मोफत नोंदणी',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer जबाबदाऱ्या',r1:'यात्रेकरूंना मदत',r2:'माहिती सहाय्य',r3:'आपत्काळी मार्गदर्शन',r4:'गर्दी नियंत्रण सहाय्य',r5:'मार्ग मार्गदर्शन',r6:'Digital Documentation',ben_title:'🌟 फायदे',b1:'Digital Volunteer Recognition — Platform वर मान्यता',b2:'Experience Certificate (लागू असल्यास)',b3:'Community Network & Networking',b4:'कुंभमेळ्यात सेवेचे पुण्य',b5:'Resume साठी Community Service अनुभव',form_title:'📋 नोंदणी करा',f_name:'पूर्ण नाव',f_mobile:'मोबाईल',f_email:'ईमेल',f_age:'वय',f_city:'शहर',f_avail:'उपलब्धता',f_langs:'ज्ञात भाषा',f_skills:'Skills / कौशल्ये',f_msg:'अतिरिक्त माहिती',btn_submit:'Volunteer म्हणून नोंदणी करा',success_title:'नोंदणी यशस्वी!',success_msg:'KumbhConnect Volunteer Team मध्ये आपले स्वागत आहे!',success_sub:'🕉️ सेवा हीच पूजा — Service is Devotion',btn_again:'नवीन नोंदणी',home_btn:'मुखपृष्ठ — Home'},
-  hi:{page_title:'🙋 Volunteer पंजीकरण',hero_tag:'🌟 Volunteer बनें — सेवा करें',hero_title:'कुंभ Volunteer बनें',hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेले में लाखों तीर्थयात्रियों की सेवा का अनूठा अवसर।',vc_txt:'Registered Volunteers',vc_sub:'कुंभमेला २०२७',stat_free:'मुफ्त पंजीकरण',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer जिम्मेदारियां',r1:'तीर्थयात्रियों की मदद',r2:'जानकारी सहायता',r3:'आपातकालीन मार्गदर्शन',r4:'भीड़ नियंत्रण सहायता',r5:'मार्ग मार्गदर्शन',r6:'Digital Documentation',ben_title:'🌟 फायदे',b1:'Digital Volunteer Recognition — Platform पर मान्यता',b2:'Experience Certificate (लागू होने पर)',b3:'Community Network & Networking',b4:'कुंभमेले में सेवा का पुण्य',b5:'Resume के लिए Community Service अनुभव',form_title:'📋 पंजीकरण करें',f_name:'पूरा नाम',f_mobile:'मोबाइल',f_email:'ईमेल',f_age:'आयु',f_city:'शहर',f_avail:'उपलब्धता',f_langs:'ज्ञात भाषाएं',f_skills:'Skills / कौशल',f_msg:'अतिरिक्त जानकारी',btn_submit:'Volunteer के रूप में पंजीकरण करें',success_title:'पंजीकरण सफल!',success_msg:'KumbhConnect Volunteer Team में आपका स्वागत है!',success_sub:'🕉️ सेवा ही पूजा है',btn_again:'नया पंजीकरण',home_btn:'होम पेज — Home'},
-  en:{page_title:'🙋 Volunteer Registration',hero_tag:'🌟 Become a Volunteer — Serve',hero_title:'Become a Kumbh Volunteer',hero_desc:'A unique opportunity to serve millions of pilgrims at Nashik–Trimbakeshwar Kumbh Mela 2027.',vc_txt:'Registered Volunteers',vc_sub:'Kumbh Mela 2027',stat_free:'Free Registration',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer Responsibilities',r1:'Help Pilgrims',r2:'Information Assistance',r3:'Emergency Guidance',r4:'Crowd Support',r5:'Route Guidance',r6:'Digital Documentation',ben_title:'🌟 Benefits',b1:'Digital Volunteer Recognition on Platform',b2:'Experience Certificate (if applicable)',b3:'Community Network & Networking',b4:'Spiritual merit of service at Kumbh',b5:'Community Service experience for resume',form_title:'📋 Register Now',f_name:'Full Name',f_mobile:'Mobile',f_email:'Email',f_age:'Age',f_city:'City',f_avail:'Availability',f_langs:'Languages Known',f_skills:'Skills',f_msg:'Additional Information',btn_submit:'Register as Volunteer',success_title:'Registration Successful!',success_msg:'Welcome to KumbhConnect Volunteer Team!',success_sub:'🕉️ Service is Devotion',btn_again:'New Registration',home_btn:'Home Page'}
+  mr:{page_title:'🙋 Volunteer नोंदणी',hero_tag:'🌟 Volunteer बना — सेवा करा',hero_title:'कुंभ Volunteer व्हा',hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेळ्यात लाखो यात्रेकरूंसाठी सेवा करण्याची अद्वितीय संधी.',vc_txt:'Registered Volunteers',vc_sub:'कुंभमेळा २०२७',stat_free:'मोफत नोंदणी',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer जबाबदाऱ्या',r1:'यात्रेकरूंना मदत',r2:'माहिती सहाय्य',r3:'आपत्काळी मार्गदर्शन',r4:'गर्दी नियंत्रण सहाय्य',r5:'मार्ग मार्गदर्शन',r6:'Digital Documentation',ben_title:'🌟 फायदे',b1:'Digital Volunteer Recognition — Platform वर मान्यता',b2:'Experience Certificate (लागू असल्यास)',b3:'Community Network & Networking',b4:'कुंभमेळ्यात सेवेचे पुण्य',b5:'Resume साठी Community Service अनुभव',form_title:'📋 नोंदणी करा',f_name:'पूर्ण नाव',f_mobile:'मोबाईल',f_email:'ईमेल',f_age:'वय',f_city:'शहर',f_avail:'उपलब्धता',f_langs:'ज्ञात भाषा',f_skills:'Skills / कौशल्ये',f_msg:'अतिरिक्त माहिती',btn_submit:'Volunteer म्हणून नोंदणी करा',success_title:'नोंदणी यशस्वी!',success_msg:'KumbhConnect Volunteer Team मध्ये आपले स्वागत आहे!',success_sub:'🕉️ सेवा हीच पूजा — Service is Devotion',btn_again:'नवीन नोंदणी',home_btn:'मुखपृष्ठ — Home',ph_name:'तुमचे पूर्ण नाव',ph_city:'तुमचे शहर',ph_msg:'तुमचा अनुभव, विशेष कौशल्ये किंवा अपेक्षा...',opt_select:'-- निवडा --',opt_fulltime:'Full Time',opt_parttime:'Part Time',opt_weekends:'Weekends Only',opt_specific:'Specific Dates',lang_other:'इतर'},
+  hi:{page_title:'🙋 Volunteer पंजीकरण',hero_tag:'🌟 Volunteer बनें — सेवा करें',hero_title:'कुंभ Volunteer बनें',hero_desc:'नाशिक–त्र्यंबकेश्वर कुंभमेले में लाखों तीर्थयात्रियों की सेवा का अनूठा अवसर।',vc_txt:'Registered Volunteers',vc_sub:'कुंभमेला २०२७',stat_free:'मुफ्त पंजीकरण',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer जिम्मेदारियां',r1:'तीर्थयात्रियों की मदद',r2:'जानकारी सहायता',r3:'आपातकालीन मार्गदर्शन',r4:'भीड़ नियंत्रण सहायता',r5:'मार्ग मार्गदर्शन',r6:'Digital Documentation',ben_title:'🌟 फायदे',b1:'Digital Volunteer Recognition — Platform पर मान्यता',b2:'Experience Certificate (लागू होने पर)',b3:'Community Network & Networking',b4:'कुंभमेले में सेवा का पुण्य',b5:'Resume के लिए Community Service अनुभव',form_title:'📋 पंजीकरण करें',f_name:'पूरा नाम',f_mobile:'मोबाइल',f_email:'ईमेल',f_age:'आयु',f_city:'शहर',f_avail:'उपलब्धता',f_langs:'ज्ञात भाषाएं',f_skills:'Skills / कौशल',f_msg:'अतिरिक्त जानकारी',btn_submit:'Volunteer के रूप में पंजीकरण करें',success_title:'पंजीकरण सफल!',success_msg:'KumbhConnect Volunteer Team में आपका स्वागत है!',success_sub:'🕉️ सेवा ही पूजा है',btn_again:'नया पंजीकरण',home_btn:'होम पेज — Home',ph_name:'आपका पूरा नाम',ph_city:'आपका शहर',ph_msg:'अपना अनुभव, विशेष कौशल या अपेक्षा लिखें...',opt_select:'-- चुनें --',opt_fulltime:'Full Time',opt_parttime:'Part Time',opt_weekends:'Weekends Only',opt_specific:'Specific Dates',lang_other:'अन्य'},
+  en:{page_title:'🙋 Volunteer Registration',hero_tag:'🌟 Become a Volunteer — Serve',hero_title:'Become a Kumbh Volunteer',hero_desc:'A unique opportunity to serve millions of pilgrims at Nashik–Trimbakeshwar Kumbh Mela 2027.',vc_txt:'Registered Volunteers',vc_sub:'Kumbh Mela 2027',stat_free:'Free Registration',stat_cert:'Certificate',stat_kumbh:'Kumbh 2027',resp_title:'📋 Volunteer Responsibilities',r1:'Help Pilgrims',r2:'Information Assistance',r3:'Emergency Guidance',r4:'Crowd Support',r5:'Route Guidance',r6:'Digital Documentation',ben_title:'🌟 Benefits',b1:'Digital Volunteer Recognition on Platform',b2:'Experience Certificate (if applicable)',b3:'Community Network & Networking',b4:'Spiritual merit of service at Kumbh',b5:'Community Service experience for resume',form_title:'📋 Register Now',f_name:'Full Name',f_mobile:'Mobile',f_email:'Email',f_age:'Age',f_city:'City',f_avail:'Availability',f_langs:'Languages Known',f_skills:'Skills',f_msg:'Additional Information',btn_submit:'Register as Volunteer',success_title:'Registration Successful!',success_msg:'Welcome to KumbhConnect Volunteer Team!',success_sub:'🕉️ Service is Devotion',btn_again:'New Registration',home_btn:'Home Page',ph_name:'Your full name',ph_city:'Your city',ph_msg:'Write your experience, special skills or expectations...',opt_select:'-- Select --',opt_fulltime:'Full Time',opt_parttime:'Part Time',opt_weekends:'Weekends Only',opt_specific:'Specific Dates',lang_other:'Other'}
 };
 
 let _lang=localStorage.getItem('kc_lang')||'mr';
-function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]!==undefined)n.textContent=T[k];});}
+function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]===undefined)return;if(/<[a-z][\s\S]*>/i.test(T[k])){n.innerHTML=T[k];}else{n.textContent=T[k];}});document.querySelectorAll('[data-i18n-ph]').forEach(n=>{const k=n.getAttribute('data-i18n-ph');if(T[k]!==undefined)n.setAttribute('placeholder',T[k]);});}
 function toggleChip(el){el.classList.toggle('sel');}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function getSelected(gridId){return Array.from(document.querySelectorAll('#'+gridId+' .sel')).map(e=>e.textContent).join(', ');}

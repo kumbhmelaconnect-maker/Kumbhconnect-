@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
 <meta name="theme-color" content="#C8410A"/>
 <title>Lost & Found — KumbhConnect</title>
-<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="icon" href="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10);}
@@ -13,7 +13,14 @@
 html{scroll-behavior:smooth}
 body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
 .app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:88px}
-@media(min-width:700px){body{background:#EDE5D8}}
+@media(min-width:700px){
+  body{background:#EDE5D8}
+  .app-wrap{box-shadow:0 8px 60px rgba(0,0,0,.16);border-radius:20px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden}
+  .topbar{border-radius:20px 20px 0 0}
+}
+@media(min-width:1024px){
+  .app-wrap{max-width:680px}
+}
 
 .topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
 .back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
@@ -93,6 +100,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 <!-- TOP BAR -->
 <div class="topbar">
   <a href="index.html" class="back-btn">←</a>
+  <img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'"/>
   <div style="flex:1">
     <div class="topbar-title" data-i18n="page_title">🔍 हरवले & सापडले</div>
     <div style="font-size:.6rem;color:var(--t3);letter-spacing:1px;text-transform:uppercase">Lost & Found</div>
@@ -138,13 +146,13 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
     </div>
 
     <div class="fg-row">
-      <div class="fg"><label data-i18n="f_reporter">तुमचे नाव <span class="req">*</span></label><input id="l-reporter" type="text" placeholder="तुमचे नाव"/></div>
+      <div class="fg"><label data-i18n="f_reporter">तुमचे नाव <span class="req">*</span></label><input id="l-reporter" type="text" data-i18n-ph="ph_name" placeholder="तुमचे नाव"/></div>
       <div class="fg"><label data-i18n="f_mobile">मोबाईल <span class="req">*</span></label><input id="l-mobile" type="tel" placeholder="+91 00000 00000"/></div>
     </div>
-    <div class="fg"><label data-i18n="f_what">हरवलेल्याचे नाव / वस्तू <span class="req">*</span></label><input id="l-what" type="text" placeholder="उदा. मुलाचे नाव, पर्स, मोबाईल..."/></div>
-    <div class="fg"><label data-i18n="f_desc">वर्णन / Description</label><textarea id="l-desc" placeholder="वय, रंग, वेशभूषा, ब्रँड..."></textarea></div>
+    <div class="fg"><label data-i18n="f_what">हरवलेल्याचे नाव / वस्तू <span class="req">*</span></label><input id="l-what" type="text" data-i18n-ph="ph_l_what" placeholder="उदा. मुलाचे नाव, पर्स, मोबाईल..."/></div>
+    <div class="fg"><label data-i18n="f_desc">वर्णन / Description</label><textarea id="l-desc" data-i18n-ph="ph_l_desc" placeholder="वय, रंग, वेशभूषा, ब्रँड..."></textarea></div>
     <div class="fg-row">
-      <div class="fg"><label data-i18n="f_loc">ठिकाण <span class="req">*</span></label><input id="l-loc" type="text" placeholder="उदा. रामकुंड, CBS..."/></div>
+      <div class="fg"><label data-i18n="f_loc">ठिकाण <span class="req">*</span></label><input id="l-loc" type="text" data-i18n-ph="ph_l_loc" placeholder="उदा. रामकुंड, CBS..."/></div>
       <div class="fg"><label data-i18n="f_date">तारीख / वेळ</label><input id="l-date" type="datetime-local"/></div>
     </div>
     <div class="fg">
@@ -171,13 +179,13 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
   <div class="form-card" id="found-form">
     <div style="font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--gn);margin-bottom:13px" data-i18n="found_form_title">✅ सापडलेली वस्तू / व्यक्ती नोंदवा</div>
     <div class="fg-row">
-      <div class="fg"><label data-i18n="f_finder">तुमचे नाव <span class="req">*</span></label><input id="fd-name" type="text" placeholder="तुमचे नाव"/></div>
+      <div class="fg"><label data-i18n="f_finder">तुमचे नाव <span class="req">*</span></label><input id="fd-name" type="text" data-i18n-ph="ph_name" placeholder="तुमचे नाव"/></div>
       <div class="fg"><label data-i18n="f_mobile">मोबाईल <span class="req">*</span></label><input id="fd-mobile" type="tel" placeholder="+91 00000 00000"/></div>
     </div>
-    <div class="fg"><label data-i18n="f_found_what">काय सापडले <span class="req">*</span></label><input id="fd-what" type="text" placeholder="उदा. पर्स, मोबाईल, मुल..."/></div>
-    <div class="fg"><label data-i18n="f_desc">वर्णन</label><textarea id="fd-desc" placeholder="रंग, ब्रँड, विशेष चिन्हे..."></textarea></div>
+    <div class="fg"><label data-i18n="f_found_what">काय सापडले <span class="req">*</span></label><input id="fd-what" type="text" data-i18n-ph="ph_fd_what" placeholder="उदा. पर्स, मोबाईल, मुल..."/></div>
+    <div class="fg"><label data-i18n="f_desc">वर्णन</label><textarea id="fd-desc" data-i18n-ph="ph_fd_desc" placeholder="रंग, ब्रँड, विशेष चिन्हे..."></textarea></div>
     <div class="fg-row">
-      <div class="fg"><label data-i18n="f_found_loc">सापडलेले ठिकाण <span class="req">*</span></label><input id="fd-loc" type="text" placeholder="उदा. काळाराम मंदिर जवळ..."/></div>
+      <div class="fg"><label data-i18n="f_found_loc">सापडलेले ठिकाण <span class="req">*</span></label><input id="fd-loc" type="text" data-i18n-ph="ph_fd_loc" placeholder="उदा. काळाराम मंदिर जवळ..."/></div>
       <div class="fg"><label data-i18n="f_date">तारीख / वेळ</label><input id="fd-date" type="datetime-local"/></div>
     </div>
     <div class="fg">
@@ -203,7 +211,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 <div class="panel" id="panel-search">
   <div class="search-box">
     <span style="font-size:16px;color:#7C3AED">🔍</span>
-    <input type="text" placeholder="नाव, वस्तू, ठिकाण शोधा..." oninput="searchLF(this.value)"/>
+    <input type="text" data-i18n-ph="ph_search_lf" placeholder="नाव, वस्तू, ठिकाण शोधा..." oninput="searchLF(this.value)"/>
   </div>
   <div style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1px solid #93C5FD;border-radius:var(--r);padding:14px;margin-bottom:14px;text-align:center">
     <div style="font-size:36px;margin-bottom:8px">🔍</div>
@@ -231,15 +239,15 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
 <script>
 const I18N={
-  mr:{page_title:'🔍 हरवले & सापडले',hero_title:'🔍 हरवले & सापडले',hero_desc:'कुंभमेळ्यात हरवलेल्या व्यक्ती / वस्तू नोंदवा. तात्काळ मदतीसाठी SOS वापरा.',hero_notice:'⚠️ KumbhConnect केवळ माहिती शेअर करण्याची सुविधा देतो. वस्तू / व्यक्ती मिळण्याची हमी नाही. आपत्कालीन परिस्थितीत 100 / 112 कॉल करा.',tab_lost:'🚨 हरवले',tab_found:'✅ सापडले',tab_search:'🔍 शोधा',hl_title:'🆘 तात्काळ Emergency संपर्क',hl_police:'पोलीस Control Room',hl_emergency:'Emergency',hl_nashik:'नाशिक PCR',lost_form_title:'📋 हरवलेली वस्तू / व्यक्ती नोंदवा',lt_person:'व्यक्ती',lt_item:'वस्तू',f_reporter:'तुमचे नाव',f_mobile:'मोबाईल',f_what:'हरवलेल्याचे नाव / वस्तू',f_desc:'वर्णन / Description',f_loc:'ठिकाण',f_date:'तारीख / वेळ',f_photo:'📷 फोटो (ऐच्छिक)',photo_tap:'फोटो निवडण्यासाठी दाबा',btn_lost:'Email द्वारे पाठवा — Report करा',success_title:'तक्रार नोंदवली!',success_msg:'KumbhConnect Guide आणि पोलीस यांना माहिती पाठवली गेली.',found_form_title:'✅ सापडलेली वस्तू / व्यक्ती नोंदवा',f_finder:'तुमचे नाव',f_found_what:'काय सापडले',f_found_loc:'सापडलेले ठिकाण',btn_found:'Email द्वारे पाठवा — Report Found',found_success:'माहिती नोंदवली!',found_success_msg:'तुमची माहिती पाठवली गेली. मालक शोधण्यास मदत होईल.',search_info_title:'Search Feature',search_info_desc:'नोंदवलेल्या Lost & Found items आमच्या Guide Email वर उपलब्ध आहेत.',search_btn:'Email वर Search करा 📧',btn_again:'नवीन अर्ज',home_btn:'मुखपृष्ठ — Home'},
-  hi:{page_title:'🔍 खोया & पाया',hero_title:'🔍 खोया & पाया',hero_desc:'कुंभमेले में खोई हुई व्यक्ति / वस्तु दर्ज करें।',hero_notice:'⚠️ KumbhConnect केवल जानकारी साझा करने की सुविधा देता है। आपातकाल में 100 / 112 कॉल करें।',tab_lost:'🚨 खोया',tab_found:'✅ मिला',tab_search:'🔍 खोजें',hl_title:'🆘 आपातकालीन संपर्क',hl_police:'पुलिस Control Room',hl_emergency:'आपातकाल',hl_nashik:'नाशिक PCR',lost_form_title:'📋 खोई वस्तु / व्यक्ति दर्ज करें',lt_person:'व्यक्ति',lt_item:'वस्तु',f_reporter:'आपका नाम',f_mobile:'मोबाइल',f_what:'खोई वस्तु / व्यक्ति का नाम',f_desc:'विवरण',f_loc:'स्थान',f_date:'तारीख / समय',f_photo:'📷 फोटो (वैकल्पिक)',photo_tap:'फोटो चुनने के लिए दबाएं',btn_lost:'Email से भेजें',success_title:'दर्ज किया गया!',success_msg:'KumbhConnect Guide और पुलिस को जानकारी भेज दी गई।',found_form_title:'✅ मिली वस्तु / व्यक्ति दर्ज करें',f_finder:'आपका नाम',f_found_what:'क्या मिला',f_found_loc:'मिलने का स्थान',btn_found:'Email से भेजें',found_success:'जानकारी दर्ज की!',found_success_msg:'आपकी जानकारी भेज दी गई।',search_info_title:'Search Feature',search_info_desc:'दर्ज Lost & Found items हमारे Guide Email पर उपलब्ध हैं।',search_btn:'Email पर Search करें 📧',btn_again:'नया आवेदन',home_btn:'होम पेज — Home'},
-  en:{page_title:'🔍 Lost & Found',hero_title:'🔍 Lost & Found',hero_desc:'Report lost persons / items at Kumbh Mela. Use SOS for immediate help.',hero_notice:'⚠️ KumbhConnect only facilitates information sharing. Recovery not guaranteed. Call 100 / 112 in emergency.',tab_lost:'🚨 Report Lost',tab_found:'✅ Report Found',tab_search:'🔍 Search',hl_title:'🆘 Emergency Contacts',hl_police:'Police Control Room',hl_emergency:'Emergency',hl_nashik:'Nashik PCR',lost_form_title:'📋 Report Lost Person / Item',lt_person:'Person',lt_item:'Item',f_reporter:'Your Name',f_mobile:'Mobile',f_what:'Lost Person / Item Name',f_desc:'Description',f_loc:'Location',f_date:'Date / Time',f_photo:'📷 Photo (Optional)',photo_tap:'Tap to select photo',btn_lost:'Send via Email — Report',success_title:'Reported!',success_msg:'Information sent to KumbhConnect Guide and Police.',found_form_title:'✅ Report Found Person / Item',f_finder:'Your Name',f_found_what:'What did you find',f_found_loc:'Where found',btn_found:'Send via Email — Report Found',found_success:'Reported!',found_success_msg:'Your information has been submitted.',search_info_title:'Search Feature',search_info_desc:'Registered Lost & Found items are available on our Guide Email.',search_btn:'Search via Email 📧',btn_again:'New Report',home_btn:'Home Page'}
+  mr:{page_title:'🔍 हरवले & सापडले',hero_title:'🔍 हरवले & सापडले',hero_desc:'कुंभमेळ्यात हरवलेल्या व्यक्ती / वस्तू नोंदवा. तात्काळ मदतीसाठी SOS वापरा.',hero_notice:'⚠️ KumbhConnect केवळ माहिती शेअर करण्याची सुविधा देतो. वस्तू / व्यक्ती मिळण्याची हमी नाही. आपत्कालीन परिस्थितीत 100 / 112 कॉल करा.',tab_lost:'🚨 हरवले',tab_found:'✅ सापडले',tab_search:'🔍 शोधा',hl_title:'🆘 तात्काळ Emergency संपर्क',hl_police:'पोलीस Control Room',hl_emergency:'Emergency',hl_nashik:'नाशिक PCR',lost_form_title:'📋 हरवलेली वस्तू / व्यक्ती नोंदवा',lt_person:'व्यक्ती',lt_item:'वस्तू',f_reporter:'तुमचे नाव',f_mobile:'मोबाईल',f_what:'हरवलेल्याचे नाव / वस्तू',f_desc:'वर्णन / Description',f_loc:'ठिकाण',f_date:'तारीख / वेळ',f_photo:'📷 फोटो (ऐच्छिक)',photo_tap:'फोटो निवडण्यासाठी दाबा',btn_lost:'Email द्वारे पाठवा — Report करा',success_title:'तक्रार नोंदवली!',success_msg:'KumbhConnect Guide आणि पोलीस यांना माहिती पाठवली गेली.',found_form_title:'✅ सापडलेली वस्तू / व्यक्ती नोंदवा',f_finder:'तुमचे नाव',f_found_what:'काय सापडले',f_found_loc:'सापडलेले ठिकाण',btn_found:'Email द्वारे पाठवा — Report Found',found_success:'माहिती नोंदवली!',found_success_msg:'तुमची माहिती पाठवली गेली. मालक शोधण्यास मदत होईल.',search_info_title:'Search Feature',search_info_desc:'नोंदवलेल्या Lost & Found items आमच्या Guide Email वर उपलब्ध आहेत.',search_btn:'Email वर Search करा 📧',btn_again:'नवीन अर्ज',home_btn:'मुखपृष्ठ — Home',ph_name:'तुमचे नाव',ph_l_what:'उदा. मुलाचे नाव, पर्स, मोबाईल...',ph_l_desc:'वय, रंग, वेशभूषा, ब्रँड...',ph_l_loc:'उदा. रामकुंड, CBS...',ph_fd_what:'उदा. पर्स, मोबाईल, मुल...',ph_fd_desc:'रंग, ब्रँड, विशेष चिन्हे...',ph_fd_loc:'उदा. काळाराम मंदिर जवळ...',ph_search_lf:'नाव, वस्तू, ठिकाण शोधा...'},
+  hi:{page_title:'🔍 खोया & पाया',hero_title:'🔍 खोया & पाया',hero_desc:'कुंभमेले में खोई हुई व्यक्ति / वस्तु दर्ज करें।',hero_notice:'⚠️ KumbhConnect केवल जानकारी साझा करने की सुविधा देता है। आपातकाल में 100 / 112 कॉल करें।',tab_lost:'🚨 खोया',tab_found:'✅ मिला',tab_search:'🔍 खोजें',hl_title:'🆘 आपातकालीन संपर्क',hl_police:'पुलिस Control Room',hl_emergency:'आपातकाल',hl_nashik:'नाशिक PCR',lost_form_title:'📋 खोई वस्तु / व्यक्ति दर्ज करें',lt_person:'व्यक्ति',lt_item:'वस्तु',f_reporter:'आपका नाम',f_mobile:'मोबाइल',f_what:'खोई वस्तु / व्यक्ति का नाम',f_desc:'विवरण',f_loc:'स्थान',f_date:'तारीख / समय',f_photo:'📷 फोटो (वैकल्पिक)',photo_tap:'फोटो चुनने के लिए दबाएं',btn_lost:'Email से भेजें',success_title:'दर्ज किया गया!',success_msg:'KumbhConnect Guide और पुलिस को जानकारी भेज दी गई।',found_form_title:'✅ मिली वस्तु / व्यक्ति दर्ज करें',f_finder:'आपका नाम',f_found_what:'क्या मिला',f_found_loc:'मिलने का स्थान',btn_found:'Email से भेजें',found_success:'जानकारी दर्ज की!',found_success_msg:'आपकी जानकारी भेज दी गई।',search_info_title:'Search Feature',search_info_desc:'दर्ज Lost & Found items हमारे Guide Email पर उपलब्ध हैं।',search_btn:'Email पर Search करें 📧',btn_again:'नया आवेदन',home_btn:'होम पेज — Home',ph_name:'आपका नाम',ph_l_what:'उदा. बच्चे का नाम, पर्स, मोबाइल...',ph_l_desc:'उम्र, रंग, पहनावा, ब्रांड...',ph_l_loc:'उदा. रामकुंड, CBS...',ph_fd_what:'उदा. पर्स, मोबाइल, बच्चा...',ph_fd_desc:'रंग, ब्रांड, विशेष चिन्ह...',ph_fd_loc:'उदा. काळाराम मंदिर के पास...',ph_search_lf:'नाम, वस्तु, स्थान खोजें...'},
+  en:{page_title:'🔍 Lost & Found',hero_title:'🔍 Lost & Found',hero_desc:'Report lost persons / items at Kumbh Mela. Use SOS for immediate help.',hero_notice:'⚠️ KumbhConnect only facilitates information sharing. Recovery not guaranteed. Call 100 / 112 in emergency.',tab_lost:'🚨 Report Lost',tab_found:'✅ Report Found',tab_search:'🔍 Search',hl_title:'🆘 Emergency Contacts',hl_police:'Police Control Room',hl_emergency:'Emergency',hl_nashik:'Nashik PCR',lost_form_title:'📋 Report Lost Person / Item',lt_person:'Person',lt_item:'Item',f_reporter:'Your Name',f_mobile:'Mobile',f_what:'Lost Person / Item Name',f_desc:'Description',f_loc:'Location',f_date:'Date / Time',f_photo:'📷 Photo (Optional)',photo_tap:'Tap to select photo',btn_lost:'Send via Email — Report',success_title:'Reported!',success_msg:'Information sent to KumbhConnect Guide and Police.',found_form_title:'✅ Report Found Person / Item',f_finder:'Your Name',f_found_what:'What did you find',f_found_loc:'Where found',btn_found:'Send via Email — Report Found',found_success:'Reported!',found_success_msg:'Your information has been submitted.',search_info_title:'Search Feature',search_info_desc:'Registered Lost & Found items are available on our Guide Email.',search_btn:'Search via Email 📧',btn_again:'New Report',home_btn:'Home Page',ph_name:'Your name',ph_l_what:'e.g. Child name, purse, mobile...',ph_l_desc:'Age, color, clothing, brand...',ph_l_loc:'e.g. Ramkund, CBS...',ph_fd_what:'e.g. Purse, mobile, child...',ph_fd_desc:'Color, brand, special marks...',ph_fd_loc:'e.g. Near Kalaram Temple...',ph_search_lf:'Search name, item, location...'}
 };
 
 let _lang=localStorage.getItem('kc_lang')||'mr';
 let _lostType='person';
 
-function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]!==undefined)n.textContent=T[k];})}
+function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]===undefined)return;if(/<[a-z][\s\S]*>/i.test(T[k])){n.innerHTML=T[k];}else{n.textContent=T[k];}});document.querySelectorAll('[data-i18n-ph]').forEach(n=>{const k=n.getAttribute('data-i18n-ph');if(T[k]!==undefined)n.setAttribute('placeholder',T[k]);})}
 function switchTab(tab,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('panel-'+tab).classList.add('on');}
 function setLostType(type,el){_lostType=type;document.querySelectorAll('#lost-form .type-sel div').forEach(d=>d.style.borderColor='var(--br)');el.style.borderColor='var(--sf)';const lt_person_el=document.getElementById('lt-person');const lt_item_el=document.getElementById('lt-item');[lt_person_el,lt_item_el].forEach(e=>e&&(e.style.borderColor='var(--br)',e.style.background='var(--cd)'));if(el){el.style.borderColor='var(--sf)';el.style.background='var(--cs)';}}
 function previewPhoto(input,previewId){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=document.getElementById(previewId);if(img){img.src=e.target.result;img.style.display='block';}};r.readAsDataURL(f);}

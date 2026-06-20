@@ -5,14 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
 <meta name="theme-color" content="#C8410A"/>
 <title>Contact Us — KumbhConnect</title>
-<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="icon" href="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
 .app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:88px}
-@media(min-width:700px){body{background:#EDE5D8}}
+@media(min-width:700px){
+  body{background:#EDE5D8}
+  .app-wrap{box-shadow:0 8px 60px rgba(0,0,0,.16);border-radius:20px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden}
+  .topbar{border-radius:20px 20px 0 0}
+}
+@media(min-width:1024px){
+  .app-wrap{max-width:680px}
+}
 
 .topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
 .back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
@@ -69,6 +76,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
 <div class="topbar">
   <a href="index.html" class="back-btn">←</a>
+  <img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'"/>
   <div style="flex:1"><div class="topbar-title" data-i18n="page_title">📞 Contact Us</div></div>
   <div style="display:flex;gap:4px">
     <button class="lbtn on" id="lbtn-mr" onclick="setLang('mr',this)">म</button>
@@ -119,12 +127,12 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
   <div class="divider"></div>
   <div class="form-card" id="contact-form">
     <div class="fg-row">
-      <div class="fg"><label data-i18n="f_name">Name <span class="req">*</span></label><input id="c-name" type="text" placeholder="तुमचे नाव"/></div>
+      <div class="fg"><label data-i18n="f_name">Name <span class="req">*</span></label><input id="c-name" type="text" data-i18n-ph="ph_name" placeholder="तुमचे नाव"/></div>
       <div class="fg"><label data-i18n="f_mobile">Mobile <span class="req">*</span></label><input id="c-mobile" type="tel" placeholder="+91 00000 00000"/></div>
     </div>
     <div class="fg"><label data-i18n="f_email">Email</label><input id="c-email" type="email" placeholder="your@email.com"/></div>
-    <div class="fg"><label data-i18n="f_subject">Subject <span class="req">*</span></label><input id="c-subject" type="text" placeholder="विषय / Subject"/></div>
-    <div class="fg"><label data-i18n="f_message">Message <span class="req">*</span></label><textarea id="c-message" placeholder="तुमचा संदेश येथे लिहा..."></textarea></div>
+    <div class="fg"><label data-i18n="f_subject">Subject <span class="req">*</span></label><input id="c-subject" type="text" data-i18n-ph="ph_subject" placeholder="विषय / Subject"/></div>
+    <div class="fg"><label data-i18n="f_message">Message <span class="req">*</span></label><textarea id="c-message" data-i18n-ph="ph_message" placeholder="तुमचा संदेश येथे लिहा..."></textarea></div>
     <button class="btn-submit" onclick="submitContact()"><span>📤</span><span data-i18n="btn_submit">Send Message</span></button>
   </div>
   <div class="success-box" id="contact-success">
@@ -144,12 +152,12 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
 <script>
 const I18N={
-  mr:{page_title:'📞 Contact Us',hero_title:'Get In Touch With Us',hero_sub:'आम्हाला संपर्क करा — आम्ही मदतीसाठी सदैव तयार आहोत',details_title:'📋 संपर्क माहिती',l_official_email:'Official Email',l_feedback_email:'Feedback Email',qtype_title:'🗂️ विषय निवडा',q1:'General Queries',q2:'Feedback',q3:'Technical Support',q4:'Suggestions',q5:'Report Incorrect Information',form_title:'✉️ Quick Contact Form',f_name:'Name',f_mobile:'Mobile',f_email:'Email',f_subject:'Subject',f_message:'Message',btn_submit:'Send Message',success_title:'Message Sent!',success_msg:'आम्ही लवकरच तुमच्याशी संपर्क करू. धन्यवाद!',btn_again:'Send Another',home_btn:'मुखपृष्ठ — Home'},
-  hi:{page_title:'📞 Contact Us',hero_title:'Get In Touch With Us',hero_sub:'हमसे संपर्क करें — हम मदद के लिए हमेशा तैयार हैं',details_title:'📋 संपर्क जानकारी',l_official_email:'Official Email',l_feedback_email:'Feedback Email',qtype_title:'🗂️ विषय चुनें',q1:'General Queries',q2:'Feedback',q3:'Technical Support',q4:'Suggestions',q5:'Report Incorrect Information',form_title:'✉️ Quick Contact Form',f_name:'Name',f_mobile:'Mobile',f_email:'Email',f_subject:'Subject',f_message:'Message',btn_submit:'Send Message',success_title:'Message Sent!',success_msg:'हम जल्द ही आपसे संपर्क करेंगे। धन्यवाद!',btn_again:'Send Another',home_btn:'होम पेज — Home'},
-  en:{page_title:'📞 Contact Us',hero_title:'Get In Touch With Us',hero_sub:'Reach out to us — we are always here to help',details_title:'📋 Contact Details',l_official_email:'Official Email',l_feedback_email:'Feedback Email',qtype_title:'🗂️ Select Topic',q1:'General Queries',q2:'Feedback',q3:'Technical Support',q4:'Suggestions',q5:'Report Incorrect Information',form_title:'✉️ Quick Contact Form',f_name:'Name',f_mobile:'Mobile',f_email:'Email',f_subject:'Subject',f_message:'Message',btn_submit:'Send Message',success_title:'Message Sent!',success_msg:'We will contact you soon. Thank you!',btn_again:'Send Another',home_btn:'Home Page'}
+  mr:{page_title:'📞 Contact Us',hero_title:'Get In Touch With Us',hero_sub:'आम्हाला संपर्क करा — आम्ही मदतीसाठी सदैव तयार आहोत',details_title:'📋 संपर्क माहिती',l_official_email:'Official Email',l_feedback_email:'Feedback Email',qtype_title:'🗂️ विषय निवडा',q1:'General Queries',q2:'Feedback',q3:'Technical Support',q4:'Suggestions',q5:'Report Incorrect Information',form_title:'✉️ Quick Contact Form',f_name:'Name',f_mobile:'Mobile',f_email:'Email',f_subject:'Subject',f_message:'Message',btn_submit:'Send Message',success_title:'Message Sent!',success_msg:'आम्ही लवकरच तुमच्याशी संपर्क करू. धन्यवाद!',btn_again:'Send Another',home_btn:'मुखपृष्ठ — Home',ph_name:'तुमचे नाव',ph_subject:'विषय / Subject',ph_message:'तुमचा संदेश येथे लिहा...'},
+  hi:{page_title:'📞 Contact Us',hero_title:'Get In Touch With Us',hero_sub:'हमसे संपर्क करें — हम मदद के लिए हमेशा तैयार हैं',details_title:'📋 संपर्क जानकारी',l_official_email:'Official Email',l_feedback_email:'Feedback Email',qtype_title:'🗂️ विषय चुनें',q1:'General Queries',q2:'Feedback',q3:'Technical Support',q4:'Suggestions',q5:'Report Incorrect Information',form_title:'✉️ Quick Contact Form',f_name:'Name',f_mobile:'Mobile',f_email:'Email',f_subject:'Subject',f_message:'Message',btn_submit:'Send Message',success_title:'Message Sent!',success_msg:'हम जल्द ही आपसे संपर्क करेंगे। धन्यवाद!',btn_again:'Send Another',home_btn:'होम पेज — Home',ph_name:'आपका नाम',ph_subject:'विषय / Subject',ph_message:'अपना संदेश यहां लिखें...'},
+  en:{page_title:'📞 Contact Us',hero_title:'Get In Touch With Us',hero_sub:'Reach out to us — we are always here to help',details_title:'📋 Contact Details',l_official_email:'Official Email',l_feedback_email:'Feedback Email',qtype_title:'🗂️ Select Topic',q1:'General Queries',q2:'Feedback',q3:'Technical Support',q4:'Suggestions',q5:'Report Incorrect Information',form_title:'✉️ Quick Contact Form',f_name:'Name',f_mobile:'Mobile',f_email:'Email',f_subject:'Subject',f_message:'Message',btn_submit:'Send Message',success_title:'Message Sent!',success_msg:'We will contact you soon. Thank you!',btn_again:'Send Another',home_btn:'Home Page',ph_name:'Your name',ph_subject:'Subject',ph_message:'Write your message here...'}
 };
 let _lang=localStorage.getItem('kc_lang')||'mr';
-function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]!==undefined)n.textContent=T[k];});}
+function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]===undefined)return;if(/<[a-z][\s\S]*>/i.test(T[k])){n.innerHTML=T[k];}else{n.textContent=T[k];}});document.querySelectorAll('[data-i18n-ph]').forEach(n=>{const k=n.getAttribute('data-i18n-ph');if(T[k]!==undefined)n.setAttribute('placeholder',T[k]);});}
 function selQ(el){document.querySelectorAll('.qtype-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function submitContact(){

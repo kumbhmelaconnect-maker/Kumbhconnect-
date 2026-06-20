@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
 <meta name="theme-color" content="#C8410A"/>
 <title>Work With Us — KumbhConnect</title>
-<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="icon" href="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -111,7 +111,14 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
 /* ── APP WRAPPER ── */
 .app-wrap{max-width:640px;margin:0 auto;min-height:100vh;background:var(--cr);padding-bottom:80px}
-@media(min-width:700px){body{background:#EDE5D8}}
+@media(min-width:700px){
+  body{background:#EDE5D8}
+  .app-wrap{box-shadow:0 8px 60px rgba(0,0,0,.16);border-radius:20px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden}
+  .topbar{border-radius:20px 20px 0 0}
+}
+@media(min-width:1024px){
+  .app-wrap{max-width:680px}
+}
 </style>
 </head>
 <body>
@@ -120,6 +127,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 <!-- TOP BAR -->
 <div class="topbar">
   <a href="index.html" class="back-btn">←</a>
+  <img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'"/>
   <div>
     <div class="topbar-title">🤝 Work With Us</div>
     <div class="topbar-sub">KumbhConnect Team</div>
@@ -186,7 +194,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
       <div class="role-desc" data-i18n="role_temple_d">मंदिर माहिती</div>
     </div>
     <div class="role-card" onclick="selectRole(this,'ngo')" data-role="ngo">
-      <div class="role-ic">🤲</div>
+      <div class="role-ic">🤝</div>
       <div class="role-name" data-i18n="role_ngo">NGO Partner</div>
       <div class="role-desc" data-i18n="role_ngo_d">सामाजिक कार्य</div>
     </div>
@@ -240,7 +248,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
     <div class="fg-row">
       <div class="fg">
         <label data-i18n="f_name">पूर्ण नाव <span>*</span></label>
-        <input type="text" id="f-name" placeholder="तुमचे पूर्ण नाव"/>
+        <input type="text" id="f-name" data-i18n-ph="ph_name" placeholder="तुमचे पूर्ण नाव"/>
       </div>
       <div class="fg">
         <label data-i18n="f_mobile">मोबाईल <span>*</span></label>
@@ -254,12 +262,12 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
     <div class="fg-row">
       <div class="fg">
         <label data-i18n="f_city">शहर <span>*</span></label>
-        <input type="text" id="f-city" placeholder="तुमचे शहर"/>
+        <input type="text" id="f-city" data-i18n-ph="ph_city" placeholder="तुमचे शहर"/>
       </div>
       <div class="fg">
         <label data-i18n="f_role">Role निवडा <span>*</span></label>
         <select id="f-role">
-          <option value="">-- निवडा --</option>
+          <option value="" data-i18n="opt_select">-- निवडा --</option>
           <option value="Volunteer">Volunteer</option>
           <option value="Local Guide">Local Guide</option>
           <option value="Content Writer">Content Writer</option>
@@ -275,11 +283,11 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
     </div>
     <div class="fg">
       <label data-i18n="f_exp">अनुभव / Experience</label>
-      <input type="text" id="f-exp" placeholder="उदा. 2 वर्षे गाईड अनुभव..."/>
+      <input type="text" id="f-exp" data-i18n-ph="ph_exp" placeholder="उदा. 2 वर्षे गाईड अनुभव..."/>
     </div>
     <div class="fg">
       <label data-i18n="f_msg">संदेश / Message</label>
-      <textarea id="f-msg" placeholder="तुमची माहिती व अपेक्षा येथे लिहा..."></textarea>
+      <textarea id="f-msg" data-i18n-ph="ph_msg" placeholder="तुमची माहिती व अपेक्षा येथे लिहा..."></textarea>
     </div>
 
     <button class="btn-submit" onclick="submitForm()">
@@ -358,7 +366,10 @@ const I18N = {
     btn_again:'नवीन अर्ज करा',
     contact_title:'📬 संपर्क माहिती',
     c_email_l:'Email',c_founder_l:'Founder',
-    home_btn:'मुखपृष्ठ — Home'
+    home_btn:'मुखपृष्ठ — Home',
+    ph_name:'तुमचे पूर्ण नाव', ph_city:'तुमचे शहर',
+    ph_exp:'उदा. 2 वर्षे गाईड अनुभव...', ph_msg:'तुमची माहिती व अपेक्षा येथे लिहा...',
+    opt_select:'-- निवडा --'
   },
   hi:{
     hero_tag:'🌟 हमारी टीम से जुड़ें',
@@ -391,7 +402,10 @@ const I18N = {
     btn_again:'नया आवेदन करें',
     contact_title:'📬 संपर्क जानकारी',
     c_email_l:'ईमेल',c_founder_l:'संस्थापक',
-    home_btn:'होम पेज — Home'
+    home_btn:'होम पेज — Home',
+    ph_name:'आपका पूरा नाम', ph_city:'आपका शहर',
+    ph_exp:'उदा. 2 साल गाइड अनुभव...', ph_msg:'अपनी जानकारी और अपेक्षा यहां लिखें...',
+    opt_select:'-- चुनें --'
   },
   en:{
     hero_tag:'🌟 Join Our Mission',
@@ -424,7 +438,10 @@ const I18N = {
     btn_again:'Apply Again',
     contact_title:'📬 Contact Information',
     c_email_l:'Email',c_founder_l:'Founder',
-    home_btn:'Home Page'
+    home_btn:'Home Page',
+    ph_name:'Your full name', ph_city:'Your city',
+    ph_exp:'e.g. 2 years guide experience...', ph_msg:'Write your information and expectations here...',
+    opt_select:'-- Select --'
   }
 };
 
@@ -438,6 +455,16 @@ function setLang(lang, el) {
   else { const b = document.getElementById('lbtn-'+lang); if(b) b.classList.add('on'); }
   const T = I18N[lang] || I18N.mr;
   document.querySelectorAll('[data-i18n]').forEach(n => {
+    const k = n.getAttribute('data-i18n');
+    if (T[k] === undefined) return;
+    if (/<[a-z][\s\S]*>/i.test(T[k])) { n.innerHTML = T[k]; }
+    else { n.textContent = T[k]; }
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(n => {
+    const k = n.getAttribute('data-i18n-ph');
+    if (T[k] !== undefined) n.setAttribute('placeholder', T[k]);
+  });
+  document.querySelectorAll('option[data-i18n]').forEach(n => {
     const k = n.getAttribute('data-i18n');
     if (T[k] !== undefined) n.textContent = T[k];
   });

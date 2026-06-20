@@ -5,14 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
 <meta name="theme-color" content="#C8410A"/>
 <title>About — KumbhConnect</title>
-<link rel="icon" href="https://i.ibb.co/Y9pWnQJ/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="icon" href="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden}
 .app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:88px}
-@media(min-width:700px){body{background:#EDE5D8}}
+@media(min-width:700px){
+  body{background:#EDE5D8}
+  .app-wrap{box-shadow:0 8px 60px rgba(0,0,0,.16);border-radius:20px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden}
+  .topbar{border-radius:20px 20px 0 0}
+}
+@media(min-width:1024px){
+  .app-wrap{max-width:680px}
+}
 
 .topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
 .back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--sf);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
@@ -23,7 +30,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 /* HERO */
 .hero{background:linear-gradient(150deg,var(--sf) 0%,var(--mr) 100%);padding:32px 18px 36px;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'🕉️';position:absolute;left:-20px;top:-20px;font-size:140px;opacity:.08}
-.hero-logo{width:72px;height:72px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 14px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.hero-logo{width:72px;height:72px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 14px;box-shadow:0 6px 20px rgba(0,0,0,.2);overflow:hidden}
 .hero h1{font-family:'Khand',sans-serif;font-size:1.9rem;font-weight:700;color:#fff;margin-bottom:6px}
 .hero .tag{color:var(--gd2);font-size:.85rem;font-weight:600;letter-spacing:1px}
 .hero p{color:rgba(255,255,255,.85);font-size:.85rem;margin-top:10px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto}
@@ -81,6 +88,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 <!-- TOP BAR -->
 <div class="topbar">
   <a href="index.html" class="back-btn">←</a>
+  <img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'"/>
   <div style="flex:1">
     <div class="topbar-title" data-i18n="page_title">ℹ️ About KumbhConnect</div>
   </div>
@@ -93,7 +101,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-logo">🕉️</div>
+  <div class="hero-logo"><img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.textContent='🕉️'"/></div>
   <h1>KumbhConnect</h1>
   <div class="tag">STAY · NAVIGATE · CONNECT</div>
   <p data-i18n="hero_desc">नाशिक आणि त्र्यंबकेश्वर येथे येणाऱ्या यात्रेकरूंसाठी निर्माण केलेले एक Smart Pilgrimage Platform.</p>
@@ -131,7 +139,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
   <div class="why-grid">
     <div class="why-card"><div class="why-ic">🗺️</div><div class="why-name" data-i18n="w1">Smart Navigation</div></div>
     <div class="why-card"><div class="why-ic">🆘</div><div class="why-name" data-i18n="w2">SOS Emergency</div></div>
-    <div class="why-card"><div class="why-ic">📅</div><div class="why-name" data-i18n="w3">Kumbh Calendar</div></div>
+    <div class="why-card"><div class="why-ic">🗓️</div><div class="why-name" data-i18n="w3">Kumbh Calendar</div></div>
     <div class="why-card"><div class="why-ic">🧭</div><div class="why-name" data-i18n="w4">Guide Assistance</div></div>
     <div class="why-card"><div class="why-ic">🏥</div><div class="why-name" data-i18n="w5">Hospitals</div></div>
     <div class="why-card"><div class="why-ic">🅿️</div><div class="why-name" data-i18n="w6">Parking Info</div></div>
@@ -186,7 +194,7 @@ const I18N={
   en:{page_title:'ℹ️ About KumbhConnect',hero_desc:'A Smart Pilgrimage Platform built for pilgrims visiting Nashik and Trimbakeshwar.',about_title:'📖 About KumbhConnect',about_text:'KumbhConnect is a Smart Pilgrimage Platform created to help pilgrims visiting Nashik and Trimbakeshwar. Our goal is to provide millions of devotees a safer, simpler, and more informed journey during Sinhastha Kumbh Mela 2027 — through maps, SOS assistance, guide services, and multilingual information.',vision_title:'Vision',vision_text:'To make pilgrimage safer, smarter and more accessible for every devotee.',mission_title:'Mission',mission_text:'Provide verified information, navigation, SOS assistance and digital guidance.',why_title:'⭐ Why KumbhConnect?',w1:'Smart Navigation',w2:'SOS Emergency',w3:'Kumbh Calendar',w4:'Guide Assistance',w5:'Hospitals',w6:'Parking Info',w7:'Verified Places',w8:'Multilingual Support',founder_title:'👤 Founder',founder_role:'Founder — KumbhConnect',founder_quote:'"Making the journey of millions of pilgrims safe and simple — that is our mission. KumbhConnect is a service of faith and technology."',obj_title:'🎯 Platform Objectives',obj1:'Provide pilgrims with verified and up-to-date information',obj2:'Offer immediate SOS assistance during emergencies',obj3:'Create opportunities for local guides, volunteers and businesses',obj4:'Ensure smooth multilingual (Marathi, Hindi, English) usage',obj5:'Make Nashik–Trimbakeshwar a Digital Information Hub',disc_title:'Disclaimer',disc_text:'KumbhConnect is an independent information platform and is not affiliated with any government authority.',home_btn:'Home Page'}
 };
 let _lang=localStorage.getItem('kc_lang')||'mr';
-function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]!==undefined)n.textContent=T[k];});}
+function setLang(lang,el){_lang=lang;localStorage.setItem('kc_lang',lang);document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));if(el)el.classList.add('on');const T=I18N[lang]||I18N.mr;document.querySelectorAll('[data-i18n]').forEach(n=>{const k=n.getAttribute('data-i18n');if(T[k]===undefined)return;if(/<[a-z][\s\S]*>/i.test(T[k])){n.innerHTML=T[k];}else{n.textContent=T[k];}});document.querySelectorAll('[data-i18n-ph]').forEach(n=>{const k=n.getAttribute('data-i18n-ph');if(T[k]!==undefined)n.setAttribute('placeholder',T[k]);});}
 document.addEventListener('DOMContentLoaded',()=>{const saved=localStorage.getItem('kc_lang')||'mr';setLang(saved,document.getElementById('lbtn-'+saved));});
 </script>
 </body>
