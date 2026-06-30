@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Media Center — KumbhConnect | सिंहस्थ कुंभमेळा 2027</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/Kxn2BKJ9/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Mukta:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* =====================================================================
+   DESIGN TOKENS — copied 1:1 from KumbhConnect index.html so this page
+   is visually identical to the main app. Keep in sync if the main
+   palette changes.
+===================================================================== */
+:root{
+  --sf:#C8410A;--sf2:#E85D1A;--sf3:#FF7A35;
+  --mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;
+  --cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;
+  --br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;
+  --wh:#FFFFFF;--gn:#15803D;--rd:#B91C1C;--bl:#1D4ED8;--pu:#7C3AED;
+  --sh:0 2px 12px rgba(200,65,10,.10);--sh2:0 6px 24px rgba(123,22,22,.16);
+  --r:14px;--r2:10px;--r3:22px;
+  --fn:'Poppins','Mukta','Khand',sans-serif;
+  --official:#1D4ED8;--guide:#15803D;--user:#E85D1A;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden;padding-bottom:90px}
+img{max-width:100%}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-dot{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 8px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+
+/* ===== SHARED FORM / BUTTON / MODAL CLASSES (kept name-identical to
+   index.html on purpose, so merging this page in later needs no
+   class renaming) ===== */
+.form-wrap{padding:0 14px 14px}
+.ftitle{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:11px}
+.fg{margin-bottom:10px}
+.fg label{font-size:.75rem;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;font-family:'Poppins',sans-serif}
+.fg label .req{color:#B91C1C}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 11px;border:1.5px solid var(--br);border-radius:var(--r2);font-family:var(--fn);font-size:.85rem;color:var(--t1);background:var(--wh);outline:none;transition:all .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sf);box-shadow:0 0 0 3px rgba(200,65,10,.09)}
+.fg textarea{resize:none}
+.note-box{background:#FEF9EC;border:1px solid var(--gd2);border-radius:var(--r2);padding:10px 12px;margin-bottom:11px}
+.note-box p{font-size:.72rem;color:#78350F;line-height:1.5}
+.btn-primary{width:100%;padding:12px;border-radius:var(--r2);border:none;cursor:pointer;background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;font-family:var(--fn);font-size:.92rem;font-weight:700;box-shadow:0 4px 12px rgba(200,65,10,.3);transition:all .2s}
+.btn-primary:active{transform:scale(.98)}
+.btn-outline{width:100%;padding:11px;border-radius:var(--r2);border:1.5px solid var(--br);background:transparent;color:var(--t2);font-family:var(--fn);font-size:.85rem;font-weight:600;cursor:pointer}
+
+.moverlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);display:flex;align-items:flex-end;opacity:0;visibility:hidden;transition:all .3s}
+.moverlay.open{opacity:1;visibility:visible}
+.msheet{background:var(--wh);border-radius:var(--r3) var(--r3) 0 0;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.moverlay.open .msheet{transform:translateY(0)}
+.mhandle{width:34px;height:4px;background:var(--br);border-radius:4px;margin:9px auto 0}
+.mhdr{padding:10px 14px 6px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mhdr h3{font-family:'Khand',sans-serif;font-size:1.05rem;font-weight:700;color:var(--t1)}
+.mclose{background:var(--cs);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;color:var(--t2);flex-shrink:0}
+.mbody{padding:0 14px 22px}
+
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--t1);color:#fff;padding:9px 18px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:500;opacity:0;transition:all .3s;white-space:nowrap;font-family:'Poppins',sans-serif;max-width:85vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== PAGE SHELL ===== */
+.wrap{max-width:520px;margin:0 auto;background:var(--cr);min-height:100vh;position:relative}
+
+/* ===== HEADER ===== */
+.mc-header{position:sticky;top:0;z-index:100;background:var(--wh);border-bottom:1px solid var(--br);padding:9px 14px;display:flex;align-items:center;gap:10px}
+.mc-back{width:36px;height:36px;border-radius:50%;background:var(--cs);color:var(--sf);border:none;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-htxt{flex:1;min-width:0}
+.mc-htitle{font-family:'Khand',sans-serif;font-size:1.08rem;font-weight:700;color:var(--t1);line-height:1.1}
+.mc-hsub{font-size:.6rem;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase;margin-top:1px}
+.mc-admin-btn{padding:7px 12px;border-radius:20px;background:var(--cs);border:1.5px solid var(--br);color:var(--t2);font-size:.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--fn);flex-shrink:0;position:relative}
+.mc-admin-btn.active{background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border-color:transparent}
+.mc-pending-dot{position:absolute;top:-4px;right:-4px;background:#EF4444;color:#fff;font-size:.55rem;font-weight:700;border-radius:50%;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* ===== HERO ===== */
+.mc-hero{background:linear-gradient(150deg,var(--sf) 0%,var(--mr) 100%);padding:22px 16px 20px;text-align:center;position:relative;overflow:hidden}
+.mc-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.08) 0%,transparent 60%);pointer-events:none}
+.mc-hero-inner{position:relative;z-index:1}
+.mc-hero-title{font-family:'Khand',sans-serif;font-size:1.55rem;font-weight:700;color:#fff;line-height:1.2}
+.mc-hero-tag{display:inline-block;margin-top:8px;padding:5px 14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.5px}
+.mc-hero-stats{display:flex;justify-content:center;gap:22px;margin-top:16px}
+.mc-stat{text-align:center}
+.mc-stat-num{font-family:'Khand',sans-serif;font-size:1.25rem;font-weight:700;color:#fff}
+.mc-stat-lbl{font-size:.6rem;color:rgba(255,255,255,.78);margin-top:1px}
+
+/* ===== VERIFIED LEGEND ===== */
+.mc-legend{display:flex;gap:7px;padding:10px 14px;background:var(--cs);border-bottom:1px solid var(--br);overflow-x:auto;scrollbar-width:none}
+.mc-legend::-webkit-scrollbar{display:none}
+.mc-leg-chip{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:.66rem;font-weight:600;color:var(--t2);background:var(--wh);border:1px solid var(--br);border-radius:14px;padding:4px 10px 4px 7px;flex-shrink:0}
+.mc-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.mc-dot.official{background:var(--official)}
+.mc-dot.guide{background:var(--guide)}
+.mc-dot.user{background:var(--user)}
+
+/* ===== LIVE TICKER ===== */
+.mc-ticker{display:flex;align-items:center;gap:9px;padding:8px 14px;background:#FEF2F2;border-bottom:1px solid #FECACA}
+.mc-live-dot{width:8px;height:8px;border-radius:50%;background:#EF4444;flex-shrink:0;animation:pulse-dot 1.8s infinite}
+.mc-live-label{font-size:.6rem;font-weight:800;color:#B91C1C;letter-spacing:1px;flex-shrink:0}
+.mc-ticker-text{font-size:.74rem;color:#7B1616;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity .25s}
+
+/* ===== SEARCH ===== */
+.mc-search{padding:11px 14px;display:flex;gap:8px;background:var(--wh)}
+.mc-sbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--cs);border:1.5px solid var(--br);border-radius:var(--r);padding:9px 13px}
+.mc-sbox input{flex:1;border:none;background:transparent;font-family:var(--fn);font-size:.85rem;color:var(--t1);outline:none}
+.mc-sbox input::placeholder{color:var(--t3)}
+.mc-filter-btn{width:40px;height:40px;border-radius:var(--r2);background:var(--cs);border:1.5px solid var(--br);color:var(--sf);font-size:16px;cursor:pointer;flex-shrink:0}
+
+/* ===== TABS ===== */
+.mc-tabs{display:flex;gap:8px;padding:4px 14px 12px;overflow-x:auto;scrollbar-width:none;background:var(--wh)}
+.mc-tabs::-webkit-scrollbar{display:none}
+.mc-tab{white-space:nowrap;padding:8px 15px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);transition:all .2s;flex-shrink:0;font-family:var(--fn)}
+.mc-tab.on{background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border-color:transparent}
+
+/* ===== PANELS ===== */
+.mc-panel{display:none;padding:14px 14px 6px}
+.mc-panel.on{display:block;animation:fi .3s ease}
+.mc-sec-hd{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:10px}
+
+/* ===== SUB-FILTER CHIP ROW (years / categories / dept) ===== */
+.mc-chiprow{display:flex;gap:7px;padding-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.mc-chiprow::-webkit-scrollbar{display:none}
+.mc-chip{white-space:nowrap;padding:6px 13px;border-radius:16px;font-size:.72rem;font-weight:600;border:1.5px solid var(--br);background:var(--cd);color:var(--t2);cursor:pointer;flex-shrink:0;font-family:var(--fn)}
+.mc-chip.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ===== PHOTO GRID ===== */
+.mc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mc-card{background:var(--cd);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.mc-card:active{transform:scale(.96)}
+.mc-thumb{height:108px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;color:rgba(255,255,255,.92)}
+.mc-badge{position:absolute;top:6px;left:6px;font-size:.55rem;font-weight:700;padding:3px 7px;border-radius:10px;color:#fff;display:flex;align-items:center;gap:3px;line-height:1}
+.mc-badge.official{background:rgba(29,78,216,.92)}
+.mc-badge.guide{background:rgba(21,128,61,.92)}
+.mc-badge.user{background:rgba(232,93,26,.92)}
+.mc-thumb-meta{position:absolute;bottom:6px;right:6px;font-size:.56rem;color:#fff;background:rgba(0,0,0,.45);padding:2px 7px;border-radius:8px}
+.mc-card-body{padding:8px 9px}
+.mc-card-title{font-size:.75rem;font-weight:700;color:var(--t1);font-family:'Mukta',sans-serif;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-card-sub{font-size:.6rem;color:var(--t3);margin-top:3px}
+
+/* ===== LIST ITEMS (videos / press) ===== */
+.mc-list-item{display:flex;gap:11px;padding:11px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r);margin-bottom:9px;cursor:pointer;transition:all .2s}
+.mc-list-item:active{background:var(--cs)}
+.mc-list-thumb{width:64px;height:64px;border-radius:var(--r2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;color:rgba(255,255,255,.92);position:relative}
+.mc-play-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);color:#fff;font-size:16px}
+.mc-list-info{flex:1;min-width:0}
+.mc-list-title{font-size:.82rem;font-weight:700;color:var(--t1);line-height:1.3;font-family:'Mukta',sans-serif}
+.mc-list-excerpt{font-size:.68rem;color:var(--t3);margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-list-meta{font-size:.62rem;color:var(--t3);margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mc-pill{padding:2px 8px;border-radius:9px;font-size:.58rem;font-weight:700;color:#fff}
+
+/* ===== DEPARTMENT GRID ===== */
+.mc-dept-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px}
+.mc-dept-card{background:var(--cd);border:1.5px solid var(--br);border-radius:var(--r);padding:13px;text-align:center;transition:all .2s}
+.mc-dept-card.on{border-color:var(--sf);background:rgba(200,65,10,.05)}
+.mc-dept-ic{font-size:25px;margin-bottom:6px}
+.mc-dept-name{font-family:'Khand',sans-serif;font-size:.86rem;font-weight:700;color:var(--t1)}
+.mc-dept-count{font-size:.6rem;color:var(--t3);margin-top:2px}
+.mc-dept-actions{display:flex;gap:6px;margin-top:9px}
+.mc-dept-btn{flex:1;padding:6px 2px;border-radius:8px;font-size:.6rem;font-weight:700;cursor:pointer;border:1px solid var(--br);background:var(--wh);color:var(--t2);font-family:var(--fn)}
+.mc-dept-btn.primary{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ===== META ROWS (used inside detail modal) ===== */
+.mc-meta-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--br)}
+.mc-meta-row:last-child{border:none}
+.mc-meta-l{font-size:.72rem;color:var(--t3);flex-shrink:0}
+.mc-meta-v{font-size:.78rem;font-weight:600;color:var(--t1);text-align:right}
+
+/* ===== FAB ===== */
+.mc-fab{position:fixed;bottom:22px;right:18px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--sf),var(--mr));color:#fff;font-size:24px;border:none;box-shadow:0 6px 18px rgba(200,65,10,.42);cursor:pointer;z-index:90;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mc-fab:active{transform:scale(.92)}
+
+/* ===== EMPTY STATE ===== */
+.mc-empty{text-align:center;padding:40px 16px;color:var(--t3)}
+.mc-empty-ic{font-size:38px;margin-bottom:10px}
+.mc-empty p{font-size:.8rem}
+
+/* ===== ADMIN DRAWER (full-screen) ===== */
+.mc-admin-drawer{position:fixed;inset:0;z-index:400;background:var(--cr);display:none;flex-direction:column}
+.mc-admin-hdr{background:linear-gradient(135deg,var(--sf),var(--mr));padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mc-admin-hdr h3{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#fff}
+.mc-admin-hdr span{font-size:.65rem;color:rgba(255,255,255,.78)}
+.mc-admin-logout{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:.72rem;font-weight:700;padding:7px 12px;border-radius:16px;cursor:pointer;font-family:var(--fn)}
+.mc-admin-body{flex:1;overflow-y:auto;padding:16px 16px 40px;max-width:520px;margin:0 auto;width:100%}
+.mc-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+.mc-stat-card{background:var(--cd);border:1px solid var(--br);border-radius:var(--r);padding:14px;text-align:center}
+.mc-stat-card .num{font-family:'Khand',sans-serif;font-size:1.4rem;font-weight:700;color:var(--sf)}
+.mc-stat-card .lbl{font-size:.64rem;color:var(--t3);margin-top:2px}
+.mc-admin-sec-hd{font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;color:var(--t1);margin:18px 0 10px;display:flex;align-items:center;justify-content:space-between}
+.mc-pa-item{display:flex;gap:10px;padding:11px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r);margin-bottom:9px}
+.mc-pa-thumb{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,var(--gd2),var(--sf));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff}
+.mc-pa-info{flex:1;min-width:0}
+.mc-pa-name{font-size:.78rem;font-weight:700;color:var(--t1)}
+.mc-pa-cap{font-size:.68rem;color:var(--t3);margin-top:2px;line-height:1.35}
+.mc-pa-actions{display:flex;gap:6px;margin-top:7px}
+.mc-pa-btn{padding:5px 11px;border-radius:8px;font-size:.66rem;font-weight:700;cursor:pointer;border:none;font-family:var(--fn)}
+.mc-pa-approve{background:var(--gn);color:#fff}
+.mc-pa-reject{background:var(--rd);color:#fff}
+.mc-dept-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px}
+.mc-dept-row .ic{font-size:18px}
+.mc-dept-row .nm{flex:1;font-size:.8rem;font-weight:600;color:var(--t1)}
+.mc-toggle{width:38px;height:21px;border-radius:12px;background:var(--gn);position:relative;cursor:pointer;flex-shrink:0}
+.mc-toggle::after{content:'';position:absolute;top:2px;right:2px;width:17px;height:17px;border-radius:50%;background:#fff;transition:all .2s}
+.mc-toggle.off{background:var(--br)}
+.mc-toggle.off::after{right:auto;left:2px}
+
+/* ===== ACCOUNT ROWS (Dept / Press credentials in Super Admin) ===== */
+.mc-acct-row{display:flex;align-items:center;gap:8px;padding:10px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px;flex-wrap:wrap}
+.mc-acct-info{flex:1;min-width:150px}
+.mc-acct-name{font-size:.8rem;font-weight:700;color:var(--t1)}
+.mc-acct-cred{font-size:.65rem;color:var(--t3);font-family:monospace;margin-top:2px;word-break:break-all}
+.mc-acct-actions{display:flex;gap:5px;flex-wrap:wrap}
+.mc-acct-btn{padding:5px 9px;border-radius:7px;font-size:.6rem;font-weight:700;cursor:pointer;border:1px solid var(--br);background:var(--wh);color:var(--t2);font-family:var(--fn)}
+.mc-acct-btn.danger{background:var(--rd);color:#fff;border-color:var(--rd)}
+.mc-acct-row.inactive{opacity:.5}
+
+/* ===== CONTENT MODERATION ROWS ===== */
+.mc-mod-row{display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px}
+.mc-mod-ic{font-size:17px;flex-shrink:0;width:26px;text-align:center}
+.mc-mod-info{flex:1;min-width:0;font-size:.74rem;color:var(--t1);font-weight:600;line-height:1.3}
+.mc-mod-info small{display:block;color:var(--t3);font-size:.6rem;font-weight:500;margin-top:2px}
+.mc-mod-tabs{display:flex;gap:6px;margin-bottom:9px;overflow-x:auto}
+.mc-mod-tab{white-space:nowrap;padding:5px 11px;border-radius:14px;font-size:.65rem;font-weight:700;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);cursor:pointer;flex-shrink:0}
+.mc-mod-tab.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ===== DEPT / PRESS DASHBOARD MINI LIST ===== */
+.mc-myitem{display:flex;align-items:center;gap:9px;padding:9px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px}
+.mc-myitem .ic{font-size:18px}
+.mc-myitem .tx{flex:1;min-width:0;font-size:.76rem;color:var(--t1);font-weight:600}
+.mc-myitem .tx small{display:block;color:var(--t3);font-size:.62rem;font-weight:500;margin-top:2px}
+.qbox{background:var(--cs);border:1px dashed var(--br);border-radius:var(--r);padding:12px;margin:10px 0 4px}
+.qbox-t{font-family:'Khand',sans-serif;font-size:.86rem;font-weight:700;color:var(--t1);margin-bottom:8px}
+
+@media(min-width:520px){.wrap{box-shadow:0 0 40px rgba(0,0,0,.06)}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app-root">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="mc-header">
+    <button class="mc-back" onclick="window.location.href='index.html'" aria-label="मागे">←</button>
+    <img src="https://i.ibb.co/Kxn2BKJ9/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0"/>
+    <div class="mc-htxt">
+      <div class="mc-htitle">📸 Media Center</div>
+      <div class="mc-hsub">Official Media Gallery</div>
+    </div>
+    <button class="mc-admin-btn" id="mc-admin-btn" onclick="handleAdminClick()">
+      🔐 <span id="mc-admin-btn-label">Admin</span>
+      <span class="mc-pending-dot" id="admin-pending-badge" style="display:none">0</span>
+    </button>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="mc-hero">
+    <div class="mc-hero-inner">
+      <div class="mc-hero-title">सिंहस्थ कुंभमेळा 2027</div>
+      <div class="mc-hero-tag">🏛️ Official Media Gallery</div>
+      <div class="mc-hero-stats">
+        <div class="mc-stat"><div class="mc-stat-num" id="stat-photos">0</div><div class="mc-stat-lbl">फोटो</div></div>
+        <div class="mc-stat"><div class="mc-stat-num" id="stat-videos">0</div><div class="mc-stat-lbl">व्हिडिओ</div></div>
+        <div class="mc-stat"><div class="mc-stat-num" id="stat-depts">7</div><div class="mc-stat-lbl">विभाग</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VERIFIED LEGEND ===================== -->
+  <div class="mc-legend">
+    <div class="mc-leg-chip"><span class="mc-dot official"></span>Official — शासन/NMC/पोलीस/आरोग्य</div>
+    <div class="mc-leg-chip"><span class="mc-dot guide"></span>Guide — अधिकृत Guide</div>
+    <div class="mc-leg-chip"><span class="mc-dot user"></span>User — यात्रेकरू अपलोड</div>
+  </div>
+
+  <!-- ===================== LIVE TICKER ===================== -->
+  <div class="mc-ticker">
+    <span class="mc-live-dot"></span>
+    <span class="mc-live-label">LIVE</span>
+    <span class="mc-ticker-text" id="ticker-text">लोड होत आहे…</span>
+  </div>
+
+  <!-- ===================== SEARCH ===================== -->
+  <div class="mc-search">
+    <div class="mc-sbox">
+      <span>🔍</span>
+      <input type="text" id="mc-search-input" placeholder="फोटो, ठिकाण, विभाग शोधा…" oninput="renderActivePanel()"/>
+    </div>
+    <button class="mc-filter-btn" onclick="openModal('filter-modal')" aria-label="फिल्टर">⚙️</button>
+  </div>
+
+  <!-- ===================== TABS ===================== -->
+  <nav class="mc-tabs" id="mc-tabs">
+    <div class="mc-tab on" data-tab="previous" onclick="switchTab('previous')">📷 मागील कुंभ</div>
+    <div class="mc-tab" data-tab="live" onclick="switchTab('live')">📸 कुंभ 2027</div>
+    <div class="mc-tab" data-tab="videos" onclick="switchTab('videos')">🎥 व्हिडिओ</div>
+    <div class="mc-tab" data-tab="press" onclick="switchTab('press')">📰 प्रेस रिलीज</div>
+    <div class="mc-tab" data-tab="govt" onclick="switchTab('govt')">🏛 शासकीय फोटो</div>
+    <div class="mc-tab" data-tab="guide" onclick="switchTab('guide')">🧭 गाईड गॅलरी</div>
+    <div class="mc-tab" data-tab="user" onclick="switchTab('user')">👥 युजर गॅलरी</div>
+  </nav>
+
+  <!-- ===================== PANEL: PREVIOUS KUMBH ===================== -->
+  <section class="mc-panel on" id="panel-previous">
+    <div class="mc-sec-hd">वर्षानुसार Albums</div>
+    <div class="mc-chiprow" id="prev-year-row"></div>
+    <div class="mc-chiprow" id="prev-cat-row"></div>
+    <div class="mc-grid" id="prev-grid"></div>
+  </section>
+
+  <!-- ===================== PANEL: KUMBH 2027 LIVE ===================== -->
+  <section class="mc-panel" id="panel-live">
+    <div class="mc-sec-hd">Kumbh 2027 Live Gallery</div>
+    <div class="mc-chiprow" id="live-cat-row"></div>
+    <div class="mc-grid" id="live-grid"></div>
+  </section>
+
+  <!-- ===================== PANEL: VIDEOS ===================== -->
+  <section class="mc-panel" id="panel-videos">
+    <div class="mc-sec-hd">🎥 व्हिडिओ गॅलरी</div>
+    <div id="videos-list"></div>
+  </section>
+
+  <!-- ===================== PANEL: PRESS RELEASES ===================== -->
+  <section class="mc-panel" id="panel-press">
+    <div class="mc-sec-hd">📰 News &amp; प्रेस रिलीज</div>
+    <button class="btn-outline" style="margin-bottom:11px" onclick="openModal('press-login-modal')">🔐 Press Reporter Login</button>
+    <div class="mc-chiprow" id="press-cat-row"></div>
+    <div id="press-list"></div>
+  </section>
+
+  <!-- ===================== PANEL: GOVERNMENT PHOTOS ===================== -->
+  <section class="mc-panel" id="panel-govt">
+    <div class="mc-sec-hd">🏛 शासकीय विभाग</div>
+    <div class="mc-dept-grid" id="dept-grid"></div>
+    <div class="mc-sec-hd" style="margin-top:6px" id="govt-grid-title">सर्व विभागांचे फोटो</div>
+    <div class="mc-grid" id="govt-grid"></div>
+  </section>
+
+  <!-- ===================== PANEL: GUIDE GALLERY ===================== -->
+  <section class="mc-panel" id="panel-guide">
+    <div class="mc-sec-hd">🧭 Guide Gallery</div>
+    <div class="mc-chiprow" id="guide-cat-row"></div>
+    <div class="mc-grid" id="guide-grid"></div>
+  </section>
+
+  <!-- ===================== PANEL: USER GALLERY ===================== -->
+  <section class="mc-panel" id="panel-user">
+    <div class="mc-sec-hd">👥 यात्रेकरू फोटो</div>
+    <div class="note-box" style="margin-bottom:12px">
+      <p>📤 तुमचा फोटो येथे शेअर करा. <b>Admin Approval</b> नंतर तो सर्वांना दिसेल (Publish).</p>
+    </div>
+    <button class="btn-primary" style="margin-bottom:14px" onclick="openModal('upload-modal')">📤 फोटो अपलोड करा</button>
+    <div class="mc-grid" id="user-grid"></div>
+  </section>
+
+  <!-- ===================== FAB (global quick upload) ===================== -->
+  <button class="mc-fab" onclick="openModal('upload-modal')" aria-label="फोटो अपलोड करा">📤</button>
+
+</div><!-- end wrap -->
+
+<!-- ===================== PHOTO / DETAIL MODAL ===================== -->
+<div class="moverlay" id="detail-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3 id="detail-title">तपशील</h3><button class="mclose" onclick="closeModal('detail-modal')">✕</button></div>
+    <div class="mbody" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- ===================== FILTER MODAL ===================== -->
+<div class="moverlay" id="filter-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3>⚙️ Search Filters</h3><button class="mclose" onclick="closeModal('filter-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>Date</label><input type="date" id="filt-date"/></div>
+      <div class="fg"><label>Category</label>
+        <select id="filt-cat"><option value="">सर्व Category</option></select>
+      </div>
+      <div class="fg"><label>Place / Location</label><input type="text" id="filt-place" placeholder="उदा. रामकुंड, त्र्यंबकेश्वर…"/></div>
+      <div class="fg"><label>Photographer / Uploaded By</label><input type="text" id="filt-by" placeholder="नाव टाका"/></div>
+      <div class="fg"><label>Department</label>
+        <select id="filt-dept"><option value="">सर्व Departments</option></select>
+      </div>
+      <button class="btn-primary" onclick="applyFilters()">फिल्टर लागू करा</button>
+      <button class="btn-outline" style="margin-top:8px" onclick="clearFilters()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== USER UPLOAD MODAL ===================== -->
+<div class="moverlay" id="upload-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3>📤 फोटो अपलोड करा</h3><button class="mclose" onclick="closeModal('upload-modal')">✕</button></div>
+    <div class="mbody">
+      <form id="upload-form" onsubmit="submitUpload(event)">
+        <div class="fg"><label>नाव <span class="req">*</span></label><input type="text" id="up-name" required placeholder="तुमचे नाव"/></div>
+        <div class="fg"><label>शहर <span class="req">*</span></label><input type="text" id="up-city" required placeholder="उदा. नाशिक, पुणे…"/></div>
+        <div class="fg"><label>फोटो <span class="req">*</span></label><input type="file" id="up-photo" accept="image/*" required/></div>
+        <div class="fg"><label>Caption <span class="req">*</span></label><textarea id="up-caption" rows="3" required placeholder="फोटोबद्दल थोडक्यात…"></textarea></div>
+        <div class="fg"><label>Location</label><input type="text" id="up-location" placeholder="उदा. रामकुंड घाट"/></div>
+        <div class="note-box"><p>🟠 हा फोटो "User" बॅज सह, Admin Approval नंतर Publish होईल.</p></div>
+        <button class="btn-primary" type="submit">Submit करा ✅</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADMIN LOGIN MODAL ===================== -->
+<div class="moverlay" id="admin-login-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3>🔐 Admin Login</h3><button class="mclose" onclick="closeModal('admin-login-modal')">✕</button></div>
+    <div class="mbody">
+      <form id="admin-login-form" onsubmit="adminLogin(event)">
+        <div class="fg"><label>Username</label><input type="text" id="admin-user" required placeholder="Admin Username"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="admin-pass" required placeholder="••••••••"/></div>
+        <button class="btn-primary" type="submit">Login करा</button>
+        <div class="note-box" style="margin-top:11px"><p>🔒 फक्त अधिकृत Super Admin साठी. क्रेडेन्शियल्स गोपनीय ठेवा.</p></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DEPARTMENT LOGIN MODAL ===================== -->
+<div class="moverlay" id="dept-login-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3 id="dept-login-title">विभाग लॉगिन</h3><button class="mclose" onclick="closeModal('dept-login-modal')">✕</button></div>
+    <div class="mbody">
+      <form id="dept-login-form" onsubmit="deptLogin(event)">
+        <div class="fg"><label>Username</label><input type="text" id="dept-user" required placeholder="Department Username"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="dept-pass" required placeholder="••••••••"/></div>
+        <button class="btn-primary" type="submit">Login करा</button>
+        <div class="note-box" style="margin-top:11px"><p>ℹ️ Username/Password Super Admin Panel मधून मिळवा.</p></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PRESS REPORTER LOGIN MODAL ===================== -->
+<div class="moverlay" id="press-login-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3>📰 Press Reporter Login</h3><button class="mclose" onclick="closeModal('press-login-modal')">✕</button></div>
+    <div class="mbody">
+      <form id="press-login-form" onsubmit="pressLogin(event)">
+        <div class="fg"><label>Username</label><input type="text" id="press-user" required placeholder="Reporter Username"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="press-pass" required placeholder="••••••••"/></div>
+        <button class="btn-primary" type="submit">Login करा</button>
+        <div class="note-box" style="margin-top:11px"><p>ℹ️ Username/Password Super Admin Panel मधून मिळवा.</p></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DEPARTMENT DASHBOARD (full-screen drawer) ===================== -->
+<div class="mc-admin-drawer" id="dept-drawer">
+  <div class="mc-admin-hdr">
+    <div><h3 id="dept-dash-title">🏛 Department Dashboard</h3><span>फक्त तुमच्या विभागाचे कंटेंट</span></div>
+    <button class="mc-admin-logout" onclick="logoutDept()">Logout</button>
+  </div>
+  <div class="mc-admin-body">
+    <div class="note-box"><p>📌 सध्या फक्त <b>फोटो</b> अपलोड करता येतील (स्टोरेज मर्यादेमुळे Video सध्या बंद आहे). Video शेअर करायचे असल्यास YouTube लिंक प्रेस नोट मध्ये द्या.</p></div>
+    <div class="ftitle">+ नवीन फोटो जोडा</div>
+    <form id="dept-photo-form" onsubmit="submitDeptPhoto(event)">
+      <div class="fg"><label>शीर्षक / Caption <span class="req">*</span></label><input type="text" id="dp-title" required placeholder="फोटोबद्दल थोडक्यात…"/></div>
+      <div class="fg"><label>Category <span class="req">*</span></label>
+        <select id="dp-cat" required></select>
+      </div>
+      <div class="fg"><label>Location</label><input type="text" id="dp-loc" placeholder="उदा. रामकुंड घाट"/></div>
+      <div class="fg"><label>फोटो <span class="req">*</span></label><input type="file" id="dp-photo" accept="image/*" required/></div>
+      <button class="btn-primary" type="submit">📤 Publish करा</button>
+    </form>
+    <div class="mc-admin-sec-hd">तुमच्या विभागाचे अपलोड्स</div>
+    <div id="dept-my-list"></div>
+  </div>
+</div>
+
+<!-- ===================== PRESS DASHBOARD (full-screen drawer) ===================== -->
+<div class="mc-admin-drawer" id="press-drawer">
+  <div class="mc-admin-hdr">
+    <div><h3>📰 Press Dashboard</h3><span id="press-dash-sub">प्रेस प्रतिनिधी</span></div>
+    <button class="mc-admin-logout" onclick="logoutPress()">Logout</button>
+  </div>
+  <div class="mc-admin-body">
+    <div class="ftitle">+ नवीन Press Release जोडा</div>
+    <form id="press-release-form" onsubmit="submitPressRelease(event)">
+      <div class="fg"><label>Title <span class="req">*</span></label><input type="text" id="pr-title" required placeholder="शीर्षक"/></div>
+      <div class="fg"><label>Type <span class="req">*</span></label>
+        <select id="pr-type" required></select>
+      </div>
+      <div class="fg"><label>Excerpt / तपशील <span class="req">*</span></label><textarea id="pr-excerpt" rows="3" required placeholder="थोडक्यात माहिती…"></textarea></div>
+      <div class="fg"><label style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" id="pr-pdf" style="width:auto"/> PDF संलग्न आहे</label></div>
+      <button class="btn-primary" type="submit">📤 Publish करा</button>
+    </form>
+    <div class="mc-admin-sec-hd">तुमचे Press Releases</div>
+    <div id="press-my-list"></div>
+  </div>
+</div>
+
+<!-- ===================== SUPER ADMIN PANEL (full-screen drawer) ===================== -->
+<div class="mc-admin-drawer" id="admin-drawer">
+  <div class="mc-admin-hdr">
+    <div><h3>👑 Super Admin Panel</h3><span>Media Center — संपूर्ण नियंत्रण</span></div>
+    <button class="mc-admin-logout" onclick="logoutAdmin()">Logout</button>
+  </div>
+  <div class="mc-admin-body">
+    <div class="mc-stat-grid">
+      <div class="mc-stat-card"><div class="num" id="adm-total-photos">0</div><div class="lbl">Total Photos</div></div>
+      <div class="mc-stat-card"><div class="num" id="adm-pending">0</div><div class="lbl">Pending Approvals</div></div>
+      <div class="mc-stat-card"><div class="num" id="adm-depts">7</div><div class="lbl">Department Accounts</div></div>
+      <div class="mc-stat-card"><div class="num" id="adm-press-count">0</div><div class="lbl">Press Accounts</div></div>
+    </div>
+
+    <div class="mc-admin-sec-hd">🟠 Pending User Uploads <span id="adm-pending-2" style="color:var(--sf)">0</span></div>
+    <div id="admin-pending-list"></div>
+
+    <div class="mc-admin-sec-hd">🏛 Department Accounts (Username/Password)</div>
+    <div id="admin-dept-list"></div>
+
+    <div class="mc-admin-sec-hd">📰 Press Reporter Accounts</div>
+    <div id="admin-press-list"></div>
+    <div class="qbox">
+      <div class="qbox-t">+ नवीन Press Account तयार करा</div>
+      <form id="add-press-acct-form" onsubmit="addPressAccount(event)">
+        <div class="fg"><label>नाव</label><input type="text" id="np-name" required placeholder="उदा. प्रतिनिधी — Lokmat"/></div>
+        <div class="fg"><label>Username</label><input type="text" id="np-user" required placeholder="username"/></div>
+        <div class="fg"><label>Password</label><input type="text" id="np-pass" required placeholder="password"/></div>
+        <button class="btn-primary" type="submit">+ Account तयार करा</button>
+      </form>
+    </div>
+
+    <div class="mc-admin-sec-hd">🗑️ Content Moderation — सर्व कंटेंट</div>
+    <div class="mc-mod-tabs" id="mod-tabs"></div>
+    <div id="mod-list"></div>
+
+    <div class="mc-admin-sec-hd">ℹ️ Verified Badge System</div>
+    <div class="note-box">
+      <p>🔵 Official — शासन/NMC/पोलीस/आरोग्य विभागांनी अपलोड केलेले.<br/>
+      🟢 Guide — अधिकृत KumbhConnect Guide यांनी अपलोड केलेले.<br/>
+      🟠 User — यात्रेकरूंनी अपलोड केलेले (Approval आवश्यक).</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   DATA MODEL
+   Mirrors the suggested folder structure, so backend integration later
+   maps cleanly:
+   Media Center
+   ├── Previous Kumbh (2003, 2015, Historical)
+   ├── Kumbh 2027 (Preparation, Ghats, Temples, Police, Health, ... Drone)
+   ├── User Gallery
+   ├── Guide Gallery
+   ├── Videos
+   ├── Press Releases
+   └── Downloads
+   All values below are placeholder/mock data for front-end demo only.
+===================================================================== */
+const GRAD = {
+  'ऐतिहासिक फोटो':'linear-gradient(135deg,#9A6040,#4A1E08)',
+  'Drone Photos':'linear-gradient(135deg,#1E293B,#0F172A)',
+  'Royal Bath Photos':'linear-gradient(135deg,#C9920A,#7B1616)',
+  'तयारीची कामे':'linear-gradient(135deg,#D97706,#92400E)',
+  'घाट':'linear-gradient(135deg,#0EA5E9,#0369A1)',
+  'मंदिरे':'linear-gradient(135deg,#F0B429,#C9920A)',
+  'वाहतूक':'linear-gradient(135deg,#64748B,#334155)',
+  'सुरक्षा':'linear-gradient(135deg,#EF4444,#7B1616)',
+  'वैद्यकीय सेवा':'linear-gradient(135deg,#22C55E,#15803D)',
+  'स्वयंसेवक':'linear-gradient(135deg,#A855F7,#6D28D9)',
+  'साधू-संत':'linear-gradient(135deg,#C9920A,#7B1616)',
+  'शाही स्नान':'linear-gradient(135deg,#F0B429,#C8410A)',
+  'Drone View':'linear-gradient(135deg,#1E293B,#0F172A)',
+  'Night View':'linear-gradient(135deg,#312E81,#1E1B4B)',
+  default:'linear-gradient(135deg,#C8410A,#7B1616)'
+};
+const EMOJI = {
+  'ऐतिहासिक फोटो':'🖼️','Drone Photos':'🚁','Royal Bath Photos':'👑','तयारीची कामे':'🏗️',
+  'घाट':'🌊','मंदिरे':'🛕','वाहतूक':'🚦','सुरक्षा':'👮','वैद्यकीय सेवा':'🏥','स्वयंसेवक':'🙋',
+  'साधू-संत':'🧘','शाही स्नान':'🙏','Drone View':'🚁','Night View':'🌙'
+};
+
+const PREV_ALBUMS = [{year:'2003'},{year:'2015'}];
+const PREV_CATS = ['सर्व','ऐतिहासिक फोटो','Drone Photos','Royal Bath Photos'];
+/* No previous-Kumbh archive uploaded yet */
+let PREV_PHOTOS = [];
+
+const LIVE_CATS = ['सर्व','तयारीची कामे','घाट','मंदिरे','वाहतूक','सुरक्षा','वैद्यकीय सेवा','स्वयंसेवक','साधू-संत','शाही स्नान','Drone View','Night View'];
+/* No Kumbh 2027 live photos yet — departments publish via their Dashboard */
+let LIVE_PHOTOS = [];
+
+/* No videos yet */
+const VIDEOS = [];
+
+const PRESS_TYPES = ['सर्व','Live','प्रेस नोट','अधिकृत घोषणा','Traffic Update','Weather','Crowd Update'];
+/* No press releases yet — reporters publish their own via Press Dashboard */
+let PRESS = [];
+
+const GUIDE_CATS = ['सर्व','Tour Photos','Customer Photos','Reviews'];
+/* No guide gallery content yet */
+const GUIDES = [];
+
+/* No yatrekaru uploads yet — these populate only after Admin approval */
+let USER_PHOTOS = [];
+let PENDING = [];
+
+const DEPARTMENTS = [
+  {id:'police',name:'Police',ic:'👮',user:'police_admin',pass:'police@2027',active:true},
+  {id:'nmc',name:'NMC',ic:'🏢',user:'nmc_admin',pass:'nmc@2027',active:true},
+  {id:'health',name:'Health',ic:'🏥',user:'health_admin',pass:'health@2027',active:true},
+  {id:'fire',name:'Fire',ic:'🚒',user:'fire_admin',pass:'fire@2027',active:true},
+  {id:'disaster',name:'Disaster Mgmt',ic:'🌊',user:'disaster_admin',pass:'disaster@2027',active:true},
+  {id:'tourism',name:'Tourism',ic:'🧭',user:'tourism_admin',pass:'tourism@2027',active:true},
+  {id:'volunteers',name:'Volunteers',ic:'🙋',user:'volunteers_admin',pass:'volunteers@2027',active:true},
+];
+/* No photos uploaded yet — departments will publish their own via Department Dashboard */
+let GOVT_PHOTOS = [];
+
+/* Press reporter accounts — created by Super Admin, used to log into Press Dashboard */
+let PRESS_ACCOUNTS = [
+  {id:'press1',name:'डेमो प्रतिनिधी',user:'press_demo',pass:'press@2027',active:true},
+];
+
+function mk(id,title,cat,date,loc,by,badge){
+  return {id,title,cat,date,loc,by,badge,emoji:EMOJI[cat]||'📷',grad:GRAD[cat]||GRAD.default};
+}
+
+/* Lookup registries for modal detail rendering */
+const PHOTO_IDX = {}, VIDEO_IDX = {}, PRESS_IDX = {}, GUIDE_IDX = {};
+function index(arr,reg){ arr.forEach(x=>reg[x.id]=x); }
+index(PREV_PHOTOS,PHOTO_IDX); index(LIVE_PHOTOS,PHOTO_IDX); index(VIDEOS,VIDEO_IDX);
+index(PRESS,PRESS_IDX); index(GUIDES,GUIDE_IDX);
+
+/* =====================================================================
+   STATE
+===================================================================== */
+let state = {
+  tab:'previous',
+  prevYear:'सर्व', prevCat:'सर्व',
+  liveCat:'सर्व',
+  pressType:'सर्व',
+  guideCat:'सर्व',
+  govtDept:'सर्व',
+};
+let isAdmin = false;
+let deptSession = null;   // logged-in department object
+let pressSession = null;  // logged-in press account object
+
+/* =====================================================================
+   GENERIC HELPERS
+===================================================================== */
+function openModal(id){ document.getElementById(id)?.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id){ document.getElementById(id)?.classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.moverlay').forEach(o=>o.addEventListener('click',function(e){ if(e.target===this) closeModal(this.id); }));
+});
+
+let _tt;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function badgeHtml(b){
+  const map={official:['🔵','Official'],guide:['🟢','Guide'],user:['🟠','User']};
+  const v=map[b]||map.official;
+  return `<span class="mc-badge ${b}">${v[0]} ${v[1]}</span>`;
+}
+function fmtDate(d){
+  try{
+    const dt=new Date(d);
+    return dt.toLocaleDateString('mr-IN',{day:'2-digit',month:'short',year:'numeric'});
+  }catch(e){ return d; }
+}
+
+/* =====================================================================
+   TAB SWITCHING
+===================================================================== */
+function switchTab(tab){
+  state.tab=tab;
+  document.querySelectorAll('.mc-tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===tab));
+  document.querySelectorAll('.mc-panel').forEach(p=>p.classList.toggle('on', p.id==='panel-'+tab));
+  document.getElementById('mc-search-input').value='';
+  renderActivePanel();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderActivePanel(){
+  const q=(document.getElementById('mc-search-input')?.value||'').trim().toLowerCase();
+  switch(state.tab){
+    case 'previous': renderPrevious(q); break;
+    case 'live': renderLive(q); break;
+    case 'videos': renderVideos(q); break;
+    case 'press': renderPress(q); break;
+    case 'govt': renderGovt(q); break;
+    case 'guide': renderGuide(q); break;
+    case 'user': renderUser(q); break;
+  }
+}
+
+function matches(text,q){ return !q || (text||'').toLowerCase().includes(q); }
+
+/* =====================================================================
+   CHIP ROW RENDER
+===================================================================== */
+function chipRow(containerId, items, activeVal, onClick){
+  const el=document.getElementById(containerId);
+  el.innerHTML = items.map(v=>`<div class="mc-chip ${v===activeVal?'on':''}" onclick="${onClick}('${v.replace(/'/g,"\\'")}')">${v}</div>`).join('');
+}
+
+/* =====================================================================
+   PREVIOUS KUMBH PANEL
+===================================================================== */
+function setPrevYear(y){ state.prevYear=y; renderPrevious(); }
+function setPrevCat(c){ state.prevCat=c; renderPrevious(); }
+function renderPrevious(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  const years=['सर्व',...PREV_ALBUMS.map(a=>a.year)];
+  chipRow('prev-year-row', years, state.prevYear, 'setPrevYear');
+  chipRow('prev-cat-row', PREV_CATS, state.prevCat, 'setPrevCat');
+
+  let list = PREV_PHOTOS.filter(p=>
+    (state.prevYear==='सर्व'||p.year===state.prevYear) &&
+    (state.prevCat==='सर्व'||p.cat===state.prevCat) &&
+    (matches(p.title,q)||matches(p.loc,q))
+  );
+  renderGrid('prev-grid', list, openPhotoModal);
+}
+
+/* =====================================================================
+   KUMBH 2027 LIVE PANEL
+===================================================================== */
+function setLiveCat(c){ state.liveCat=c; renderLive(); }
+function renderLive(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  chipRow('live-cat-row', LIVE_CATS, state.liveCat, 'setLiveCat');
+  let list = LIVE_PHOTOS.filter(p=>
+    (state.liveCat==='सर्व'||p.cat===state.liveCat) &&
+    (matches(p.title,q)||matches(p.loc,q)||matches(p.cat,q))
+  );
+  renderGrid('live-grid', list, openPhotoModal);
+}
+
+function renderGrid(containerId, list, clickFn){
+  const el=document.getElementById(containerId);
+  if(!list.length){ el.innerHTML = emptyState(); return; }
+  el.innerHTML = list.map(p=>`
+    <div class="mc-card" onclick="${clickFn.name}('${p.id}')">
+      <div class="mc-thumb" style="background:${p.grad}">
+        ${p.emoji}
+        ${badgeHtml(p.badge)}
+        <div class="mc-thumb-meta">${fmtDate(p.date)}</div>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-card-title">${p.title}</div>
+        <div class="mc-card-sub">📍 ${p.loc||'—'}</div>
+      </div>
+    </div>`).join('');
+}
+function emptyState(){
+  return `<div class="mc-empty"><div class="mc-empty-ic">🗂️</div><p>या फिल्टरसाठी सध्या कोणतेही फोटो उपलब्ध नाहीत.</p></div>`;
+}
+
+function openPhotoModal(id){
+  const p = PHOTO_IDX[id] || USER_LOOKUP(id) || GOVT_LOOKUP(id) || GUIDE_LOOKUP(id);
+  if(!p) return;
+  document.getElementById('detail-title').textContent = p.title || p.caption || 'फोटो तपशील';
+  const allowDownload = !!p.img;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-thumb" style="height:170px;border-radius:var(--r);margin-bottom:12px;background:${p.img?('url('+p.img+') center/cover'):(p.grad||GRAD.default)};font-size:54px">
+      ${p.img?'':(p.emoji||'📷')}${badgeHtml(p.badge||'user')}
+    </div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Caption</span><span class="mc-meta-v">${p.title||p.caption||'—'}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Date</span><span class="mc-meta-v">${fmtDate(p.date)}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Location</span><span class="mc-meta-v">${p.loc||p.location||'—'}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Uploaded By</span><span class="mc-meta-v">${p.by||(p.name? (p.name+' · '+p.city):'—')}</span></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-outline" style="flex:1" onclick="toast('🔗 लिंक कॉपी झाली')">🔗 Share</button>
+      ${allowDownload?`<a class="btn-primary" style="flex:1;display:block;text-align:center;text-decoration:none" href="${p.img}" download="${(p.title||'photo').replace(/[^a-zA-Z0-9]+/g,'_')}.jpg">⬇️ Download</a>`:`<button class="btn-primary" style="flex:1" onclick="toast('⬇️ डाउनलोड सुरू झाले')">⬇️ Download</button>`}
+    </div>
+    ${p.badge==='user'?'<div class="note-box" style="margin-top:10px"><p>🟠 User फोटोंवर डाउनलोड परवानगी uploader वर अवलंबून आहे.</p></div>':''}
+  `;
+  openModal('detail-modal');
+}
+function USER_LOOKUP(id){ const u=USER_PHOTOS.find(x=>x.id===id); return u? toPhotoShape(u) : null; }
+function GOVT_LOOKUP(id){ const g=GOVT_PHOTOS.find(x=>x.id===id); return g? {...g,badge:'official',emoji:EMOJI[g.cat]||'🏛️',grad:GRAD[g.cat]||GRAD.default,by:g.dept} : null; }
+function GUIDE_LOOKUP(id){ const g=GUIDE_IDX[id]; return g? {...g,badge:'guide',emoji:'🧭',grad:GRAD.default,title:g.caption} : null; }
+function toPhotoShape(u){ return {id:u.id,title:u.caption,date:u.date,loc:u.location,by:u.name+' · '+u.city,badge:'user',emoji:'🧑‍🤝‍🧑',grad:GRAD.default,img:u.img}; }
+
+/* =====================================================================
+   VIDEOS PANEL
+===================================================================== */
+function renderVideos(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  const list = VIDEOS.filter(v=>matches(v.title,q)||matches(v.dept,q));
+  const el=document.getElementById('videos-list');
+  if(!list.length){ el.innerHTML=emptyState(); return; }
+  el.innerHTML = list.map(v=>`
+    <div class="mc-list-item" onclick="openVideoModal('${v.id}')">
+      <div class="mc-list-thumb" style="background:${GRAD.default}">
+        🎬<div class="mc-play-ov">▶️</div>
+      </div>
+      <div class="mc-list-info">
+        <div class="mc-list-title">${v.title}</div>
+        <div class="mc-list-meta">
+          <span class="mc-pill" style="background:${v.badge==='official'?'var(--official)':'var(--guide)'}">${v.badge==='official'?'🔵 Official':'🟢 Guide'}</span>
+          <span>⏱ ${v.duration}</span><span>📅 ${fmtDate(v.date)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function openVideoModal(id){
+  const v=VIDEO_IDX[id]; if(!v) return;
+  document.getElementById('detail-title').textContent = v.title;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-thumb" style="height:170px;border-radius:var(--r);margin-bottom:12px;background:${GRAD.default};font-size:48px">🎬<div class="mc-play-ov" style="font-size:34px">▶️</div></div>
+    <p style="font-size:.82rem;color:var(--t2);line-height:1.6;margin-bottom:10px">${v.desc}</p>
+    <div class="mc-meta-row"><span class="mc-meta-l">Department</span><span class="mc-meta-v">${v.dept}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Duration</span><span class="mc-meta-v">${v.duration}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Date</span><span class="mc-meta-v">${fmtDate(v.date)}</span></div>
+    <button class="btn-primary" style="margin-top:12px" onclick="toast('▶️ Video Player येथे लोड होईल')">▶️ Play Video</button>
+  `;
+  openModal('detail-modal');
+}
+
+/* =====================================================================
+   PRESS RELEASES PANEL
+===================================================================== */
+function setPressType(t){ state.pressType=t; renderPress(); }
+function renderPress(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  chipRow('press-cat-row', PRESS_TYPES, state.pressType, 'setPressType');
+  const list = PRESS.filter(p=>
+    (state.pressType==='सर्व'||p.type===state.pressType) &&
+    (matches(p.title,q)||matches(p.excerpt,q))
+  );
+  const el=document.getElementById('press-list');
+  if(!list.length){ el.innerHTML=emptyState(); return; }
+  el.innerHTML = list.map(p=>`
+    <div class="mc-list-item" onclick="openPressModal('${p.id}')">
+      <div class="mc-list-thumb" style="background:${GRAD.default}">📰</div>
+      <div class="mc-list-info">
+        <div class="mc-list-title">${p.title}</div>
+        <div class="mc-list-excerpt">${p.excerpt}</div>
+        <div class="mc-list-meta">
+          <span class="mc-pill" style="background:var(--official)">🔵 ${p.type}</span>
+          <span>📅 ${fmtDate(p.date)}</span>${p.pdf?'<span>📄 PDF</span>':''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+function openPressModal(id){
+  const p=PRESS_IDX[id]; if(!p) return;
+  document.getElementById('detail-title').textContent = p.title;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-meta-row"><span class="mc-meta-l">Type</span><span class="mc-meta-v">${p.type}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Date</span><span class="mc-meta-v">${fmtDate(p.date)}</span></div>
+    <p style="font-size:.84rem;color:var(--t2);line-height:1.6;margin:12px 0">${p.excerpt}</p>
+    ${p.pdf?`<button class="btn-primary" onclick="toast('📄 PDF डाउनलोड सुरू झाले')">📄 PDF डाउनलोड करा</button>`:''}
+  `;
+  openModal('detail-modal');
+}
+
+/* =====================================================================
+   GOVERNMENT PHOTOS PANEL (Department Upload)
+===================================================================== */
+function renderDeptGrid(){
+  const el=document.getElementById('dept-grid');
+  el.innerHTML = DEPARTMENTS.map(d=>{
+    const cnt = GOVT_PHOTOS.filter(g=>g.deptId===d.id).length;
+    return `
+    <div class="mc-dept-card ${state.govtDept===d.name?'on':''}">
+      <div class="mc-dept-ic">${d.ic}</div>
+      <div class="mc-dept-name">${d.name}</div>
+      <div class="mc-dept-count">${cnt} फोटो</div>
+      <div class="mc-dept-actions">
+        <button class="mc-dept-btn primary" onclick="setGovtDept('${d.name}')">गॅलरी पाहा</button>
+        <button class="mc-dept-btn" onclick="openDeptLogin('${d.id}')">🔐 Login</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setGovtDept(name){
+  state.govtDept = state.govtDept===name ? 'सर्व' : name;
+  renderGovt();
+}
+function renderGovt(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  renderDeptGrid();
+  document.getElementById('govt-grid-title').textContent =
+    state.govtDept==='सर्व' ? 'सर्व विभागांचे फोटो' : (state.govtDept+' विभागाचे फोटो');
+  const list = GOVT_PHOTOS.filter(g=>
+    (state.govtDept==='सर्व'||g.dept===state.govtDept) &&
+    (matches(g.title,q)||matches(g.dept,q)||matches(g.loc,q))
+  );
+  const el=document.getElementById('govt-grid');
+  if(!list.length){ el.innerHTML=emptyState(); return; }
+  el.innerHTML = list.map(g=>`
+    <div class="mc-card" onclick="openPhotoModal('${g.id}')">
+      <div class="mc-thumb" style="background:${g.img?('url('+g.img+') center/cover'):(GRAD[g.cat]||GRAD.default)}">
+        ${g.img?'':'📷'}
+        <span class="mc-badge official">🔵 ${g.dept}</span>
+        <div class="mc-thumb-meta">${fmtDate(g.date)}</div>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-card-title">${g.title}</div>
+        <div class="mc-card-sub">📍 ${g.loc||'—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ----- Department login / dashboard ----- */
+let _deptLoginTargetId = null;
+function openDeptLogin(deptId){
+  _deptLoginTargetId = deptId;
+  const d = DEPARTMENTS.find(x=>x.id===deptId);
+  document.getElementById('dept-login-title').textContent = '🔐 '+(d?d.name:'')+' — विभाग लॉगिन';
+  openModal('dept-login-modal');
+}
+function deptLogin(e){
+  e.preventDefault();
+  const u=document.getElementById('dept-user').value.trim();
+  const p=document.getElementById('dept-pass').value.trim();
+  const d = DEPARTMENTS.find(x=>x.id===_deptLoginTargetId && x.user===u && x.pass===p);
+  if(!d){ toast('❌ चुकीचे Username किंवा Password'); return; }
+  if(!d.active){ toast('⚠️ हे Account सध्या निष्क्रिय (deactivated) आहे'); return; }
+  deptSession = d;
+  document.getElementById('dept-login-form').reset();
+  closeModal('dept-login-modal');
+  openDeptDrawer();
+  toast('स्वागत आहे, '+d.name+'! 🏛');
+}
+function openDeptDrawer(){
+  if(!deptSession) return;
+  document.getElementById('dept-dash-title').textContent = '🏛 '+deptSession.name+' Dashboard';
+  buildDeptCatOptions();
+  renderDeptMyList();
+  document.getElementById('dept-drawer').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function logoutDept(){
+  deptSession=null;
+  document.getElementById('dept-drawer').style.display='none';
+  document.body.style.overflow='';
+  toast('Department Logout झाले');
+}
+function buildDeptCatOptions(){
+  document.getElementById('dp-cat').innerHTML = LIVE_CATS.slice(1).map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+function submitDeptPhoto(e){
+  e.preventDefault();
+  if(!deptSession) return;
+  const title=document.getElementById('dp-title').value.trim();
+  const cat=document.getElementById('dp-cat').value;
+  const loc=document.getElementById('dp-loc').value.trim();
+  const fileInput=document.getElementById('dp-photo');
+  const file=fileInput.files[0];
+  if(!title||!file){ toast('शीर्षक व फोटो आवश्यक आहे'); return; }
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    GOVT_PHOTOS.unshift({
+      id:'go'+Date.now(), deptId:deptSession.id, dept:deptSession.name, title, cat,
+      loc:loc||'—', date:new Date().toISOString().slice(0,10), img:ev.target.result
+    });
+    document.getElementById('dept-photo-form').reset();
+    renderDeptMyList();
+    renderGovt();
+    updateHeroStats();
+    toast('✅ फोटो Publish झाला');
+  };
+  reader.readAsDataURL(file);
+}
+function renderDeptMyList(){
+  if(!deptSession) return;
+  const mine = GOVT_PHOTOS.filter(g=>g.deptId===deptSession.id);
+  const el=document.getElementById('dept-my-list');
+  if(!mine.length){ el.innerHTML=`<div class="mc-empty" style="padding:20px 0"><div class="mc-empty-ic">📭</div><p>अजून काहीही Publish केलेले नाही.</p></div>`; return; }
+  el.innerHTML = mine.map(g=>`
+    <div class="mc-myitem">
+      <span class="ic">📷</span>
+      <div class="tx">${g.title}<small>${g.cat} · ${fmtDate(g.date)}</small></div>
+      <button class="mc-acct-btn danger" onclick="deleteDeptPhoto('${g.id}')">हटवा</button>
+    </div>`).join('');
+}
+function deleteDeptPhoto(id){
+  GOVT_PHOTOS = GOVT_PHOTOS.filter(g=>g.id!==id);
+  renderDeptMyList();
+  renderGovt();
+  updateHeroStats();
+  toast('🗑️ फोटो हटवला');
+}
+
+/* =====================================================================
+   GUIDE GALLERY PANEL
+===================================================================== */
+function setGuideCat(c){ state.guideCat=c; renderGuide(); }
+function renderGuide(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  chipRow('guide-cat-row', GUIDE_CATS, state.guideCat, 'setGuideCat');
+  const list = GUIDES.filter(g=>
+    (state.guideCat==='सर्व'||g.type===state.guideCat) &&
+    (matches(g.caption,q)||matches(g.by,q)||matches(g.loc,q))
+  );
+  const el=document.getElementById('guide-grid');
+  if(!list.length){ el.innerHTML=emptyState(); return; }
+  el.innerHTML = list.map(g=>`
+    <div class="mc-card" onclick="openGuideModal('${g.id}')">
+      <div class="mc-thumb" style="background:${GRAD.default}">
+        ${g.type==='Reviews'?'⭐':'🧭'}
+        <span class="mc-badge guide">🟢 Guide</span>
+        <div class="mc-thumb-meta">${fmtDate(g.date)}</div>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-card-title">${g.caption}</div>
+        <div class="mc-card-sub">${g.by}${g.rating?(' · '+'⭐'.repeat(g.rating)):''}</div>
+      </div>
+    </div>`).join('');
+}
+function openGuideModal(id){
+  const g=GUIDE_IDX[id]; if(!g) return;
+  document.getElementById('detail-title').textContent = g.type;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-thumb" style="height:150px;border-radius:var(--r);margin-bottom:12px;background:${GRAD.default};font-size:46px">${g.type==='Reviews'?'⭐':'🧭'}<span class="mc-badge guide">🟢 Guide</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">By</span><span class="mc-meta-v">${g.by}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Date</span><span class="mc-meta-v">${fmtDate(g.date)}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Location</span><span class="mc-meta-v">${g.loc}</span></div>
+    ${g.rating?`<div class="mc-meta-row"><span class="mc-meta-l">Rating</span><span class="mc-meta-v">${'⭐'.repeat(g.rating)}</span></div>`:''}
+    <p style="font-size:.84rem;color:var(--t2);line-height:1.6;margin-top:12px">${g.caption}</p>
+  `;
+  openModal('detail-modal');
+}
+
+/* =====================================================================
+   USER GALLERY PANEL + UPLOAD FLOW
+===================================================================== */
+function renderUser(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  const list = USER_PHOTOS.filter(u=>matches(u.caption,q)||matches(u.city,q)||matches(u.location,q));
+  const el=document.getElementById('user-grid');
+  if(!list.length){ el.innerHTML=emptyState(); return; }
+  el.innerHTML = list.map(u=>`
+    <div class="mc-card" onclick="openPhotoModal('${u.id}')">
+      <div class="mc-thumb" style="background:${u.img?('url('+u.img+') center/cover'):GRAD.default}">
+        ${u.img?'':'🧑‍🤝‍🧑'}
+        <span class="mc-badge user">🟠 User</span>
+        <div class="mc-thumb-meta">${fmtDate(u.date)}</div>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-card-title">${u.caption}</div>
+        <div class="mc-card-sub">👤 ${u.name} · ${u.city}</div>
+      </div>
+    </div>`).join('');
+}
+
+function submitUpload(e){
+  e.preventDefault();
+  const name=document.getElementById('up-name').value.trim();
+  const city=document.getElementById('up-city').value.trim();
+  const caption=document.getElementById('up-caption').value.trim();
+  const location=document.getElementById('up-location').value.trim();
+  const file=document.getElementById('up-photo').files[0];
+  if(!name||!city||!caption||!file){ toast('कृपया सर्व आवश्यक माहिती व फोटो भरा'); return; }
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const item={id:'u'+Date.now(),name,city,caption,location:location||'—',date:new Date().toISOString().slice(0,10),img:ev.target.result};
+    PENDING.push(item);
+    document.getElementById('upload-form').reset();
+    closeModal('upload-modal');
+    toast('✅ फोटो सबमिट झाला! Admin Approval नंतर तो Publish होईल.');
+    refreshPendingBadge();
+    if(isAdmin) renderAdminPanel();
+  };
+  reader.readAsDataURL(file);
+}
+
+/* =====================================================================
+   FILTER MODAL (Search by Date/Category/Place/Photographer/Department)
+===================================================================== */
+function buildFilterOptions(){
+  const cats=['सर्व',...new Set([...PREV_CATS.slice(1),...LIVE_CATS.slice(1)])];
+  document.getElementById('filt-cat').innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  document.getElementById('filt-dept').innerHTML = ['सर्व',...DEPARTMENTS.map(d=>d.name)].map(d=>`<option value="${d}">${d}</option>`).join('');
+}
+function applyFilters(){
+  const place=document.getElementById('filt-place').value.trim();
+  const by=document.getElementById('filt-by').value.trim();
+  const cat=document.getElementById('filt-cat').value;
+  const dept=document.getElementById('filt-dept').value;
+  document.getElementById('mc-search-input').value = [place,by].filter(Boolean).join(' ');
+  if(cat && cat!=='सर्व'){
+    if(state.tab==='previous') state.prevCat=cat;
+    if(state.tab==='live') state.liveCat=cat;
+  }
+  if(dept && dept!=='सर्व' && state.tab==='govt'){ state.govtDept=dept; }
+  closeModal('filter-modal');
+  renderActivePanel();
+  toast('🔎 फिल्टर लागू केले');
+}
+function clearFilters(){
+  document.getElementById('filt-date').value='';
+  document.getElementById('filt-place').value='';
+  document.getElementById('filt-by').value='';
+  document.getElementById('filt-cat').value='सर्व';
+  document.getElementById('filt-dept').value='सर्व';
+}
+
+/* =====================================================================
+   ADMIN — LOGIN / PANEL / APPROVALS
+   (Super Admin credentials are checked against SUPER_ADMIN below.
+   For real production use, move this check to a secure backend —
+   never ship real credentials inside client-side JS.)
+===================================================================== */
+const SUPER_ADMIN = { user:'Tapasya@13', pass:'Kumbh@tapu' };
+function handleAdminClick(){
+  if(isAdmin) openAdminPanel(); else openModal('admin-login-modal');
+}
+function adminLogin(e){
+  e.preventDefault();
+  const u=document.getElementById('admin-user').value.trim();
+  const p=document.getElementById('admin-pass').value.trim();
+  if(u!==SUPER_ADMIN.user || p!==SUPER_ADMIN.pass){ toast('❌ चुकीचे Username किंवा Password'); return; }
+  isAdmin=true;
+  document.getElementById('admin-login-form').reset();
+  closeModal('admin-login-modal');
+  document.getElementById('mc-admin-btn').classList.add('active');
+  document.getElementById('mc-admin-btn-label').textContent='Admin ✓';
+  toast('स्वागत आहे, Super Admin! 👑');
+  openAdminPanel();
+}
+function openAdminPanel(){
+  renderAdminPanel();
+  document.getElementById('admin-drawer').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeAdminPanel(){
+  document.getElementById('admin-drawer').style.display='none';
+  document.body.style.overflow='';
+}
+function logoutAdmin(){
+  isAdmin=false;
+  closeAdminPanel();
+  document.getElementById('mc-admin-btn').classList.remove('active');
+  document.getElementById('mc-admin-btn-label').textContent='Admin';
+  toast('Admin Logout झाले');
+}
+function renderAdminPanel(){
+  const totalPhotos = PREV_PHOTOS.length+LIVE_PHOTOS.length+GOVT_PHOTOS.length+USER_PHOTOS.length;
+  document.getElementById('adm-total-photos').textContent = totalPhotos;
+  document.getElementById('adm-pending').textContent = PENDING.length;
+  document.getElementById('adm-pending-2').textContent = PENDING.length;
+  document.getElementById('adm-depts').textContent = DEPARTMENTS.length;
+  document.getElementById('adm-press-count').textContent = PRESS_ACCOUNTS.length;
+
+  const list=document.getElementById('admin-pending-list');
+  if(!PENDING.length){
+    list.innerHTML = `<div class="mc-empty" style="padding:24px 0"><div class="mc-empty-ic">📭</div><p>सध्या कोणतेही Pending Upload नाहीत.</p></div>`;
+  } else {
+    list.innerHTML = PENDING.map(p=>`
+      <div class="mc-pa-item">
+        <div class="mc-pa-thumb" style="${p.img?('background:url('+p.img+') center/cover'):''}" ${p.img?`onclick="previewPending('${p.id}')"`:''}>${p.img?'':'🧑‍🤝‍🧑'}</div>
+        <div class="mc-pa-info">
+          <div class="mc-pa-name">${p.name} · ${p.city}</div>
+          <div class="mc-pa-cap">${p.caption}${p.location && p.location!=='—'?(' — 📍'+p.location):''}</div>
+          <div class="mc-pa-actions">
+            <button class="mc-pa-btn mc-pa-approve" onclick="approveItem('${p.id}')">✅ Approve</button>
+            <button class="mc-pa-btn mc-pa-reject" onclick="rejectItem('${p.id}')">❌ Reject</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  renderAdminDeptList();
+  renderAdminPressList();
+  renderModTabs();
+  renderModList();
+  refreshPendingBadge();
+}
+function previewPending(id){
+  const p=PENDING.find(x=>x.id===id); if(!p||!p.img) return;
+  document.getElementById('detail-title').textContent = p.caption;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-thumb" style="height:170px;border-radius:var(--r);margin-bottom:12px;background:url(${p.img}) center/cover"></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">नाव</span><span class="mc-meta-v">${p.name} · ${p.city}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Location</span><span class="mc-meta-v">${p.location}</span></div>
+  `;
+  openModal('detail-modal');
+}
+function approveItem(id){
+  const idx=PENDING.findIndex(p=>p.id===id);
+  if(idx<0) return;
+  const item=PENDING.splice(idx,1)[0];
+  USER_PHOTOS.unshift(item);
+  renderAdminPanel();
+  renderUser();
+  updateHeroStats();
+  toast('✅ Approved व Publish झाले');
+}
+function rejectItem(id){
+  PENDING = PENDING.filter(p=>p.id!==id);
+  renderAdminPanel();
+  toast('❌ अपलोड Reject केले');
+}
+function refreshPendingBadge(){
+  const b=document.getElementById('admin-pending-badge');
+  if(PENDING.length>0){ b.style.display='flex'; b.textContent=PENDING.length; }
+  else { b.style.display='none'; }
+}
+
+/* ----- Department account management (Super Admin) ----- */
+function renderAdminDeptList(){
+  const el=document.getElementById('admin-dept-list');
+  el.innerHTML = DEPARTMENTS.map(d=>`
+    <div class="mc-acct-row ${d.active?'':'inactive'}">
+      <span style="font-size:18px">${d.ic}</span>
+      <div class="mc-acct-info">
+        <div class="mc-acct-name">${d.name}${!d.active?' (निष्क्रिय)':''}</div>
+        <div class="mc-acct-cred">👤 ${d.user} &nbsp; 🔑 ${d.pass}</div>
+      </div>
+      <div class="mc-acct-actions">
+        <button class="mc-acct-btn" onclick="editDeptPass('${d.id}')">Password बदला</button>
+        <button class="mc-acct-btn" onclick="toggleDeptActive('${d.id}')">${d.active?'Deactivate':'Activate'}</button>
+      </div>
+    </div>`).join('');
+}
+function editDeptPass(id){
+  const d=DEPARTMENTS.find(x=>x.id===id); if(!d) return;
+  const np=prompt(d.name+' साठी नवीन Password टाका:', d.pass);
+  if(np===null) return;
+  if(!np.trim()){ toast('Password रिकामे ठेवता येणार नाही'); return; }
+  d.pass=np.trim();
+  renderAdminDeptList();
+  toast('🔑 '+d.name+' चे Password अपडेट झाले');
+}
+function toggleDeptActive(id){
+  const d=DEPARTMENTS.find(x=>x.id===id); if(!d) return;
+  d.active=!d.active;
+  renderAdminDeptList();
+  toast(d.name+' '+(d.active?'Activate':'Deactivate')+' केले');
+}
+
+/* ----- Press account management (Super Admin) ----- */
+function renderAdminPressList(){
+  const el=document.getElementById('admin-press-list');
+  if(!PRESS_ACCOUNTS.length){
+    el.innerHTML = `<div class="mc-empty" style="padding:16px 0"><div class="mc-empty-ic">📭</div><p>अजून कोणतेही Press Account नाही.</p></div>`;
+    return;
+  }
+  el.innerHTML = PRESS_ACCOUNTS.map(p=>`
+    <div class="mc-acct-row ${p.active?'':'inactive'}">
+      <span style="font-size:18px">📰</span>
+      <div class="mc-acct-info">
+        <div class="mc-acct-name">${p.name}${!p.active?' (निष्क्रिय)':''}</div>
+        <div class="mc-acct-cred">👤 ${p.user} &nbsp; 🔑 ${p.pass}</div>
+      </div>
+      <div class="mc-acct-actions">
+        <button class="mc-acct-btn" onclick="editPressPass('${p.id}')">Password बदला</button>
+        <button class="mc-acct-btn" onclick="togglePressActive('${p.id}')">${p.active?'Deactivate':'Activate'}</button>
+        <button class="mc-acct-btn danger" onclick="deletePressAccount('${p.id}')">हटवा</button>
+      </div>
+    </div>`).join('');
+}
+function addPressAccount(e){
+  e.preventDefault();
+  const name=document.getElementById('np-name').value.trim();
+  const user=document.getElementById('np-user').value.trim();
+  const pass=document.getElementById('np-pass').value.trim();
+  if(!name||!user||!pass){ toast('सर्व माहिती भरा'); return; }
+  if(PRESS_ACCOUNTS.some(p=>p.user===user)){ toast('हे Username आधीच वापरात आहे'); return; }
+  PRESS_ACCOUNTS.push({id:'press'+Date.now(),name,user,pass,active:true});
+  document.getElementById('add-press-acct-form').reset();
+  renderAdminPanel();
+  toast('✅ Press Account तयार झाले');
+}
+function editPressPass(id){
+  const p=PRESS_ACCOUNTS.find(x=>x.id===id); if(!p) return;
+  const np=prompt(p.name+' साठी नवीन Password टाका:', p.pass);
+  if(np===null) return;
+  if(!np.trim()){ toast('Password रिकामे ठेवता येणार नाही'); return; }
+  p.pass=np.trim();
+  renderAdminPressList();
+  toast('🔑 Password अपडेट झाले');
+}
+function togglePressActive(id){
+  const p=PRESS_ACCOUNTS.find(x=>x.id===id); if(!p) return;
+  p.active=!p.active;
+  renderAdminPressList();
+  toast((p.active?'Activate':'Deactivate')+' केले');
+}
+function deletePressAccount(id){
+  PRESS_ACCOUNTS = PRESS_ACCOUNTS.filter(p=>p.id!==id);
+  renderAdminPanel();
+  toast('🗑️ Press Account हटवले');
+}
+
+/* ----- Content moderation (Super Admin can delete anything) ----- */
+const MOD_TABS = [
+  {key:'previous',label:'मागील कुंभ'},
+  {key:'live',label:'कुंभ 2027'},
+  {key:'govt',label:'शासकीय'},
+  {key:'guide',label:'गाईड'},
+  {key:'user',label:'युजर'},
+  {key:'press',label:'प्रेस'},
+];
+let modTab = 'live';
+function renderModTabs(){
+  const el=document.getElementById('mod-tabs');
+  el.innerHTML = MOD_TABS.map(t=>`<div class="mc-mod-tab ${modTab===t.key?'on':''}" onclick="setModTab('${t.key}')">${t.label}</div>`).join('');
+}
+function setModTab(k){ modTab=k; renderModTabs(); renderModList(); }
+function modSourceArray(){
+  switch(modTab){
+    case 'previous': return PREV_PHOTOS;
+    case 'live': return LIVE_PHOTOS;
+    case 'govt': return GOVT_PHOTOS;
+    case 'guide': return GUIDES;
+    case 'user': return USER_PHOTOS;
+    case 'press': return PRESS;
+  }
+}
+function renderModList(){
+  const el=document.getElementById('mod-list');
+  const arr = modSourceArray();
+  if(!arr || !arr.length){ el.innerHTML = `<div class="mc-empty" style="padding:16px 0"><div class="mc-empty-ic">🗂️</div><p>या Section मध्ये सध्या काहीही नाही.</p></div>`; return; }
+  el.innerHTML = arr.map(item=>{
+    const title = item.title || item.caption || '—';
+    const sub = item.date ? fmtDate(item.date) : '';
+    return `
+    <div class="mc-mod-row">
+      <span class="mc-mod-ic">${item.img?'🖼️':'📄'}</span>
+      <div class="mc-mod-info">${title}<small>${sub}</small></div>
+      <button class="mc-acct-btn danger" onclick="deleteModItem('${item.id}')">हटवा</button>
+    </div>`;
+  }).join('');
+}
+function deleteModItem(id){
+  switch(modTab){
+    case 'previous': PREV_PHOTOS = PREV_PHOTOS.filter(x=>x.id!==id); break;
+    case 'live': LIVE_PHOTOS = LIVE_PHOTOS.filter(x=>x.id!==id); break;
+    case 'govt': GOVT_PHOTOS = GOVT_PHOTOS.filter(x=>x.id!==id); break;
+    case 'guide': GUIDES.splice(GUIDES.findIndex(x=>x.id===id),1); break;
+    case 'user': USER_PHOTOS = USER_PHOTOS.filter(x=>x.id!==id); break;
+    case 'press': PRESS = PRESS.filter(x=>x.id!==id); break;
+  }
+  renderModList();
+  renderAdminPanel();
+  renderActivePanel();
+  updateHeroStats();
+  toast('🗑️ हटवले');
+}
+function updateHeroStats(){
+  document.getElementById('stat-photos').textContent =
+    PREV_PHOTOS.length+LIVE_PHOTOS.length+GOVT_PHOTOS.length+USER_PHOTOS.length;
+  document.getElementById('stat-videos').textContent = VIDEOS.length;
+}
+
+/* ----- Press reporter login / dashboard ----- */
+function pressLogin(e){
+  e.preventDefault();
+  const u=document.getElementById('press-user').value.trim();
+  const p=document.getElementById('press-pass').value.trim();
+  const acct = PRESS_ACCOUNTS.find(x=>x.user===u && x.pass===p);
+  if(!acct){ toast('❌ चुकीचे Username किंवा Password'); return; }
+  if(!acct.active){ toast('⚠️ हे Account सध्या निष्क्रिय आहे'); return; }
+  pressSession = acct;
+  document.getElementById('press-login-form').reset();
+  closeModal('press-login-modal');
+  openPressDrawer();
+  toast('स्वागत आहे, '+acct.name+'! 📰');
+}
+function openPressDrawer(){
+  if(!pressSession) return;
+  document.getElementById('press-dash-sub').textContent = pressSession.name;
+  buildPressTypeOptions();
+  renderPressMyList();
+  document.getElementById('press-drawer').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function logoutPress(){
+  pressSession=null;
+  document.getElementById('press-drawer').style.display='none';
+  document.body.style.overflow='';
+  toast('Press Logout झाले');
+}
+function buildPressTypeOptions(){
+  document.getElementById('pr-type').innerHTML = PRESS_TYPES.slice(1).map(t=>`<option value="${t}">${t}</option>`).join('');
+}
+function submitPressRelease(e){
+  e.preventDefault();
+  if(!pressSession) return;
+  const title=document.getElementById('pr-title').value.trim();
+  const type=document.getElementById('pr-type').value;
+  const excerpt=document.getElementById('pr-excerpt').value.trim();
+  const pdf=document.getElementById('pr-pdf').checked;
+  if(!title||!excerpt){ toast('Title व तपशील आवश्यक आहे'); return; }
+  const item={id:'pr'+Date.now(),type,title,excerpt,pdf,date:new Date().toISOString().slice(0,10),by:pressSession.name};
+  PRESS.unshift(item);
+  PRESS_IDX[item.id]=item;
+  document.getElementById('press-release-form').reset();
+  renderPressMyList();
+  renderPress();
+  toast('✅ Press Release Publish झाला');
+}
+function renderPressMyList(){
+  if(!pressSession) return;
+  const mine = PRESS.filter(p=>p.by===pressSession.name);
+  const el=document.getElementById('press-my-list');
+  if(!mine.length){ el.innerHTML = `<div class="mc-empty" style="padding:20px 0"><div class="mc-empty-ic">📭</div><p>अजून काहीही Publish केलेले नाही.</p></div>`; return; }
+  el.innerHTML = mine.map(p=>`
+    <div class="mc-myitem">
+      <span class="ic">📰</span>
+      <div class="tx">${p.title}<small>${p.type} · ${fmtDate(p.date)}</small></div>
+      <button class="mc-acct-btn danger" onclick="deletePressRelease('${p.id}')">हटवा</button>
+    </div>`).join('');
+}
+function deletePressRelease(id){
+  PRESS = PRESS.filter(p=>p.id!==id);
+  delete PRESS_IDX[id];
+  renderPressMyList();
+  renderPress();
+  toast('🗑️ Press Release हटवला');
+}
+
+/* =====================================================================
+   LIVE TICKER ROTATION
+===================================================================== */
+const TICKER_MSGS = [
+  '🚦 Traffic Update: रामकुंड परिसरात वळण मार्ग सुरू',
+  '🌤️ Weather: पुढील 3 दिवस आकाश निरभ्र राहील',
+  '👥 Crowd Update: साधुग्राम परिसरात मध्यम गर्दी',
+  '📢 अधिकृत घोषणा: मुख्य शाही स्नान दिनांक जाहीर',
+];
+let _tIdx=0;
+function rotateTicker(){
+  const el=document.getElementById('ticker-text');
+  el.style.opacity=0;
+  setTimeout(()=>{
+    el.textContent = TICKER_MSGS[_tIdx % TICKER_MSGS.length];
+    _tIdx++;
+    el.style.opacity=1;
+  },250);
+}
+
+/* =====================================================================
+   INIT
+===================================================================== */
+function init(){
+  updateHeroStats();
+  buildFilterOptions();
+  renderPrevious('');
+  renderLive('');
+  renderVideos('');
+  renderPress('');
+  renderGovt('');
+  renderGuide('');
+  renderUser('');
+  rotateTicker();
+  setInterval(rotateTicker, 4500);
+}
+init();
+</script>
+</body>
+</html>

@@ -1383,10 +1383,11 @@ if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.
     <div onclick="moreNav('kex')" style="text-align:center;padding:10px 4px;background:var(--cs);border-radius:12px;cursor:pointer;border:1px solid var(--br)"><div style="font-size:20px">🕉️</div><div style="font-size:.6rem;font-weight:600;color:var(--t2);margin-top:4px;line-height:1.2" data-i18n="more_kex">कुंभ<br/>Explore</div></div>
     <div onclick="window.location.href='contact.html'" style="text-align:center;padding:10px 4px;background:var(--cs);border-radius:12px;cursor:pointer;border:1px solid var(--br)"><div style="font-size:20px">📞</div><div style="font-size:.6rem;font-weight:600;color:var(--t2);margin-top:4px;line-height:1.2" data-i18n="more_contact">संपर्क<br/>करा</div></div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
     <div onclick="window.location.href='about.html'" style="text-align:center;padding:10px 4px;background:var(--cs);border-radius:12px;cursor:pointer;border:1px solid var(--br)"><div style="font-size:20px">ℹ️</div><div style="font-size:.6rem;font-weight:600;color:var(--t2);margin-top:4px;line-height:1.2" data-i18n="more_about">About<br/>KC</div></div>
     <div onclick="window.location.href='lost-found.html'" style="text-align:center;padding:10px 4px;background:var(--cs);border-radius:12px;cursor:pointer;border:1px solid var(--br)"><div style="font-size:20px">🔍</div><div style="font-size:.6rem;font-weight:600;color:var(--t2);margin-top:4px;line-height:1.2" data-i18n="more_lf">हरवले<br/>सापडले</div></div>
     <div onclick="window.location.href='volunteer.html'" style="text-align:center;padding:10px 4px;background:var(--cs);border-radius:12px;cursor:pointer;border:1px solid var(--br)"><div style="font-size:20px">🙋</div><div style="font-size:.6rem;font-weight:600;color:var(--t2);margin-top:4px;line-height:1.2" data-i18n="more_vol">Volunteer<br/>व्हा</div></div>
+    <div onclick="window.location.href='media-center.html'" style="text-align:center;padding:10px 4px;background:var(--cs);border-radius:12px;cursor:pointer;border:1px solid var(--br)"><div style="font-size:20px">📸</div><div style="font-size:.6rem;font-weight:600;color:var(--t2);margin-top:4px;line-height:1.2" data-i18n="more_media">Media<br/>Center</div></div>
   </div>
   <button onclick="closeMoreMenu()" style="width:100%;margin-top:13px;padding:10px;border:1.5px solid var(--br);border-radius:10px;background:transparent;color:var(--t3);font-family:var(--fn);font-size:.82rem;cursor:pointer" data-i18n="btn_close">बंद करा ✕</button>
 </div>
@@ -3735,7 +3736,7 @@ const I18N = {
     // More menu
     nav_more_sheet: 'अधिक', more_options_title: 'अधिक पर्याय / More Options',
     more_work: 'Work<br/>With Us', more_kex: 'कुंभ<br/>Explore', more_contact: 'संपर्क<br/>करा',
-    more_about: 'About<br/>KC', more_news: 'बातम्या<br/>News', more_lf: 'हरवले<br/>सापडले', more_vol: 'Volunteer<br/>व्हा',
+    more_about: 'About<br/>KC', more_news: 'बातम्या<br/>News', more_lf: 'हरवले<br/>सापडले', more_vol: 'Volunteer<br/>व्हा', more_media: 'Media<br/>Center',
     btn_close: 'बंद करा ✕',
     // Map search placeholder
     map_search_ph: 'रामकुंड, मंदिर, पार्किंग शोधा...', ph_full_name: 'तुमचे पूर्ण नाव',
@@ -3862,7 +3863,7 @@ const I18N = {
     hosp3_name: 'त्र्यंबक आरोग्य केंद्र', btn_call: 'कॉल',
     nav_more_sheet: 'अधिक', more_options_title: 'अधिक विकल्प / More Options',
     more_work: 'Work<br/>With Us', more_kex: 'कुंभ<br/>Explore', more_contact: 'संपर्क<br/>करें',
-    more_about: 'About<br/>KC', more_news: 'समाचार<br/>News', more_lf: 'खोया<br/>पाया', more_vol: 'Volunteer<br/>बनें',
+    more_about: 'About<br/>KC', more_news: 'समाचार<br/>News', more_lf: 'खोया<br/>पाया', more_vol: 'Volunteer<br/>बनें', more_media: 'Media<br/>Center',
     btn_close: 'बंद करें ✕',
     map_search_ph: 'रामकुंड, मंदिर, पार्किंग खोजें...', ph_full_name: 'आपका पूरा नाम',
   },
@@ -3988,7 +3989,7 @@ const I18N = {
     hosp3_name: 'Trimbak Health Center', btn_call: 'Call',
     nav_more_sheet: 'More', more_options_title: 'More Options',
     more_work: 'Work<br/>With Us', more_kex: 'Kumbh<br/>Explore', more_contact: 'Contact<br/>Us',
-    more_about: 'About<br/>KC', more_news: 'News<br/>Updates', more_lf: 'Lost<br/>& Found', more_vol: 'Become<br/>Volunteer',
+    more_about: 'About<br/>KC', more_news: 'News<br/>Updates', more_lf: 'Lost<br/>& Found', more_vol: 'Become<br/>Volunteer', more_media: 'Media<br/>Center',
     btn_close: 'Close ✕',
     map_search_ph: 'Search Ramkund, temple, parking...', ph_full_name: 'Your full name',
   }
