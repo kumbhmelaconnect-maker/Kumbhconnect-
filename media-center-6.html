@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Media Center — KumbhConnect | सिंहस्थ कुंभमेळा 2027</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/Kxn2BKJ9/file-000000002a5c7208ab4c69ebcffadb76.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Mukta:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<style>
+/* =====================================================================
+   DESIGN TOKENS — copied 1:1 from KumbhConnect index.html so this page
+   is visually identical to the main app. Keep in sync if the main
+   palette changes.
+===================================================================== */
+:root{
+  --sf:#C8410A;--sf2:#E85D1A;--sf3:#FF7A35;
+  --mr:#7B1616;--gd:#C9920A;--gd2:#F0B429;
+  --cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;
+  --br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;
+  --wh:#FFFFFF;--gn:#15803D;--rd:#B91C1C;--bl:#1D4ED8;--pu:#7C3AED;
+  --sh:0 2px 12px rgba(200,65,10,.10);--sh2:0 6px 24px rgba(123,22,22,.16);
+  --r:14px;--r2:10px;--r3:22px;
+  --fn:'Poppins','Mukta','Khand',sans-serif;
+  --official:#1D4ED8;--guide:#15803D;--user:#E85D1A;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden;padding-bottom:90px}
+img{max-width:100%}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-dot{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 8px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+
+/* ===== SHARED FORM / BUTTON / MODAL CLASSES (kept name-identical to
+   index.html on purpose, so merging this page in later needs no
+   class renaming) ===== */
+.form-wrap{padding:0 14px 14px}
+.ftitle{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:11px}
+.fg{margin-bottom:10px}
+.fg label{font-size:.75rem;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;font-family:'Poppins',sans-serif}
+.fg label .req{color:#B91C1C}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 11px;border:1.5px solid var(--br);border-radius:var(--r2);font-family:var(--fn);font-size:.85rem;color:var(--t1);background:var(--wh);outline:none;transition:all .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sf);box-shadow:0 0 0 3px rgba(200,65,10,.09)}
+.fg textarea{resize:none}
+.note-box{background:#FEF9EC;border:1px solid var(--gd2);border-radius:var(--r2);padding:10px 12px;margin-bottom:11px}
+.note-box p{font-size:.72rem;color:#78350F;line-height:1.5}
+.btn-primary{width:100%;padding:12px;border-radius:var(--r2);border:none;cursor:pointer;background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;font-family:var(--fn);font-size:.92rem;font-weight:700;box-shadow:0 4px 12px rgba(200,65,10,.3);transition:all .2s}
+.btn-primary:active{transform:scale(.98)}
+.btn-outline{width:100%;padding:11px;border-radius:var(--r2);border:1.5px solid var(--br);background:transparent;color:var(--t2);font-family:var(--fn);font-size:.85rem;font-weight:600;cursor:pointer}
+
+.moverlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);display:flex;align-items:flex-end;opacity:0;visibility:hidden;transition:all .3s}
+.moverlay.open{opacity:1;visibility:visible}
+.msheet{background:var(--wh);border-radius:var(--r3) var(--r3) 0 0;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.moverlay.open .msheet{transform:translateY(0)}
+.mhandle{width:34px;height:4px;background:var(--br);border-radius:4px;margin:9px auto 0}
+.mhdr{padding:10px 14px 6px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mhdr h3{font-family:'Khand',sans-serif;font-size:1.05rem;font-weight:700;color:var(--t1)}
+.mclose{background:var(--cs);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;color:var(--t2);flex-shrink:0}
+.mbody{padding:0 14px 22px}
+
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--t1);color:#fff;padding:9px 18px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:500;opacity:0;transition:all .3s;white-space:nowrap;font-family:'Poppins',sans-serif;max-width:85vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== PAGE SHELL ===== */
+.wrap{max-width:520px;margin:0 auto;background:var(--cr);min-height:100vh;position:relative}
+
+/* ===== HEADER ===== */
+.mc-header{position:sticky;top:0;z-index:100;background:var(--wh);border-bottom:1px solid var(--br);padding:9px 14px;display:flex;align-items:center;gap:10px}
+.mc-back{width:36px;height:36px;border-radius:50%;background:var(--cs);color:var(--sf);border:none;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-htxt{flex:1;min-width:0}
+.mc-htitle{font-family:'Khand',sans-serif;font-size:1.08rem;font-weight:700;color:var(--t1);line-height:1.1}
+.mc-hsub{font-size:.6rem;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase;margin-top:1px}
+.mc-admin-btn{padding:7px 12px;border-radius:20px;background:var(--cs);border:1.5px solid var(--br);color:var(--t2);font-size:.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--fn);flex-shrink:0;position:relative}
+.mc-admin-btn.active{background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border-color:transparent}
+.mc-pending-dot{position:absolute;top:-4px;right:-4px;background:#EF4444;color:#fff;font-size:.55rem;font-weight:700;border-radius:50%;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+/* Admin entry point is hidden from the public — revealed only via secret tap on the logo, or a private ?admin= link. */
+.mc-admin-btn.mc-hidden{display:none}
+.lang-row{display:flex;gap:3px;flex-shrink:0}
+.lbtn{padding:4px 8px;border-radius:6px;border:1.5px solid var(--br);background:var(--cs);color:var(--t2);font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fn);min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.lbtn.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+.mc-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:pointer;user-select:none;-webkit-user-select:none}
+
+/* ===== HERO ===== */
+.mc-hero{background:linear-gradient(150deg,var(--sf) 0%,var(--mr) 100%);padding:22px 16px 20px;text-align:center;position:relative;overflow:hidden}
+.mc-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.08) 0%,transparent 60%);pointer-events:none}
+.mc-hero-inner{position:relative;z-index:1}
+.mc-hero-title{font-family:'Khand',sans-serif;font-size:1.55rem;font-weight:700;color:#fff;line-height:1.2}
+.mc-hero-tag{display:inline-block;margin-top:8px;padding:5px 14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.5px}
+.mc-hero-stats{display:flex;justify-content:center;gap:22px;margin-top:16px}
+.mc-stat{text-align:center}
+.mc-stat-num{font-family:'Khand',sans-serif;font-size:1.25rem;font-weight:700;color:#fff}
+.mc-stat-lbl{font-size:.6rem;color:rgba(255,255,255,.78);margin-top:1px}
+
+/* ===== VERIFIED LEGEND ===== */
+.mc-legend{display:flex;gap:7px;padding:10px 14px;background:var(--cs);border-bottom:1px solid var(--br);overflow-x:auto;scrollbar-width:none}
+.mc-legend::-webkit-scrollbar{display:none}
+.mc-leg-chip{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:.66rem;font-weight:600;color:var(--t2);background:var(--wh);border:1px solid var(--br);border-radius:14px;padding:4px 10px 4px 7px;flex-shrink:0}
+.mc-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.mc-dot.official{background:var(--official)}
+.mc-dot.guide{background:var(--guide)}
+.mc-dot.user{background:var(--user)}
+
+/* ===== LIVE TICKER ===== */
+.mc-ticker{display:flex;align-items:center;gap:9px;padding:8px 14px;background:#FEF2F2;border-bottom:1px solid #FECACA}
+.mc-live-dot{width:8px;height:8px;border-radius:50%;background:#EF4444;flex-shrink:0;animation:pulse-dot 1.8s infinite}
+.mc-live-label{font-size:.6rem;font-weight:800;color:#B91C1C;letter-spacing:1px;flex-shrink:0}
+.mc-ticker-text{font-size:.74rem;color:#7B1616;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity .25s}
+
+/* ===== SEARCH ===== */
+.mc-search{padding:11px 14px;display:flex;gap:8px;background:var(--wh)}
+.mc-sbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--cs);border:1.5px solid var(--br);border-radius:var(--r);padding:9px 13px}
+.mc-sbox input{flex:1;border:none;background:transparent;font-family:var(--fn);font-size:.85rem;color:var(--t1);outline:none}
+.mc-sbox input::placeholder{color:var(--t3)}
+.mc-filter-btn{width:40px;height:40px;border-radius:var(--r2);background:var(--cs);border:1.5px solid var(--br);color:var(--sf);font-size:16px;cursor:pointer;flex-shrink:0}
+
+/* ===== TABS ===== */
+.mc-tabs{display:flex;gap:8px;padding:4px 14px 12px;overflow-x:auto;scrollbar-width:none;background:var(--wh)}
+.mc-tabs::-webkit-scrollbar{display:none}
+.mc-tab{white-space:nowrap;padding:8px 15px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);transition:all .2s;flex-shrink:0;font-family:var(--fn)}
+.mc-tab.on{background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border-color:transparent}
+
+/* ===== PANELS ===== */
+.mc-panel{display:none;padding:14px 14px 6px}
+.mc-panel.on{display:block;animation:fi .3s ease}
+.mc-sec-hd{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:10px}
+
+/* ===== SUB-FILTER CHIP ROW (years / categories / dept) ===== */
+.mc-chiprow{display:flex;gap:7px;padding-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.mc-chiprow::-webkit-scrollbar{display:none}
+.mc-chip{white-space:nowrap;padding:6px 13px;border-radius:16px;font-size:.72rem;font-weight:600;border:1.5px solid var(--br);background:var(--cd);color:var(--t2);cursor:pointer;flex-shrink:0;font-family:var(--fn)}
+.mc-chip.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ===== PHOTO GRID ===== */
+.mc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mc-card{background:var(--cd);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.mc-card:active{transform:scale(.96)}
+.mc-thumb{height:108px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;color:rgba(255,255,255,.92)}
+.mc-badge{position:absolute;top:6px;left:6px;font-size:.55rem;font-weight:700;padding:3px 7px;border-radius:10px;color:#fff;display:flex;align-items:center;gap:3px;line-height:1}
+.mc-badge.official{background:rgba(29,78,216,.92)}
+.mc-badge.guide{background:rgba(21,128,61,.92)}
+.mc-badge.user{background:rgba(232,93,26,.92)}
+.mc-thumb-meta{position:absolute;bottom:6px;right:6px;font-size:.56rem;color:#fff;background:rgba(0,0,0,.45);padding:2px 7px;border-radius:8px}
+.mc-card-body{padding:8px 9px}
+.mc-card-title{font-size:.75rem;font-weight:700;color:var(--t1);font-family:'Mukta',sans-serif;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-card-sub{font-size:.6rem;color:var(--t3);margin-top:3px}
+
+/* ===== LIST ITEMS (videos / press) ===== */
+.mc-list-item{display:flex;gap:11px;padding:11px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r);margin-bottom:9px;cursor:pointer;transition:all .2s}
+.mc-list-item:active{background:var(--cs)}
+.mc-list-thumb{width:64px;height:64px;border-radius:var(--r2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;color:rgba(255,255,255,.92);position:relative}
+.mc-play-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);color:#fff;font-size:16px}
+.mc-list-info{flex:1;min-width:0}
+.mc-list-title{font-size:.82rem;font-weight:700;color:var(--t1);line-height:1.3;font-family:'Mukta',sans-serif}
+.mc-list-excerpt{font-size:.68rem;color:var(--t3);margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-list-meta{font-size:.62rem;color:var(--t3);margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mc-pill{padding:2px 8px;border-radius:9px;font-size:.58rem;font-weight:700;color:#fff}
+
+/* ===== DEPARTMENT GRID ===== */
+.mc-dept-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px}
+.mc-dept-card{background:var(--cd);border:1.5px solid var(--br);border-radius:var(--r);padding:13px;text-align:center;transition:all .2s}
+.mc-dept-card.on{border-color:var(--sf);background:rgba(200,65,10,.05)}
+.mc-dept-ic{font-size:25px;margin-bottom:6px}
+.mc-dept-name{font-family:'Khand',sans-serif;font-size:.86rem;font-weight:700;color:var(--t1)}
+.mc-dept-count{font-size:.6rem;color:var(--t3);margin-top:2px}
+.mc-dept-actions{display:flex;gap:6px;margin-top:9px}
+.mc-dept-btn{flex:1;padding:6px 2px;border-radius:8px;font-size:.6rem;font-weight:700;cursor:pointer;border:1px solid var(--br);background:var(--wh);color:var(--t2);font-family:var(--fn)}
+.mc-dept-btn.primary{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ===== META ROWS (used inside detail modal) ===== */
+.mc-meta-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--br)}
+.mc-meta-row:last-child{border:none}
+.mc-meta-l{font-size:.72rem;color:var(--t3);flex-shrink:0}
+.mc-meta-v{font-size:.78rem;font-weight:600;color:var(--t1);text-align:right}
+
+/* ===== FAB ===== */
+.mc-fab{position:fixed;bottom:22px;right:18px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--sf),var(--mr));color:#fff;font-size:24px;border:none;box-shadow:0 6px 18px rgba(200,65,10,.42);cursor:pointer;z-index:90;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mc-fab:active{transform:scale(.92)}
+
+/* ===== EMPTY STATE ===== */
+.mc-empty{text-align:center;padding:40px 16px;color:var(--t3)}
+.mc-empty-ic{font-size:38px;margin-bottom:10px}
+.mc-empty p{font-size:.8rem}
+
+/* ===== ADMIN DRAWER (full-screen) ===== */
+.mc-admin-drawer{position:fixed;inset:0;z-index:400;background:var(--cr);display:none;flex-direction:column}
+.mc-admin-hdr{background:linear-gradient(135deg,var(--sf),var(--mr));padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mc-admin-hdr h3{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#fff}
+.mc-admin-hdr span{font-size:.65rem;color:rgba(255,255,255,.78)}
+.mc-admin-logout{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:.72rem;font-weight:700;padding:7px 12px;border-radius:16px;cursor:pointer;font-family:var(--fn)}
+.mc-admin-body{flex:1;overflow-y:auto;padding:16px 16px 40px;max-width:520px;margin:0 auto;width:100%}
+.mc-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+.mc-stat-card{background:var(--cd);border:1px solid var(--br);border-radius:var(--r);padding:14px;text-align:center}
+.mc-stat-card .num{font-family:'Khand',sans-serif;font-size:1.4rem;font-weight:700;color:var(--sf)}
+.mc-stat-card .lbl{font-size:.64rem;color:var(--t3);margin-top:2px}
+.mc-admin-sec-hd{font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;color:var(--t1);margin:18px 0 10px;display:flex;align-items:center;justify-content:space-between}
+.mc-pa-item{display:flex;gap:10px;padding:11px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r);margin-bottom:9px}
+.mc-pa-thumb{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,var(--gd2),var(--sf));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff}
+.mc-pa-info{flex:1;min-width:0}
+.mc-pa-name{font-size:.78rem;font-weight:700;color:var(--t1)}
+.mc-pa-cap{font-size:.68rem;color:var(--t3);margin-top:2px;line-height:1.35}
+.mc-pa-actions{display:flex;gap:6px;margin-top:7px}
+.mc-pa-btn{padding:5px 11px;border-radius:8px;font-size:.66rem;font-weight:700;cursor:pointer;border:none;font-family:var(--fn)}
+.mc-pa-approve{background:var(--gn);color:#fff}
+.mc-pa-reject{background:var(--rd);color:#fff}
+.mc-dept-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px}
+.mc-dept-row .ic{font-size:18px}
+.mc-dept-row .nm{flex:1;font-size:.8rem;font-weight:600;color:var(--t1)}
+.mc-toggle{width:38px;height:21px;border-radius:12px;background:var(--gn);position:relative;cursor:pointer;flex-shrink:0}
+.mc-toggle::after{content:'';position:absolute;top:2px;right:2px;width:17px;height:17px;border-radius:50%;background:#fff;transition:all .2s}
+.mc-toggle.off{background:var(--br)}
+.mc-toggle.off::after{right:auto;left:2px}
+
+/* ===== ACCOUNT ROWS (Dept / Press credentials in Super Admin) ===== */
+.mc-acct-row{display:flex;align-items:center;gap:8px;padding:10px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px;flex-wrap:wrap}
+.mc-acct-info{flex:1;min-width:150px}
+.mc-acct-name{font-size:.8rem;font-weight:700;color:var(--t1)}
+.mc-acct-cred{font-size:.65rem;color:var(--t3);font-family:monospace;margin-top:2px;word-break:break-all}
+.mc-acct-actions{display:flex;gap:5px;flex-wrap:wrap}
+.mc-acct-btn{padding:5px 9px;border-radius:7px;font-size:.6rem;font-weight:700;cursor:pointer;border:1px solid var(--br);background:var(--wh);color:var(--t2);font-family:var(--fn)}
+.mc-acct-btn.danger{background:var(--rd);color:#fff;border-color:var(--rd)}
+.mc-acct-row.inactive{opacity:.5}
+
+/* ===== CONTENT MODERATION ROWS ===== */
+.mc-mod-row{display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px}
+.mc-mod-ic{font-size:17px;flex-shrink:0;width:26px;text-align:center}
+.mc-mod-info{flex:1;min-width:0;font-size:.74rem;color:var(--t1);font-weight:600;line-height:1.3}
+.mc-mod-info small{display:block;color:var(--t3);font-size:.6rem;font-weight:500;margin-top:2px}
+.mc-mod-tabs{display:flex;gap:6px;margin-bottom:9px;overflow-x:auto}
+.mc-mod-tab{white-space:nowrap;padding:5px 11px;border-radius:14px;font-size:.65rem;font-weight:700;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);cursor:pointer;flex-shrink:0}
+.mc-mod-tab.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+/* ===== DEPT / PRESS DASHBOARD MINI LIST ===== */
+.mc-myitem{display:flex;align-items:center;gap:9px;padding:9px;background:var(--cd);border:1px solid var(--br);border-radius:var(--r2);margin-bottom:7px}
+.mc-myitem .ic{font-size:18px}
+.mc-myitem .tx{flex:1;min-width:0;font-size:.76rem;color:var(--t1);font-weight:600}
+.mc-myitem .tx small{display:block;color:var(--t3);font-size:.62rem;font-weight:500;margin-top:2px}
+.qbox{background:var(--cs);border:1px dashed var(--br);border-radius:var(--r);padding:12px;margin:10px 0 4px}
+.qbox-t{font-family:'Khand',sans-serif;font-size:.86rem;font-weight:700;color:var(--t1);margin-bottom:8px}
+
+@media(min-width:520px){.wrap{box-shadow:0 0 40px rgba(0,0,0,.06)}}
+</style>
+<style>
+/* ===== Watermark + anti-copy hardening (best-effort deterrents; see chat notes) =====
+   Every photo already renders as a CSS background-image on .mc-thumb (not an <img> tag) —
+   this overlay rides on top of that same element so the watermark appears everywhere
+   a photo appears: grid cards AND the full detail view. */
+.mc-thumb{ position:relative; overflow:hidden; }
+.mc-thumb::after{
+  content:''; position:absolute; inset:-40%; pointer-events:none; opacity:.22; z-index:3;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Ctext x='0' y='60' font-family='Poppins,Arial,sans-serif' font-size='20' font-weight='700' fill='white' transform='rotate(-28 130 60)'%3EKumbhConnect%3C/text%3E%3C/svg%3E");
+  background-repeat:repeat;
+}
+body, .mc-thumb{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+</style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="wrap" id="app-root">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="mc-header">
+    <button class="mc-back" onclick="window.location.href='index.html'" aria-label="मागे">←</button>
+    <img class="mc-logo" src="https://i.ibb.co/Kxn2BKJ9/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect Logo"/>
+    <div class="mc-htxt">
+      <div class="mc-htitle" data-i18n="mc_title">📸 Media Center</div>
+      <div class="mc-hsub" data-i18n="mc_subtitle">Official Media Gallery</div>
+    </div>
+    <div class="lang-row">
+      <button class="lbtn on" id="lbtn-mr" onclick="setLang('mr',this)">म</button>
+      <button class="lbtn" id="lbtn-hi" onclick="setLang('hi',this)">हि</button>
+      <button class="lbtn" id="lbtn-en" onclick="setLang('en',this)">EN</button>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="mc-hero">
+    <div class="mc-hero-inner">
+      <div class="mc-hero-title" data-i18n="mc_hero_title">सिंहस्थ कुंभमेळा 2027</div>
+      <div class="mc-hero-tag" data-i18n="mc_hero_tag">🏛️ Official Media Gallery</div>
+      <div class="mc-hero-stats">
+        <div class="mc-stat"><div class="mc-stat-num" id="stat-photos">0</div><div class="mc-stat-lbl" data-i18n="mc_stat_photos">फोटो</div></div>
+        <div class="mc-stat"><div class="mc-stat-num" id="stat-videos">0</div><div class="mc-stat-lbl" data-i18n="mc_stat_videos">व्हिडिओ</div></div>
+        <div class="mc-stat"><div class="mc-stat-num" id="stat-depts">2</div><div class="mc-stat-lbl" data-i18n="mc_stat_depts">विभाग</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VERIFIED LEGEND ===================== -->
+  <div class="mc-legend">
+    <div class="mc-leg-chip"><span class="mc-dot official"></span><span data-i18n="mc_leg_official">Official — शासन/NMC/पोलीस/आरोग्य</span></div>
+    <div class="mc-leg-chip"><span class="mc-dot guide"></span><span data-i18n="mc_leg_guide">Guide — अधिकृत Guide</span></div>
+    <div class="mc-leg-chip"><span class="mc-dot user"></span><span data-i18n="mc_leg_user">User — यात्रेकरू अपलोड</span></div>
+  </div>
+
+  <!-- ===================== LIVE TICKER ===================== -->
+  <div class="mc-ticker">
+    <span class="mc-live-dot"></span>
+    <span class="mc-live-label" data-i18n="mc_live">LIVE</span>
+    <span class="mc-ticker-text" id="ticker-text" data-i18n="mc_loading">लोड होत आहे…</span>
+  </div>
+
+  <!-- ===================== SEARCH ===================== -->
+  <div class="mc-search">
+    <div class="mc-sbox">
+      <span>🔍</span>
+      <input type="text" id="mc-search-input" data-i18n-ph="mc_search_ph" placeholder="फोटो, ठिकाण, विभाग शोधा…" oninput="renderActivePanel()"/>
+    </div>
+    <button class="mc-filter-btn" onclick="openModal('filter-modal')" aria-label="फिल्टर">⚙️</button>
+  </div>
+
+  <!-- ===================== TABS ===================== -->
+  <nav class="mc-tabs" id="mc-tabs">
+    <div class="mc-tab on" data-tab="previous" onclick="switchTab('previous')" data-i18n="mc_tab_prev">📷 मागील कुंभ</div>
+    <div class="mc-tab" data-tab="live" onclick="switchTab('live')" data-i18n="mc_tab_live">📸 कुंभ 2027</div>
+    <div class="mc-tab" data-tab="videos" onclick="switchTab('videos')" data-i18n="mc_tab_videos">🎥 व्हिडिओ</div>
+    <div class="mc-tab" data-tab="press" onclick="switchTab('press')" data-i18n="mc_tab_press">📰 प्रेस रिलीज</div>
+    <div class="mc-tab" data-tab="govt" onclick="switchTab('govt')" data-i18n="mc_tab_govt">🏛 शासकीय फोटो</div>
+    <div class="mc-tab" data-tab="guide" onclick="switchTab('guide')" data-i18n="mc_tab_guide">🧭 गाईड गॅलरी</div>
+    <div class="mc-tab" data-tab="user" onclick="switchTab('user')" data-i18n="mc_tab_user">👥 युजर गॅलरी</div>
+  </nav>
+
+  <section class="mc-panel on" id="panel-previous">
+    <div class="mc-sec-hd" data-i18n="mc_sec_prev">वर्षानुसार Albums</div>
+    <div class="mc-chiprow" id="prev-year-row"></div>
+    <div class="mc-chiprow" id="prev-cat-row"></div>
+    <div class="mc-grid" id="prev-grid"></div>
+  </section>
+
+  <section class="mc-panel" id="panel-live">
+    <div class="mc-sec-hd" data-i18n="mc_sec_live">Kumbh 2027 Live Gallery</div>
+    <div class="mc-chiprow" id="live-cat-row"></div>
+    <div class="mc-grid" id="live-grid"></div>
+  </section>
+
+  <section class="mc-panel" id="panel-videos">
+    <div class="mc-sec-hd" data-i18n="mc_sec_videos">🎥 व्हिडिओ गॅलरी</div>
+    <div id="videos-list"></div>
+  </section>
+
+  <section class="mc-panel" id="panel-press">
+    <div class="mc-sec-hd" data-i18n="mc_sec_press">📰 News &amp; प्रेस रिलीज</div>
+    <div class="mc-chiprow" id="press-cat-row"></div>
+    <div id="press-list"></div>
+  </section>
+
+  <section class="mc-panel" id="panel-govt">
+    <div class="mc-sec-hd" data-i18n="mc_sec_govt">🏛 शासकीय विभाग</div>
+    <div class="mc-dept-grid" id="dept-grid"></div>
+    <div class="mc-sec-hd" style="margin-top:6px" id="govt-grid-title" data-i18n="mc_sec_govt2">सर्व विभागांचे फोटो</div>
+    <div class="mc-grid" id="govt-grid"></div>
+  </section>
+
+  <section class="mc-panel" id="panel-guide">
+    <div class="mc-sec-hd" data-i18n="mc_sec_guide">🧭 Guide Gallery</div>
+    <div class="mc-chiprow" id="guide-cat-row"></div>
+    <div class="mc-grid" id="guide-grid"></div>
+  </section>
+
+  <section class="mc-panel" id="panel-user">
+    <div class="mc-sec-hd" data-i18n="mc_sec_user">👥 यात्रेकरू फोटो</div>
+    <div class="note-box" style="margin-bottom:12px">
+      <p data-i18n="mc_user_note">📤 तुमचा फोटो येथे शेअर करा. <b>Admin Approval</b> नंतर तो सर्वांना दिसेल (Publish). प्रत्येक फोटोवर KumbhConnect watermark आपोआप लागतो.</p>
+    </div>
+    <button class="btn-primary" style="margin-bottom:14px" onclick="openModal('upload-modal')" data-i18n="mc_upload_btn">📤 फोटो अपलोड करा</button>
+    <div class="mc-grid" id="user-grid"></div>
+  </section>
+
+  <button class="mc-fab" onclick="openModal('upload-modal')" aria-label="फोटो अपलोड करा">📤</button>
+
+</div>
+
+<!-- ===================== PHOTO / DETAIL MODAL ===================== -->
+<div class="moverlay" id="detail-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3 id="detail-title">तपशील</h3><button class="mclose" onclick="closeModal('detail-modal')">✕</button></div>
+    <div class="mbody" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- ===================== FILTER MODAL ===================== -->
+<div class="moverlay" id="filter-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3 data-i18n="mc_filter_title">⚙️ Search Filters</h3><button class="mclose" onclick="closeModal('filter-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label data-i18n="mc_f_date">Date</label><input type="date" id="filt-date"/></div>
+      <div class="fg"><label data-i18n="mc_f_cat">Category</label><select id="filt-cat"><option value="">सर्व Category</option></select></div>
+      <div class="fg"><label data-i18n="mc_f_place">Place / Location</label><input type="text" id="filt-place" placeholder="उदा. रामकुंड, त्र्यंबकेश्वर…"/></div>
+      <div class="fg"><label data-i18n="mc_f_by">Photographer / Uploaded By</label><input type="text" id="filt-by" placeholder="नाव टाका"/></div>
+      <div class="fg"><label data-i18n="mc_f_dept">Department</label><select id="filt-dept"><option value="">सर्व Departments</option></select></div>
+      <button class="btn-primary" onclick="applyFilters()" data-i18n="mc_f_apply">फिल्टर लागू करा</button>
+      <button class="btn-outline" style="margin-top:8px" onclick="clearFilters()" data-i18n="mc_f_reset">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== USER UPLOAD MODAL ===================== -->
+<div class="moverlay" id="upload-modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mhdr"><h3 data-i18n="mc_upload_title">📤 फोटो अपलोड करा</h3><button class="mclose" onclick="closeModal('upload-modal')">✕</button></div>
+    <div class="mbody">
+      <form id="upload-form" onsubmit="submitUpload(event)">
+        <div class="fg"><label data-i18n="mc_up_name">नाव <span class="req">*</span></label><input type="text" id="up-name" required placeholder="तुमचे नाव"/></div>
+        <div class="fg"><label data-i18n="mc_up_city">शहर <span class="req">*</span></label><input type="text" id="up-city" required placeholder="उदा. नाशिक, पुणे…"/></div>
+        <div class="fg"><label data-i18n="mc_up_photo">फोटो <span class="req">*</span></label><input type="file" id="up-photo" accept="image/*" required/></div>
+        <div class="fg"><label data-i18n="mc_up_caption">Caption <span class="req">*</span></label><textarea id="up-caption" rows="3" required placeholder="फोटोबद्दल थोडक्यात…"></textarea></div>
+        <div class="fg"><label data-i18n="mc_up_loc">Location</label><input type="text" id="up-location" placeholder="उदा. रामकुंड घाट"/></div>
+        <div class="note-box"><p data-i18n="mc_up_note">🟠 हा फोटो "User" बॅज सह, Admin Approval नंतर Publish होईल.</p></div>
+        <button class="btn-primary" type="submit" id="upload-submit-btn" data-i18n="mc_up_submit">Submit करा ✅</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="mc-toast" id="toast"></div>
+
+<script src="firebase-config.js"></script>
+<script>
+/* =====================================================================
+   STATIC CONFIG (category taxonomies — not user data, safe to keep in code)
+===================================================================== */
+const GRAD = {
+  'ऐतिहासिक फोटो':'linear-gradient(135deg,#9A6040,#4A1E08)','Drone Photos':'linear-gradient(135deg,#1E293B,#0F172A)',
+  'Royal Bath Photos':'linear-gradient(135deg,#C9920A,#7B1616)','तयारीची कामे':'linear-gradient(135deg,#D97706,#92400E)',
+  'घाट':'linear-gradient(135deg,#0EA5E9,#0369A1)','मंदिरे':'linear-gradient(135deg,#F0B429,#C9920A)',
+  'वाहतूक':'linear-gradient(135deg,#64748B,#334155)','सुरक्षा':'linear-gradient(135deg,#EF4444,#7B1616)',
+  'वैद्यकीय सेवा':'linear-gradient(135deg,#22C55E,#15803D)','स्वयंसेवक':'linear-gradient(135deg,#A855F7,#6D28D9)',
+  'साधू-संत':'linear-gradient(135deg,#C9920A,#7B1616)','शाही स्नान':'linear-gradient(135deg,#F0B429,#C8410A)',
+  'Drone View':'linear-gradient(135deg,#1E293B,#0F172A)','Night View':'linear-gradient(135deg,#312E81,#1E1B4B)',
+  default:'linear-gradient(135deg,#C8410A,#7B1616)'
+};
+const EMOJI = {
+  'ऐतिहासिक फोटो':'🖼️','Drone Photos':'🚁','Royal Bath Photos':'👑','तयारीची कामे':'🏗️','घाट':'🌊','मंदिरे':'🛕',
+  'वाहतूक':'🚦','सुरक्षा':'👮','वैद्यकीय सेवा':'🏥','स्वयंसेवक':'🙋','साधू-संत':'🧘','शाही स्नान':'🙏','Drone View':'🚁','Night View':'🌙'
+};
+const PREV_ALBUMS = [{year:'2003'},{year:'2015'}];
+const PREV_CATS = ['सर्व','ऐतिहासिक फोटो','Drone Photos','Royal Bath Photos'];
+const LIVE_CATS = ['सर्व','तयारीची कामे','घाट','मंदिरे','वाहतूक','सुरक्षा','वैद्यकीय सेवा','स्वयंसेवक','साधू-संत','शाही स्नान','Drone View','Night View'];
+const PRESS_TYPES = ['सर्व','Live','प्रेस नोट','अधिकृत घोषणा','Traffic Update','Weather','Crowd Update'];
+const GUIDE_CATS = ['सर्व','Tour Photos','Customer Photos','Reviews'];
+const VIDEOS = []; /* video upload not wired to a backend yet */
+const GUIDES = []; /* guide gallery not wired to a backend yet */
+
+/* =====================================================================
+   LIVE DATA — populated in real time from Firestore (mc_photos, mc_press,
+   mc_departments). Every visitor's browser sees the same data instantly.
+===================================================================== */
+let PREV_PHOTOS=[], LIVE_PHOTOS=[], GOVT_PHOTOS=[], USER_PHOTOS=[], PRESS=[], DEPARTMENTS=[];
+const PHOTO_IDX={}, PRESS_IDX={};
+
+let state = { tab:'previous', prevYear:'सर्व', prevCat:'सर्व', liveCat:'सर्व', pressType:'सर्व', guideCat:'सर्व', govtDept:'सर्व' };
+
+/* =====================================================================
+   FIRESTORE LISTENERS
+===================================================================== */
+function startListeners(){
+  db.collection(COL_PHOTOS).where('section','==','previous').where('status','==','approved')
+    .onSnapshot(snap=>{ PREV_PHOTOS = snapToArr(snap); reindex(); renderActivePanel(); updateHeroStats(); }, logErr);
+  db.collection(COL_PHOTOS).where('section','==','live').where('status','==','approved')
+    .onSnapshot(snap=>{ LIVE_PHOTOS = snapToArr(snap); reindex(); renderActivePanel(); updateHeroStats(); }, logErr);
+  db.collection(COL_PHOTOS).where('section','==','govt').where('status','==','approved')
+    .onSnapshot(snap=>{ GOVT_PHOTOS = snapToArr(snap); reindex(); renderActivePanel(); updateHeroStats(); }, logErr);
+  db.collection(COL_PHOTOS).where('section','==','user').where('status','==','approved')
+    .onSnapshot(snap=>{ USER_PHOTOS = snapToArr(snap); reindex(); renderActivePanel(); updateHeroStats(); }, logErr);
+  db.collection(COL_PRESS).orderBy('createdAt','desc')
+    .onSnapshot(snap=>{ PRESS = snapToArr(snap); PRESS_IDX_rebuild(); renderActivePanel(); }, logErr);
+  db.collection(COL_DEPTS)
+    .onSnapshot(snap=>{ DEPARTMENTS = snapToArr(snap); buildFilterOptions(); if(state.tab==='govt') renderGovt(); updateHeroStats(); }, logErr);
+}
+function snapToArr(snap){ const a=[]; snap.forEach(d=>a.push({id:d.id,...d.data()})); return a; }
+function reindex(){ PHOTO_IDX_clear(); [PREV_PHOTOS,LIVE_PHOTOS].forEach(arr=>arr.forEach(x=>PHOTO_IDX[x.id]=x)); }
+function PHOTO_IDX_clear(){ Object.keys(PHOTO_IDX).forEach(k=>delete PHOTO_IDX[k]); }
+function PRESS_IDX_rebuild(){ Object.keys(PRESS_IDX).forEach(k=>delete PRESS_IDX[k]); PRESS.forEach(p=>PRESS_IDX[p.id]=p); }
+function logErr(e){ console.error(e); toast('⚠️ डेटा लोड करताना अडचण आली'); }
+
+/* =====================================================================
+   GENERIC HELPERS
+===================================================================== */
+function openModal(id){ document.getElementById(id)?.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id){ document.getElementById(id)?.classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.moverlay').forEach(o=>o.addEventListener('click',function(e){ if(e.target===this) closeModal(this.id); }));
+});
+let _tt;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),3000); }
+function badgeHtml(b){ const map={official:['🔵','Official'],guide:['🟢','Guide'],user:['🟠','User']}; const v=map[b]||map.official; return `<span class="mc-badge ${b}">${v[0]} ${v[1]}</span>`; }
+function fmtDate(d){ try{ const dt=new Date(d); return dt.toLocaleDateString('mr-IN',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return d||'—'; } }
+function matches(text,q){ return !q || (text||'').toLowerCase().includes(q); }
+function emptyState(){ return `<div class="mc-empty"><div class="mc-empty-ic">🗂️</div><p>या फिल्टरसाठी सध्या कोणतेही फोटो उपलब्ध नाहीत.</p></div>`; }
+function chipRow(containerId, items, activeVal, onClick){
+  const el=document.getElementById(containerId);
+  el.innerHTML = items.map(v=>`<div class="mc-chip ${v===activeVal?'on':''}" onclick="${onClick}('${v.replace(/'/g,"\\'")}')">${v}</div>`).join('');
+}
+
+/* =====================================================================
+   TAB SWITCHING + ACTIVE PANEL RENDER
+===================================================================== */
+function switchTab(tab){
+  state.tab=tab;
+  document.querySelectorAll('.mc-tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===tab));
+  document.querySelectorAll('.mc-panel').forEach(p=>p.classList.toggle('on', p.id==='panel-'+tab));
+  document.getElementById('mc-search-input').value='';
+  renderActivePanel();
+}
+function renderActivePanel(){
+  const q=(document.getElementById('mc-search-input')?.value||'').trim().toLowerCase();
+  switch(state.tab){
+    case 'previous': renderPrevious(q); break;
+    case 'live': renderLive(q); break;
+    case 'videos': renderVideos(q); break;
+    case 'press': renderPress(q); break;
+    case 'govt': renderGovt(q); break;
+    case 'guide': renderGuide(q); break;
+    case 'user': renderUser(q); break;
+  }
+}
+
+/* ===== PREVIOUS KUMBH ===== */
+function setPrevYear(y){ state.prevYear=y; renderPrevious(); }
+function setPrevCat(c){ state.prevCat=c; renderPrevious(); }
+function renderPrevious(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  chipRow('prev-year-row', ['सर्व',...PREV_ALBUMS.map(a=>a.year)], state.prevYear, 'setPrevYear');
+  chipRow('prev-cat-row', PREV_CATS, state.prevCat, 'setPrevCat');
+  let list = PREV_PHOTOS.filter(p=>(state.prevYear==='सर्व'||p.year===state.prevYear)&&(state.prevCat==='सर्व'||p.cat===state.prevCat)&&(matches(p.title,q)||matches(p.loc,q)));
+  renderGrid('prev-grid', list.map(decorate));
+}
+function decorate(p){ return {...p, emoji:EMOJI[p.cat]||'📷', grad:GRAD[p.cat]||GRAD.default, badge:p.badge||'official'}; }
+
+/* ===== LIVE KUMBH 2027 ===== */
+function setLiveCat(c){ state.liveCat=c; renderLive(); }
+function renderLive(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  chipRow('live-cat-row', LIVE_CATS, state.liveCat, 'setLiveCat');
+  let list = LIVE_PHOTOS.filter(p=>(state.liveCat==='सर्व'||p.cat===state.liveCat)&&(matches(p.title,q)||matches(p.loc,q)||matches(p.cat,q)));
+  renderGrid('live-grid', list.map(decorate));
+}
+
+function renderGrid(containerId, list){
+  const el=document.getElementById(containerId);
+  if(!list.length){ el.innerHTML = emptyState(); return; }
+  el.innerHTML = list.map(p=>`
+    <div class="mc-card" onclick="openPhotoModal('${p.id}')">
+      <div class="mc-thumb" style="background:${p.img?('url('+p.img+') center/cover'):(p.grad||GRAD.default)}">
+        ${p.img?'':(p.emoji||'📷')}
+        ${badgeHtml(p.badge)}
+        <div class="mc-thumb-meta">${fmtDate(p.date)}</div>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-card-title">${p.title||p.caption||''}</div>
+        <div class="mc-card-sub">📍 ${p.loc||p.location||'—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function findAnyPhoto(id){
+  return PHOTO_IDX[id]
+    || (USER_PHOTOS.find(u=>u.id===id) && {...USER_PHOTOS.find(u=>u.id===id), badge:'user', title:USER_PHOTOS.find(u=>u.id===id).caption, by:USER_PHOTOS.find(u=>u.id===id).name+' · '+USER_PHOTOS.find(u=>u.id===id).city})
+    || (GOVT_PHOTOS.find(g=>g.id===id) && {...GOVT_PHOTOS.find(g=>g.id===id), badge:'official', by:GOVT_PHOTOS.find(g=>g.id===id).dept});
+}
+function openPhotoModal(id){
+  const p = findAnyPhoto(id);
+  if(!p) return;
+  document.getElementById('detail-title').textContent = p.title || p.caption || 'फोटो तपशील';
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-thumb" style="height:170px;border-radius:var(--r);margin-bottom:12px;background:${p.img?('url('+p.img+') center/cover'):(p.grad||GRAD.default)};font-size:54px">
+      ${p.img?'':(p.emoji||'📷')}${badgeHtml(p.badge||'user')}
+    </div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Caption</span><span class="mc-meta-v">${p.title||p.caption||'—'}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Date</span><span class="mc-meta-v">${fmtDate(p.date)}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Location</span><span class="mc-meta-v">${p.loc||p.location||'—'}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Uploaded By</span><span class="mc-meta-v">${p.by||'—'}</span></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-outline" style="flex:1" onclick="toast('🔗 लिंक कॉपी झाली')">🔗 Share</button>
+    </div>
+    <div class="note-box" style="margin-top:10px"><p>🔒 हा फोटो KumbhConnect watermark सह संरक्षित आहे. Download उपलब्ध नाही.</p></div>
+  `;
+  openModal('detail-modal');
+}
+
+/* ===== VIDEOS (static — no backend wired yet) ===== */
+function renderVideos(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  const list = VIDEOS.filter(v=>matches(v.title,q)||matches(v.dept,q));
+  const el=document.getElementById('videos-list');
+  el.innerHTML = list.length ? list.map(v=>`<div class="mc-list-item"><div class="mc-list-thumb" style="background:${GRAD.default}">🎬</div><div class="mc-list-info"><div class="mc-list-title">${v.title}</div></div></div>`).join('') : emptyState();
+}
+
+/* ===== PRESS RELEASES ===== */
+function setPressType(t){ state.pressType=t; renderPress(); }
+function renderPress(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  chipRow('press-cat-row', PRESS_TYPES, state.pressType, 'setPressType');
+  const list = PRESS.filter(p=>(state.pressType==='सर्व'||p.type===state.pressType)&&(matches(p.title,q)||matches(p.excerpt,q)));
+  const el=document.getElementById('press-list');
+  if(!list.length){ el.innerHTML=emptyState(); return; }
+  el.innerHTML = list.map(p=>`
+    <div class="mc-list-item" onclick="openPressModal('${p.id}')">
+      <div class="mc-list-thumb" style="background:${GRAD.default}">📰</div>
+      <div class="mc-list-info">
+        <div class="mc-list-title">${p.title}</div>
+        <div class="mc-list-excerpt">${p.excerpt}</div>
+        <div class="mc-list-meta"><span class="mc-pill" style="background:var(--official)">🔵 ${p.type}</span><span>📅 ${fmtDate(p.date)}</span></div>
+      </div>
+    </div>`).join('');
+}
+function openPressModal(id){
+  const p=PRESS_IDX[id]; if(!p) return;
+  document.getElementById('detail-title').textContent = p.title;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="mc-meta-row"><span class="mc-meta-l">Type</span><span class="mc-meta-v">${p.type}</span></div>
+    <div class="mc-meta-row"><span class="mc-meta-l">Date</span><span class="mc-meta-v">${fmtDate(p.date)}</span></div>
+    <p style="font-size:.84rem;color:var(--t2);line-height:1.6;margin:12px 0">${p.excerpt}</p>
+  `;
+  openModal('detail-modal');
+}
+
+/* ===== GOVERNMENT PHOTOS ===== */
+function renderDeptGrid(){
+  const el=document.getElementById('dept-grid');
+  el.innerHTML = DEPARTMENTS.map(d=>{
+    const cnt = GOVT_PHOTOS.filter(g=>g.deptId===d.id).length;
+    return `<div class="mc-dept-card ${state.govtDept===d.name?'on':''}">
+      <div class="mc-dept-ic">${d.ic||'🏛️'}</div>
+      <div class="mc-dept-name">${d.name}</div>
+      <div class="mc-dept-count">${cnt} फोटो</div>
+      <div class="mc-dept-actions"><button class="mc-dept-btn primary" style="flex:1" onclick="setGovtDept('${d.name}')" data-i18n="mc_view_gallery">गॅलरी पाहा</button></div>
+    </div>`;
+  }).join('');
+}
+function setGovtDept(name){ state.govtDept = state.govtDept===name ? 'सर्व' : name; renderGovt(); }
+function renderGovt(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  renderDeptGrid();
+  document.getElementById('govt-grid-title').textContent = state.govtDept==='सर्व' ? 'सर्व विभागांचे फोटो' : (state.govtDept+' विभागाचे फोटो');
+  const list = GOVT_PHOTOS.filter(g=>(state.govtDept==='सर्व'||g.dept===state.govtDept)&&(matches(g.title,q)||matches(g.dept,q)||matches(g.loc,q)));
+  renderGrid('govt-grid', list.map(g=>({...g,badge:'official'})));
+}
+
+/* ===== GUIDE GALLERY (static — no backend wired yet) ===== */
+function setGuideCat(c){ state.guideCat=c; renderGuide(); }
+function renderGuide(q){
+  chipRow('guide-cat-row', GUIDE_CATS, state.guideCat, 'setGuideCat');
+  const el=document.getElementById('guide-grid');
+  el.innerHTML = GUIDES.length ? '' : emptyState();
+}
+
+/* ===== USER GALLERY + UPLOAD ===== */
+function renderUser(q){
+  q = q ?? (document.getElementById('mc-search-input').value||'').trim().toLowerCase();
+  const list = USER_PHOTOS.filter(u=>matches(u.caption,q)||matches(u.city,q)||matches(u.location,q));
+  renderGrid('user-grid', list.map(u=>({...u, title:u.caption, loc:u.location, badge:'user'})));
+}
+async function submitUpload(e){
+  e.preventDefault();
+  const name=document.getElementById('up-name').value.trim();
+  const city=document.getElementById('up-city').value.trim();
+  const caption=document.getElementById('up-caption').value.trim();
+  const location=document.getElementById('up-location').value.trim();
+  const file=document.getElementById('up-photo').files[0];
+  if(!name||!city||!caption||!file){ toast('कृपया सर्व आवश्यक माहिती व फोटो भरा'); return; }
+  const btn=document.getElementById('upload-submit-btn');
+  btn.disabled=true; btn.textContent='अपलोड होत आहे…';
+  try{
+    const imgUrl = await uploadToCloudinary(file);
+    await db.collection(COL_PHOTOS).add({
+      section:'user', status:'pending', badge:'user', name, city, caption, location: location||'—',
+      date:new Date().toISOString().slice(0,10), img:imgUrl, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('upload-form').reset();
+    closeModal('upload-modal');
+    toast('✅ फोटो सबमिट झाला! Admin Approval नंतर तो सर्वांना दिसेल.');
+  }catch(err){
+    console.error(err);
+    toast('❌ अपलोड अयशस्वी झाले — पुन्हा प्रयत्न करा');
+  }finally{
+    btn.disabled=false; btn.textContent='Submit करा ✅';
+  }
+}
+
+/* ===== FILTER MODAL ===== */
+function buildFilterOptions(){
+  const cats=['सर्व',...new Set([...PREV_CATS.slice(1),...LIVE_CATS.slice(1)])];
+  document.getElementById('filt-cat').innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  document.getElementById('filt-dept').innerHTML = ['सर्व',...DEPARTMENTS.map(d=>d.name)].map(d=>`<option value="${d}">${d}</option>`).join('');
+}
+function applyFilters(){
+  const place=document.getElementById('filt-place').value.trim();
+  const by=document.getElementById('filt-by').value.trim();
+  const cat=document.getElementById('filt-cat').value;
+  const dept=document.getElementById('filt-dept').value;
+  document.getElementById('mc-search-input').value = [place,by].filter(Boolean).join(' ');
+  if(cat && cat!=='सर्व'){ if(state.tab==='previous') state.prevCat=cat; if(state.tab==='live') state.liveCat=cat; }
+  if(dept && dept!=='सर्व' && state.tab==='govt'){ state.govtDept=dept; }
+  closeModal('filter-modal');
+  renderActivePanel();
+  toast('🔎 फिल्टर लागू केले');
+}
+function clearFilters(){
+  document.getElementById('filt-date').value='';
+  document.getElementById('filt-place').value='';
+  document.getElementById('filt-by').value='';
+  document.getElementById('filt-cat').value='सर्व';
+  document.getElementById('filt-dept').value='सर्व';
+}
+
+/* ===== HERO STATS + TICKER ===== */
+function updateHeroStats(){
+  document.getElementById('stat-photos').textContent = PREV_PHOTOS.length+LIVE_PHOTOS.length+GOVT_PHOTOS.length+USER_PHOTOS.length;
+  document.getElementById('stat-videos').textContent = VIDEOS.length;
+  document.getElementById('stat-depts').textContent = DEPARTMENTS.length;
+}
+const TICKER_MSGS = [
+  '🚦 Traffic Update: रामकुंड परिसरात वळण मार्ग सुरू',
+  '🌤️ Weather: पुढील 3 दिवस आकाश निरभ्र राहील',
+  '👥 Crowd Update: साधुग्राम परिसरात मध्यम गर्दी',
+  '📢 अधिकृत घोषणा: मुख्य शाही स्नान दिनांक जाहीर',
+];
+let _tIdx=0;
+function rotateTicker(){
+  const el=document.getElementById('ticker-text');
+  el.style.opacity=0;
+  setTimeout(()=>{ el.textContent = TICKER_MSGS[_tIdx % TICKER_MSGS.length]; _tIdx++; el.style.opacity=1; },250);
+}
+
+/* ===== INIT ===== */
+function init(){
+  buildFilterOptions();
+  renderPrevious(''); renderLive(''); renderVideos(''); renderPress(''); renderGovt(''); renderGuide(''); renderUser('');
+  rotateTicker(); setInterval(rotateTicker, 4500);
+  startListeners();
+  setLang(localStorage.getItem('kc_mc_lang') || 'mr');
+}
+
+/* =====================================================================
+   3-LANGUAGE TRANSLATION — मराठी (mr) | हिंदी (hi) | English (en)
+===================================================================== */
+const MC_I18N = {
+  mr: {
+    mc_title:'📸 Media Center', mc_subtitle:'Official Media Gallery',
+    mc_hero_title:'सिंहस्थ कुंभमेळा 2027', mc_hero_tag:'🏛️ Official Media Gallery',
+    mc_stat_photos:'फोटो', mc_stat_videos:'व्हिडिओ', mc_stat_depts:'विभाग',
+    mc_leg_official:'Official — शासन/NMC/पोलीस/आरोग्य', mc_leg_guide:'Guide — अधिकृत Guide', mc_leg_user:'User — यात्रेकरू अपलोड',
+    mc_live:'LIVE', mc_loading:'लोड होत आहे…',
+    mc_search_ph:'फोटो, ठिकाण, विभाग शोधा…',
+    mc_tab_prev:'📷 मागील कुंभ', mc_tab_live:'📸 कुंभ 2027', mc_tab_videos:'🎥 व्हिडिओ', mc_tab_press:'📰 प्रेस रिलीज', mc_tab_govt:'🏛 शासकीय फोटो', mc_tab_guide:'🧭 गाईड गॅलरी', mc_tab_user:'👥 युजर गॅलरी',
+    mc_sec_prev:'वर्षानुसार Albums', mc_sec_live:'Kumbh 2027 Live Gallery', mc_sec_videos:'🎥 व्हिडिओ गॅलरी',
+    mc_sec_press:'📰 News &amp; प्रेस रिलीज', mc_sec_govt:'🏛 शासकीय विभाग', mc_sec_guide:'🧭 Guide Gallery', mc_sec_user:'👥 यात्रेकरू फोटो',
+    mc_user_note:'📤 तुमचा फोटो येथे शेअर करा. <b>Admin Approval</b> नंतर तो सर्वांना दिसेल (Publish). प्रत्येक फोटोवर KumbhConnect watermark आपोआप लागतो.',
+    mc_upload_btn:'📤 फोटो अपलोड करा', mc_view_gallery:'गॅलरी पाहा',
+    mc_filter_title:'⚙️ Search Filters', mc_f_date:'Date', mc_f_cat:'Category', mc_f_place:'Place / Location', mc_f_by:'Photographer / Uploaded By', mc_f_dept:'Department', mc_f_apply:'फिल्टर लागू करा', mc_f_reset:'Reset',
+    mc_upload_title:'📤 फोटो अपलोड करा', mc_up_name:'नाव', mc_up_city:'शहर', mc_up_photo:'फोटो', mc_up_caption:'Caption', mc_up_loc:'Location',
+    mc_up_note:'🟠 हा फोटो "User" बॅज सह, Admin Approval नंतर Publish होईल.', mc_up_submit:'Submit करा ✅',
+    mc_sec_govt2:'सर्व विभागांचे फोटो',
+  },
+  hi: {
+    mc_title:'📸 मीडिया सेंटर', mc_subtitle:'Official Media Gallery',
+    mc_hero_title:'सिंहस्थ कुंभ मेला 2027', mc_hero_tag:'🏛️ Official Media Gallery',
+    mc_stat_photos:'फोटो', mc_stat_videos:'वीडियो', mc_stat_depts:'विभाग',
+    mc_leg_official:'Official — शासन/NMC/पुलिस/स्वास्थ्य', mc_leg_guide:'Guide — अधिकृत Guide', mc_leg_user:'User — यात्री अपलोड',
+    mc_live:'LIVE', mc_loading:'लोड हो रहा है…',
+    mc_search_ph:'फोटो, स्थान, विभाग खोजें…',
+    mc_tab_prev:'📷 पिछला कुंभ', mc_tab_live:'📸 कुंभ 2027', mc_tab_videos:'🎥 वीडियो', mc_tab_press:'📰 प्रेस रिलीज़', mc_tab_govt:'🏛 सरकारी फोटो', mc_tab_guide:'🧭 गाइड गैलरी', mc_tab_user:'👥 यूज़र गैलरी',
+    mc_sec_prev:'वर्ष अनुसार Albums', mc_sec_live:'Kumbh 2027 Live Gallery', mc_sec_videos:'🎥 वीडियो गैलरी',
+    mc_sec_press:'📰 News &amp; प्रेस रिलीज़', mc_sec_govt:'🏛 सरकारी विभाग', mc_sec_guide:'🧭 Guide Gallery', mc_sec_user:'👥 यात्री फोटो',
+    mc_user_note:'📤 अपनी फोटो यहां शेयर करें। <b>Admin Approval</b> के बाद वह सभी को दिखेगी (Publish)। हर फोटो पर KumbhConnect watermark अपने आप लगता है।',
+    mc_upload_btn:'📤 फोटो अपलोड करें', mc_view_gallery:'गैलरी देखें',
+    mc_filter_title:'⚙️ Search Filters', mc_f_date:'Date', mc_f_cat:'Category', mc_f_place:'Place / Location', mc_f_by:'Photographer / Uploaded By', mc_f_dept:'Department', mc_f_apply:'फ़िल्टर लागू करें', mc_f_reset:'Reset',
+    mc_upload_title:'📤 फोटो अपलोड करें', mc_up_name:'नाम', mc_up_city:'शहर', mc_up_photo:'फोटो', mc_up_caption:'Caption', mc_up_loc:'Location',
+    mc_up_note:'🟠 यह फोटो "User" बैज के साथ, Admin Approval के बाद Publish होगी।', mc_up_submit:'Submit करें ✅',
+    mc_sec_govt2:'सभी विभागों की फोटो',
+  },
+  en: {
+    mc_title:'📸 Media Center', mc_subtitle:'Official Media Gallery',
+    mc_hero_title:'Sinhasth Kumbh Mela 2027', mc_hero_tag:'🏛️ Official Media Gallery',
+    mc_stat_photos:'Photos', mc_stat_videos:'Videos', mc_stat_depts:'Departments',
+    mc_leg_official:'Official — Govt/NMC/Police/Health', mc_leg_guide:'Guide — Verified Guide', mc_leg_user:'User — Pilgrim Upload',
+    mc_live:'LIVE', mc_loading:'Loading…',
+    mc_search_ph:'Search photos, place, department…',
+    mc_tab_prev:'📷 Previous Kumbh', mc_tab_live:'📸 Kumbh 2027', mc_tab_videos:'🎥 Videos', mc_tab_press:'📰 Press Releases', mc_tab_govt:'🏛 Govt Photos', mc_tab_guide:'🧭 Guide Gallery', mc_tab_user:'👥 User Gallery',
+    mc_sec_prev:'Albums by Year', mc_sec_live:'Kumbh 2027 Live Gallery', mc_sec_videos:'🎥 Video Gallery',
+    mc_sec_press:'📰 News &amp; Press Releases', mc_sec_govt:'🏛 Government Departments', mc_sec_guide:'🧭 Guide Gallery', mc_sec_user:'👥 Pilgrim Photos',
+    mc_user_note:'📤 Share your photo here. It will be visible to everyone (Published) after <b>Admin Approval</b>. Every photo automatically gets a KumbhConnect watermark.',
+    mc_upload_btn:'📤 Upload Photo', mc_view_gallery:'View Gallery',
+    mc_filter_title:'⚙️ Search Filters', mc_f_date:'Date', mc_f_cat:'Category', mc_f_place:'Place / Location', mc_f_by:'Photographer / Uploaded By', mc_f_dept:'Department', mc_f_apply:'Apply Filters', mc_f_reset:'Reset',
+    mc_upload_title:'📤 Upload Photo', mc_up_name:'Name', mc_up_city:'City', mc_up_photo:'Photo', mc_up_caption:'Caption', mc_up_loc:'Location',
+    mc_up_note:'🟠 This photo will publish with a "User" badge after Admin Approval.', mc_up_submit:'Submit ✅',
+    mc_sec_govt2:'Photos from all departments',
+  }
+};
+function setLang(lang, el){
+  if(!MC_I18N[lang]) lang='mr';
+  localStorage.setItem('kc_mc_lang', lang);
+  document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));
+  (el || document.getElementById('lbtn-'+lang))?.classList.add('on');
+  renderActivePanel(); // rebuild dynamic content (e.g. dept grid) first, then translate everything below
+  const T = MC_I18N[lang];
+  document.querySelectorAll('[data-i18n]').forEach(node=>{
+    const key = node.getAttribute('data-i18n');
+    if(T[key]===undefined) return;
+    if(/<[a-z][\s\S]*>/i.test(T[key])) node.innerHTML = T[key]; else node.textContent = T[key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(node=>{
+    const key = node.getAttribute('data-i18n-ph');
+    if(T[key]!==undefined) node.setAttribute('placeholder', T[key]);
+  });
+}
+init();
+</script>
+</body>
+</html>
