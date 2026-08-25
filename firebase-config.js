@@ -42,3 +42,4 @@ const COL_ROLES   = 'mc_roles';    // Firebase Auth UID → {role, name, deptId,
 const COL_USERS    = 'kc_users';    // uid → {name, email, phone, createdAt}
 const COL_LISTINGS = 'kc_listings'; // ownerUid, type:'business'|'service'|'guide'|'volunteer', status:'pending'|'approved', fields...
 const COL_SERVICE_REQ = 'kc_service_requests'; // uid, serviceType, name, mobile, city, date, details, status
+const COL_NOTIFICATIONS = 'kc_notifications'; // uid, title, message, type, link, read:boolean, createdAt
