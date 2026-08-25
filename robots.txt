@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/sitemap.xml
