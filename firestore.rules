@@ -1,0 +1,453 @@
+rules_version = '2';
+
+// =============================================================================
+// KumbhConnect — Firestore Rules
+// PHASE 1 — SPARK-PLAN COMPATIBLE REDESIGN
+//
+// This project stays on the free Spark plan. No Cloud Functions, no Admin
+// SDK backend. Every rule below is enforced ONLY by Firestore Rules and/or
+// application-level (client) code. Where a field cannot be made fully
+// trustworthy without a backend, that limitation is stated explicitly in
+// a comment at the relevant rule — see also the Phase 1 report's "Known
+// Security Limitations" section for the full picture in one place.
+// =============================================================================
+
+service cloud.firestore {
+
+  match /databases/{database}/documents {
+
+    // ================================================================
+    // AUTH / ROLE HELPERS
+    // ================================================================
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function roleDoc() {
+      return get(
+        /databases/$(database)/documents/mc_roles/$(request.auth.uid)
+      );
+    }
+
+    function hasRole() {
+      return signedIn()
+        && exists(
+          /databases/$(database)/documents/mc_roles/$(request.auth.uid)
+        );
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && hasRole()
+        && roleDoc().data.role == 'admin'
+        && roleDoc().data.active == true;
+    }
+
+    function isDept() {
+      return signedIn()
+        && hasRole()
+        && roleDoc().data.role == 'dept'
+        && roleDoc().data.active == true;
+    }
+
+    function isPress() {
+      return signedIn()
+        && hasRole()
+        && roleDoc().data.role == 'press'
+        && roleDoc().data.active == true;
+    }
+
+    function isSelf(uid) {
+      return signedIn()
+        && request.auth.uid == uid;
+    }
+
+
+    // ================================================================
+    // MEDIA CENTER — unchanged from previous merged version
+    // ================================================================
+
+    match /mc_photos/{id} {
+
+      allow read: if resource.data.status == 'approved'
+                  || isAdmin();
+
+      allow create: if signedIn()
+                    && request.resource.data.section == 'user'
+                    && request.resource.data.status == 'pending';
+
+      allow create: if isDept()
+                    && request.resource.data.section == 'govt'
+                    && request.resource.data.deptId == roleDoc().data.deptId
+                    && request.resource.data.status == 'pending';
+
+      allow create: if isAdmin();
+
+      allow update, delete: if isAdmin()
+                            || (
+                              isDept()
+                              && resource.data.deptId == roleDoc().data.deptId
+                            );
+    }
+
+    match /mc_press/{id} {
+
+      allow read: if true;
+
+      allow create: if isPress() || isAdmin();
+
+      // FIX (Media Center audit, Critical #2): update and delete were
+      // previously combined in one clause that referenced
+      // request.resource.data — which does not exist on a delete
+      // operation, causing that clause to error/fail-closed and deny
+      // ALL press self-deletes regardless of ownership. Split into two
+      // separate clauses; delete no longer references request.resource.
+      allow update: if isAdmin()
+                    || (
+                      isPress()
+                      && resource.data.by == roleDoc().data.name
+                      && request.resource.data.by == resource.data.by
+                    );
+
+      allow delete: if isAdmin()
+                    || (
+                      isPress()
+                      && resource.data.by == roleDoc().data.name
+                    );
+    }
+
+    match /mc_departments/{id} {
+
+      allow read: if true;
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /mc_press_accounts/{id} {
+
+      allow read, write: if isAdmin();
+    }
+
+    match /mc_roles/{uid} {
+
+      allow read: if signedIn()
+                  && (
+                    request.auth.uid == uid
+                    || isAdmin()
+                  );
+
+      allow create, update, delete: if isAdmin();
+    }
+
+
+    // ================================================================
+    // KUMBH CONNECT USERS — unchanged
+    // ================================================================
+
+    match /kc_users/{uid} {
+
+      allow read: if isSelf(uid) || isAdmin();
+
+      allow create: if isSelf(uid);
+
+      allow update: if isSelf(uid);
+
+      // FIX (Phase 1 final audit, Critical #1): the existing
+      // deleteAccountNow() self-service "Delete My Account" feature in
+      // index-28.html deletes the user's own kc_users/{uid} document.
+      // The prior rule only granted delete to isAdmin(), which would have
+      // broken this real, existing feature. isSelf(uid) does not grant
+      // deletion of ANY OTHER user's document — only the caller's own,
+      // matching the same uid == request.auth.uid pattern already used
+      // for read/create/update above.
+      allow delete: if isSelf(uid) || isAdmin();
+
+      allow update: if isAdmin();
+    }
+
+
+    // ================================================================
+    // BUSINESS / SERVICE / GUIDE LISTINGS
+    // ================================================================
+
+    match /kc_listings/{id} {
+
+      // -------------------- READ --------------------
+      allow read: if resource.data.status == 'approved'
+                  || isAdmin()
+                  || (
+                    signedIn()
+                    && resource.data.ownerUid == request.auth.uid
+                  );
+
+      // -------------------- CREATE --------------------
+      allow create: if signedIn()
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.avgRating == 0
+                    && request.resource.data.reviewCount == 0;
+
+      // -------------------- ADMIN UPDATE (general fields) --------------------
+      // CHANGED THIS REDESIGN: admin update no longer implicitly grants
+      // rating-field edits. No evidence was found (media-center-admin.html
+      // was never inspected) that any existing Admin feature edits
+      // avgRating/reviewCount/ratingUpdatedAt directly — approval workflow
+      // touches `status`, not rating fields. This is the safer default per
+      // instruction #7. If Admin genuinely needs manual rating overrides,
+      // that's a one-line rule change.
+      allow update: if isAdmin()
+                    && !request.resource.data.diff(resource.data)
+                          .affectedKeys()
+                          .hasAny(['avgRating', 'reviewCount', 'ratingUpdatedAt']);
+
+      // -------------------- ADMIN UPDATE (rating fields, explicit + scoped) --------------------
+      // Admin retains the ability to correct rating fields specifically —
+      // e.g. to fix a bad value from client-side aggregation drift, given
+      // there is no trusted backend to guarantee correctness — but ONLY
+      // those fields, in a separate, narrowly-scoped rule.
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data)
+                       .affectedKeys()
+                       .hasOnly(['avgRating', 'reviewCount', 'ratingUpdatedAt']);
+
+      // -------------------- OWNER EDIT --------------------
+      allow update: if signedIn()
+                    && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == resource.data.ownerUid
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.avgRating == resource.data.avgRating
+                    && request.resource.data.reviewCount == resource.data.reviewCount;
+
+      // -------------------- RATING AGGREGATE UPDATE (client-side, Spark) --------------------
+      // HONEST LIMITATION: this is the core Spark-compatible compromise.
+      // No trusted backend exists to recompute avgRating/reviewCount from
+      // the actual kc_reviews documents, so this rule can only bound and
+      // narrow the client-side write — it CANNOT verify the new value is
+      // actually correct, and CANNOT verify a real review was created.
+      // What IS enforced:
+      //   - only avgRating/reviewCount may change (no other field)
+      //   - reviewCount may only move up by exactly 1 (no arbitrary jumps)
+      //   - avgRating stays within [0,5]
+      //   - the caller is NOT the listing's own owner (prevents the most
+      //     obvious self-inflation case)
+      // What is NOT enforced (would require a trusted backend):
+      //   - that reviewCount actually equals the true number of kc_reviews
+      //     documents for this listing
+      //   - that avgRating was computed from real review ratings
+      //   - that this specific call followed a genuine review creation at
+      //     all — a signed-in non-owner could call this repeatedly via
+      //     devtools/direct SDK use, incrementing reviewCount without ever
+      //     creating a matching review
+      // This is a deliberate, documented trade-off for staying on Spark,
+      // not a hidden gap.
+      allow update: if signedIn()
+                    && resource.data.ownerUid != request.auth.uid
+                    && request.resource.data.diff(resource.data)
+                       .affectedKeys()
+                       .hasOnly(['avgRating', 'reviewCount'])
+                    && request.resource.data.reviewCount
+                       == resource.data.reviewCount + 1
+                    && request.resource.data.avgRating >= 0
+                    && request.resource.data.avgRating <= 5;
+
+      // -------------------- DELETE --------------------
+      allow delete: if isAdmin()
+                    || (
+                      signedIn()
+                      && resource.data.ownerUid == request.auth.uid
+                    );
+    }
+
+
+    // ================================================================
+    // VOLUNTEERS
+    // ================================================================
+    // SPARK-COMPATIBLE (Phase 1 redesign): direct client creation is
+    // restored (the Cloud-Function-only path required Blaze). Tightened
+    // versus the ORIGINAL rule: regNo format is now validated.
+    //
+    // HONEST LIMITATION: Rules can require the regNo string to match the
+    // expected KCV-2027-NNNNNN pattern, but cannot verify those digits
+    // were actually produced by the kc_counters/volunteer increment that
+    // happened moments earlier — Rules evaluate each document write
+    // independently and cannot cross-reference two separate writes within
+    // one client transaction. A determined attacker with direct SDK
+    // access (not just using the normal UI) could still pick an arbitrary
+    // 6-digit number within the pattern, potentially colliding with or
+    // skipping ahead of the real sequence. This does not compromise
+    // authentication or any other user's data — it only affects the
+    // "niceness"/uniqueness of the registration-number sequence — but it
+    // is a real, standing limitation without a trusted backend.
+
+    match /kc_volunteers/{id} {
+
+      allow read: if isAdmin()
+                  || (
+                    signedIn()
+                    && resource.data.uid == request.auth.uid
+                  );
+
+      allow create: if signedIn()
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.regNo is string
+                    && request.resource.data.regNo.matches('^KCV-2027-[0-9]{6}$');
+
+      allow update, delete: if isAdmin();
+    }
+
+
+    // ================================================================
+    // COUNTERS
+    // ================================================================
+    // SPARK-COMPATIBLE (Phase 1 redesign): client write restored (the
+    // Cloud-Function-only path required Blaze). Tightened versus the
+    // ORIGINAL rule (`count >= resource.data.count`, which allowed
+    // arbitrary forward jumps): now requires EXACTLY +1 per write.
+    //
+    // HONEST LIMITATION: this closes "jump the counter forward by any
+    // amount" but does NOT close "call this repeatedly without ever
+    // completing a real registration" — Rules cannot verify a write here
+    // corresponds to an actual kc_volunteers document being created in
+    // the same operation, for the same reason described above. A
+    // determined attacker could still inflate the publicly-displayed
+    // volunteer count by 1 per call without registering. Full closure
+    // requires a trusted backend.
+
+    match /kc_counters/{id} {
+
+      allow read: if signedIn();
+
+      allow write: if signedIn()
+                   && (
+                     !resource.exists()
+                     ? request.resource.data.count == 1
+                     : request.resource.data.count == resource.data.count + 1
+                   );
+    }
+
+
+    // ================================================================
+    // SERVICE REQUESTS — unchanged (already Spark-compatible: enforced
+    // entirely by Rules, never depended on a Cloud Function)
+    // ================================================================
+
+    match /kc_service_requests/{id} {
+
+      allow read: if isAdmin()
+                  || (
+                    signedIn()
+                    && resource.data.uid == request.auth.uid
+                  )
+                  || (
+                    signedIn()
+                    && resource.data.listingId != null
+                    && get(
+                      /databases/$(database)/documents/kc_listings/$(resource.data.listingId)
+                    ).data.ownerUid == request.auth.uid
+                  );
+
+      allow create: if signedIn()
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && (
+                      !('listingId' in request.resource.data)
+                      || request.resource.data.listingId == null
+                      || exists(
+                        /databases/$(database)/documents/kc_listings/$(request.resource.data.listingId)
+                      )
+                    );
+
+      allow update: if isAdmin();
+
+      allow update: if signedIn()
+                    && resource.data.uid == request.auth.uid
+                    && resource.data.status == 'completed'
+                    && resource.data.reviewed != true
+                    && request.resource.data.diff(resource.data)
+                       .affectedKeys()
+                       .hasOnly(['reviewed'])
+                    && request.resource.data.reviewed == true;
+
+      allow delete: if isAdmin();
+    }
+
+
+    // ================================================================
+    // REVIEWS — unchanged (already Spark-compatible: enforced entirely
+    // by Rules for creation/duplicate-prevention; only the AGGREGATE
+    // effect on kc_listings, above, needed the Spark trade-off)
+    // ================================================================
+
+    match /kc_reviews/{requestId} {
+
+      allow read: if true;
+
+      allow create: if signedIn()
+                    && requestId == request.resource.data.requestId
+                    && request.resource.data.reviewerUid == request.auth.uid
+                    && exists(
+                      /databases/$(database)/documents/kc_service_requests/$(requestId)
+                    )
+                    && get(
+                      /databases/$(database)/documents/kc_service_requests/$(requestId)
+                    ).data.uid == request.auth.uid
+                    && get(
+                      /databases/$(database)/documents/kc_service_requests/$(requestId)
+                    ).data.status == 'completed'
+                    && get(
+                      /databases/$(database)/documents/kc_service_requests/$(requestId)
+                    ).data.listingId == request.resource.data.listingId
+                    && get(
+                      /databases/$(database)/documents/kc_service_requests/$(requestId)
+                    ).data.reviewed != true
+                    && exists(
+                      /databases/$(database)/documents/kc_listings/$(request.resource.data.listingId)
+                    )
+                    && get(
+                      /databases/$(database)/documents/kc_listings/$(request.resource.data.listingId)
+                    ).data.ownerUid != request.auth.uid
+                    && request.resource.data.rating is int
+                    && request.resource.data.rating >= 1
+                    && request.resource.data.rating <= 5;
+
+      allow update, delete: if isAdmin();
+    }
+
+
+    // ================================================================
+    // NOTIFICATIONS — unchanged
+    // ================================================================
+
+    match /kc_notifications/{id} {
+
+      allow read: if isAdmin()
+                  || (
+                    signedIn()
+                    && resource.data.uid == request.auth.uid
+                  );
+
+      allow create: if signedIn()
+                    && request.resource.data.uid is string
+                    && request.resource.data.uid != '';
+
+      allow update: if isAdmin()
+                    || (
+                      signedIn()
+                      && resource.data.uid == request.auth.uid
+                    );
+
+      allow delete: if isAdmin();
+    }
+
+
+    // ================================================================
+    // DEFAULT DENY
+    // ================================================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

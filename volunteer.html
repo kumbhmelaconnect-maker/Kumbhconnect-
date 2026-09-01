@@ -363,29 +363,44 @@ function pad6(n){ return String(n).padStart(6,'0'); }
 // hardened Firestore Rules (see firestore.rules — kc_counters requires
 // exact +1, kc_volunteers requires uid match + regNo format validation).
 //
-// HONEST LIMITATION (documented per Phase 1 redesign requirement, not
-// hidden): Firestore Rules validate each document write independently.
-// They can require the counter to move by exactly +1, and can require a
-// created kc_volunteers document's regNo to match the KCV-2027-NNNNNN
-// pattern and its uid to match the caller — but they CANNOT verify that
-// a given kc_volunteers document's regNo digits were actually produced by
-// that same counter increment, because Rules cannot cross-reference two
-// separate writes within one transaction. A determined attacker could
-// still call this transaction repeatedly without ever completing a real
-// registration, incrementing the counter without a matching volunteer
-// record existing afterward (rare in practice, since the transaction
-// bundles both writes together every time the real UI calls it — but not
-// impossible via direct SDK calls bypassing the UI). Closing this
-// completely requires a trusted backend (Cloud Function), which is out of
-// scope while on Spark. This is a real, standing limitation — not
-// resolved by anything in this file.
-async function getNextVolRegNo(){
+// SECURITY FIX (Item C, Phase 1 audit): the counter increment and the
+// kc_volunteers document creation used to be two SEPARATE operations —
+// this transaction wrote only the counter, and submitVol() called a
+// plain .add() afterward. If that second call failed for any ordinary
+// reason (dropped connection, closed tab, any error between the two
+// awaits — not just an attacker), the counter was left incremented with
+// no matching volunteer record. Both writes now happen inside this one
+// transaction, so that failure mode is closed: either both succeed or
+// neither does.
+//
+// HONEST LIMITATION (unchanged by this fix, documented per Phase 1
+// redesign requirement, not hidden): Firestore Rules validate each
+// document write independently. They can require the counter to move by
+// exactly +1, and can require a created kc_volunteers document's regNo
+// to match the KCV-2027-NNNNNN pattern and its uid to match the caller —
+// but they CANNOT verify that a given kc_volunteers document's regNo
+// digits were actually produced by this function, because Rules cannot
+// cross-reference two separate top-level writes even within one
+// transaction. A determined attacker with direct SDK access (bypassing
+// this UI/function entirely) could still: (a) call a transaction that
+// only increments the counter, inflating the public count with no
+// matching volunteer record, or (b) create a kc_volunteers document
+// directly with any pattern-matching regNo, without ever calling this
+// function or touching the counter at all — risking regNo collisions
+// across different volunteers, which Rules cannot detect either.
+// Closing either of those completely requires a trusted backend (Cloud
+// Function), which is out of scope while on Spark. This is a real,
+// standing limitation — not resolved by this fix.
+async function registerVolunteerAtomic(volunteerData){
   const counterRef = db.collection('kc_counters').doc('volunteer');
+  const volRef = db.collection('kc_volunteers').doc();
   return db.runTransaction(async (tx) => {
     const snap = await tx.get(counterRef);
     const next = (snap.exists ? (snap.data().count||0) : 0) + 1;
+    const regNo = 'KCV-2027-' + pad6(next);
     tx.set(counterRef, {count: next}, {merge:true});
-    return next;
+    tx.set(volRef, {...volunteerData, regNo});
+    return regNo;
   });
 }
 function toggleStudentFields(){
@@ -439,10 +454,8 @@ async function submitVol(){
   try{
     const photoUrl = await uploadToCloudinary(photoFile);
     if(btn) btn.querySelector('span:last-child').textContent='नोंदणी होत आहे…';
-    const n = await getNextVolRegNo();
-    const regNo = 'KCV-2027-' + pad6(n);
-    await db.collection('kc_volunteers').add({
-      uid: auth.currentUser.uid, regNo, name, mobile, email, age, city, avail, langs, skills, message: msg2,
+    const regNo = await registerVolunteerAtomic({
+      uid: auth.currentUser.uid, name, mobile, email, age, city, avail, langs, skills, message: msg2,
       isStudent, institute, std, photo: photoUrl,
       status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
