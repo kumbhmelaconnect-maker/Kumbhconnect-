@@ -377,6 +377,12 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh
 .svc-card.on{border-color:var(--sf);background:var(--cs)}
 .svc-ic{font-size:26px;margin-bottom:7px}
 .svc-name{font-family:'Khand',sans-serif;font-size:.95rem;font-weight:700;color:var(--t1)}
+.svc-group-hd{padding:14px 14px 4px;font-family:'Khand',sans-serif;font-size:.82rem;font-weight:700;color:var(--t3);display:flex;align-items:center;gap:6px}
+.svc-group-grid{padding:0 14px 6px;display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.svc-search-row{display:flex;gap:8px;align-items:center;padding:10px 14px;position:sticky;top:0;background:var(--cd);z-index:2}
+.svc-search-row input{flex:1;padding:9px 12px;border-radius:var(--r2);border:1px solid var(--br);font-family:var(--fn);font-size:.82rem;background:var(--cs);color:var(--t1)}
+.svc-search-clear{border:none;background:var(--br);color:var(--t1);border-radius:50%;width:28px;height:28px;flex-shrink:0;cursor:pointer;font-size:.75rem}
+.prov-directions-btn{margin-top:6px;padding:5px 10px;border-radius:7px;border:1px solid var(--sf);background:transparent;color:var(--sf);font-size:.68rem;font-weight:700;cursor:pointer;font-family:var(--fn)}
 .svc-price{font-size:.8rem;color:var(--sf);font-weight:700;margin-top:4px}
 .svc-desc{font-size:.65rem;color:var(--t3);margin-top:4px;line-height:1.4}
 
@@ -1282,7 +1288,13 @@ if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.
   <div class="msheet">
     <div class="mhandle"></div>
     <div class="mhdr"><h3 id="svc-providers-title">उपलब्ध Providers</h3><button class="mclose" onclick="closeModal('svc-providers-modal')">✕</button></div>
-    <div class="mbody" id="svc-providers-list"></div>
+    <div class="mbody">
+      <div class="svc-search-row" id="svc-providers-search-row" style="display:none">
+        <input type="text" id="svc-providers-search" placeholder="🔍 नाव / सेवा शोधा…" oninput="filterSvcProviders()"/>
+        <button type="button" class="svc-search-clear" id="svc-providers-search-clear" onclick="clearSvcProvidersSearch()" style="display:none">✕</button>
+      </div>
+      <div id="svc-providers-list"></div>
+    </div>
   </div>
 </div>
 
@@ -1425,14 +1437,65 @@ if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.
         <div class="fg"><label id="lst-name-label">व्यवसायाचे नाव</label><input type="text" id="lst-name" required/></div>
         <div class="fg" id="lst-category-fg"><label>सेवा श्रेणी (Services पेजवर याच नावाने दिसेल)</label>
           <select id="lst-category">
-            <option value="hotel">🏨 Hotel Booking</option>
-            <option value="restaurant">🍽️ Restaurant</option>
-            <option value="roomstay">🛏️ Room / Homestay</option>
-            <option value="hall">🎪 Lawn / कार्यालय</option>
-            <option value="travel">🚗 Travel Service</option>
-            <option value="shopping">🛍️ Shopping / दुकान</option>
-            <option value="religious">🕉️ धार्मिक साहित्य</option>
-            <option value="other">📦 इतर</option>
+            <optgroup label="वैद्यकीय व आरोग्य">
+              <option value="hospital">🏥 रुग्णालय</option>
+              <option value="clinic">🩺 दवाखाना / क्लिनिक</option>
+              <option value="doctor">👨‍⚕️ डॉक्टर</option>
+              <option value="pharmacy">💊 औषध दुकान</option>
+              <option value="ambulance">🚑 रुग्णवाहिका</option>
+              <option value="diagnostic">🧪 डायग्नोस्टिक / लॅब</option>
+            </optgroup>
+            <optgroup label="वाहतूक">
+              <option value="travel">🚗 ट्रॅव्हल सेवा</option>
+              <option value="bus">🚌 बस / शटल</option>
+              <option value="taxi">🚕 टॅक्सी / कॅब</option>
+              <option value="auto">🛺 ऑटो</option>
+              <option value="localtransport">🚲 स्थानिक वाहतूक</option>
+            </optgroup>
+            <optgroup label="निवास">
+              <option value="hotel">🏨 Hotel Booking</option>
+              <option value="roomstay">🛏️ रूम / होमस्टे</option>
+              <option value="dharamshala">🛕 धर्मशाळा</option>
+              <option value="ashram">🙏 आश्रम</option>
+              <option value="camp">⛺ कॅम्प / तंबू</option>
+              <option value="hall">🎪 लॉन / कार्यालय</option>
+            </optgroup>
+            <optgroup label="अन्न सेवा">
+              <option value="restaurant">🍽️ रेस्टॉरंट</option>
+              <option value="foodprovider">🍛 फूड प्रोव्हायडर</option>
+              <option value="catering">🍲 केटरिंग</option>
+              <option value="tiffin">🍱 टिफिन / जेवण सेवा</option>
+            </optgroup>
+            <optgroup label="कुंभ सेवा">
+              <option value="kumbhguide">🧭 कुंभ गाईड</option>
+              <option value="localguide">🗺️ लोकल गाईड</option>
+              <option value="multiguide">🌐 बहुभाषिक गाईड</option>
+              <option value="touroperator">🚐 टूर ऑपरेटर</option>
+              <option value="religious">🕉️ धार्मिक साहित्य / पूजा सेवा</option>
+              <option value="photographer">📷 फोटोग्राफर</option>
+              <option value="videographer">🎥 व्हिडिओग्राफर</option>
+            </optgroup>
+            <optgroup label="जीवनावश्यक सेवा">
+              <option value="grocery">🛒 किराणा / जीवनावश्यक वस्तू</option>
+              <option value="shopping">🛍️ शॉपिंग मदत</option>
+              <option value="laundry">🧺 लॉन्ड्री</option>
+              <option value="mobilerecharge">📱 मोबाईल / रिचार्ज</option>
+              <option value="repair">🔧 दुरुस्ती</option>
+              <option value="courier">🚚 कुरिअर / डिलिव्हरी</option>
+              <option value="printing">🖨️ प्रिंटिंग / फोटो</option>
+            </optgroup>
+            <optgroup label="सार्वजनिक / कार्यक्रम सहाय्य">
+              <option value="parking">🅿️ पार्किंग</option>
+              <option value="drinkingwater">💧 पिण्याचे पाणी</option>
+              <option value="cleaning">🧹 स्वच्छता</option>
+              <option value="electrical">⚡ इलेक्ट्रिकल</option>
+              <option value="watertanker">🚛 पाणी टँकर</option>
+              <option value="equipmentrental">🛠️ इक्विपमेंट भाड्याने</option>
+              <option value="eventsupport">🎤 कार्यक्रम सहाय्य</option>
+            </optgroup>
+            <optgroup label="इतर">
+              <option value="other">📦 इतर</option>
+            </optgroup>
           </select>
         </div>
         <div class="fg"><label>वर्णन</label><textarea id="lst-desc" rows="3" required placeholder="थोडक्यात माहिती..."></textarea></div>
@@ -4484,6 +4547,32 @@ function stopProviderDashboard(){
   if(_provReqUnsub){ _provReqUnsub(); _provReqUnsub=null; }
   if(_provRevUnsub){ _provRevUnsub(); _provRevUnsub=null; }
 }
+// Provider self-service request management (Phase 2 Step 1). Only touches
+// the 'status' field, only from 'pending', only for a request whose
+// listingId belongs to the caller's own approved listing — enforced by the
+// matching Firestore Rule, not just this client check.
+async function providerUpdateRequestStatus(requestId, requesterUid, newStatus){
+  if(!_kcUser){ toast('कृपया आधी Login करा'); return; }
+  if(newStatus!=='completed' && newStatus!=='rejected') return;
+  if(newStatus==='rejected' && !confirm('ही Request नाकारायची?')) return;
+  try{
+    await db.collection(COL_SERVICE_REQ).doc(requestId).update({status:newStatus});
+    toast(newStatus==='completed' ? '🎉 Request Completed म्हणून मार्क झाली' : '❌ Request नाकारली');
+    if(requesterUid){
+      const title = newStatus==='completed' ? '🎉 सेवा पूर्ण झाली!' : '❌ Request नाकारली';
+      const msg = newStatus==='completed'
+        ? `"${(_kcMyListing && _kcMyListing.name) || ''}" कडून तुमची सेवा पूर्ण झाली आहे — आता Review देऊ शकता.`
+        : 'माफ करा, तुमची Service Request सध्या पूर्ण करता आली नाही.';
+      db.collection(COL_NOTIFICATIONS).add({
+        uid: requesterUid, title, message: msg, link: 'services', read:false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(e=>console.error(e));
+    }
+  }catch(err){
+    console.error('providerUpdateRequestStatus failed for', requestId, err);
+    toast('❌ अद्ययावत करता आली नाही — पुन्हा प्रयत्न करा');
+  }
+}
 function startProviderDashboard(listingId){
   stopProviderDashboard();
   _provReqUnsub = db.collection(COL_SERVICE_REQ).where('listingId','==',listingId)
@@ -4496,7 +4585,15 @@ function startProviderDashboard(listingId){
       const listEl = document.getElementById('provider-requests-list');
       listEl.innerHTML = arr.length ? arr.slice(0,20).map(r=>{
         const statusLabel = r.status==='completed' ? '🎉 Completed' : r.status==='rejected' ? '❌ Rejected' : '🕓 Pending';
-        return `<div class="mc-myitem"><div class="tx">${KCSecurity.escapeHtml(r.name)}<small>📞 ${KCSecurity.escapeHtml(r.mobile)} · ${KCSecurity.escapeHtml(r.details)}</small></div><span class="lst-status ${r.status==='completed'?'approved':'pending'}">${statusLabel}</span></div>`;
+        const rId = KCSecurity.escapeHtml(r.id);
+        const rUid = KCSecurity.escapeHtml(r.uid);
+        // Only a 'pending' request can be actioned by the provider — matches
+        // the Firestore Rules transition (pending -> completed/rejected only).
+        const actions = r.status==='pending' ? `<div style="display:flex;gap:6px;margin-top:6px">
+            <button class="mc-acct-btn ok" onclick="providerUpdateRequestStatus('${rId}','${rUid}','completed')">🎉 Completed करा</button>
+            <button class="mc-acct-btn danger" onclick="providerUpdateRequestStatus('${rId}','${rUid}','rejected')">❌ Reject</button>
+          </div>` : '';
+        return `<div class="mc-myitem" style="align-items:flex-start"><div class="tx">${KCSecurity.escapeHtml(r.name)}<small>📞 ${KCSecurity.escapeHtml(r.mobile)} · ${KCSecurity.escapeHtml(r.details)}</small>${actions}</div><span class="lst-status ${r.status==='completed'?'approved':'pending'}">${statusLabel}</span></div>`;
       }).join('') : '<div class="mc-empty"><div class="mc-empty-ic">📭</div><p>अजून कुठलीही Request आलेली नाही.</p></div>';
     }, err => console.error(err));
 
@@ -4523,33 +4620,87 @@ function onListingTypeChange(){
 /* =====================================================================
    SERVICES PAGE — user selects a service category and submits a request
 ===================================================================== */
+const CATEGORY_GROUPS = [
+  {id:'medical', ic:'🏥', mr:'वैद्यकीय व आरोग्य', hi:'चिकित्सा एवं स्वास्थ्य', en:'Medical & Health'},
+  {id:'transport', ic:'🚌', mr:'वाहतूक', hi:'परिवहन', en:'Transport'},
+  {id:'accommodation', ic:'🏨', mr:'निवास', hi:'आवास', en:'Accommodation'},
+  {id:'food', ic:'🍽️', mr:'अन्न सेवा', hi:'भोजन सेवा', en:'Food'},
+  {id:'kumbhservices', ic:'🕉️', mr:'कुंभ सेवा', hi:'कुंभ सेवाएं', en:'Kumbh Services'},
+  {id:'essential', ic:'🛒', mr:'जीवनावश्यक सेवा', hi:'आवश्यक सेवाएं', en:'Essential Services'},
+  {id:'publicevent', ic:'🎪', mr:'सार्वजनिक / कार्यक्रम सहाय्य', hi:'सार्वजनिक / आयोजन सहायता', en:'Public / Event Support'},
+  {id:'other', ic:'📦', mr:'इतर', hi:'अन्य', en:'Other'},
+];
 const SERVICE_TYPES = [
-  {id:'hotel', ic:'🏨', key:'svc_hotel'},
-  {id:'restaurant', ic:'🍽️', key:'svc_restaurant'},
-  {id:'roomstay', ic:'🛏️', key:'svc_roomstay'},
-  {id:'hall', ic:'🎪', key:'svc_hall'},
-  {id:'travel', ic:'🚗', key:'svc_travel'},
-  {id:'guide', ic:'🧭', key:'svc_guide'},
-  {id:'volunteer', ic:'🙋', key:'svc_volunteer'},
-  {id:'shopping', ic:'🛍️', key:'svc_shopping'},
-  {id:'religious', ic:'🕉️', key:'svc_religious'},
-  {id:'other', ic:'📦', key:'svc_other'}
+  {id:'hospital', ic:'🏥', key:'svc_hospital', group:'medical'},
+  {id:'clinic', ic:'🩺', key:'svc_clinic', group:'medical'},
+  {id:'doctor', ic:'👨‍⚕️', key:'svc_doctor', group:'medical'},
+  {id:'pharmacy', ic:'💊', key:'svc_pharmacy', group:'medical'},
+  {id:'ambulance', ic:'🚑', key:'svc_ambulance', group:'medical'},
+  {id:'diagnostic', ic:'🧪', key:'svc_diagnostic', group:'medical'},
+  {id:'travel', ic:'🚗', key:'svc_travel', group:'transport'},
+  {id:'bus', ic:'🚌', key:'svc_bus', group:'transport'},
+  {id:'taxi', ic:'🚕', key:'svc_taxi', group:'transport'},
+  {id:'auto', ic:'🛺', key:'svc_auto', group:'transport'},
+  {id:'localtransport', ic:'🚲', key:'svc_localtransport', group:'transport'},
+  {id:'hotel', ic:'🏨', key:'svc_hotel', group:'accommodation'},
+  {id:'roomstay', ic:'🛏️', key:'svc_roomstay', group:'accommodation'},
+  {id:'dharamshala', ic:'🛕', key:'svc_dharamshala', group:'accommodation'},
+  {id:'ashram', ic:'🙏', key:'svc_ashram', group:'accommodation'},
+  {id:'camp', ic:'⛺', key:'svc_camp', group:'accommodation'},
+  {id:'hall', ic:'🎪', key:'svc_hall', group:'accommodation'},
+  {id:'restaurant', ic:'🍽️', key:'svc_restaurant', group:'food'},
+  {id:'foodprovider', ic:'🍛', key:'svc_foodprovider', group:'food'},
+  {id:'catering', ic:'🍲', key:'svc_catering', group:'food'},
+  {id:'tiffin', ic:'🍱', key:'svc_tiffin', group:'food'},
+  {id:'kumbhguide', ic:'🧭', key:'svc_kumbhguide', group:'kumbhservices'},
+  {id:'localguide', ic:'🗺️', key:'svc_localguide', group:'kumbhservices'},
+  {id:'multiguide', ic:'🌐', key:'svc_multiguide', group:'kumbhservices'},
+  {id:'touroperator', ic:'🚐', key:'svc_touroperator', group:'kumbhservices'},
+  {id:'religious', ic:'🕉️', key:'svc_religious', group:'kumbhservices'},
+  {id:'photographer', ic:'📷', key:'svc_photographer', group:'kumbhservices'},
+  {id:'videographer', ic:'🎥', key:'svc_videographer', group:'kumbhservices'},
+  {id:'grocery', ic:'🛒', key:'svc_grocery', group:'essential'},
+  {id:'shopping', ic:'🛍️', key:'svc_shopping', group:'essential'},
+  {id:'laundry', ic:'🧺', key:'svc_laundry', group:'essential'},
+  {id:'mobilerecharge', ic:'📱', key:'svc_mobilerecharge', group:'essential'},
+  {id:'repair', ic:'🔧', key:'svc_repair', group:'essential'},
+  {id:'courier', ic:'🚚', key:'svc_courier', group:'essential'},
+  {id:'printing', ic:'🖨️', key:'svc_printing', group:'essential'},
+  {id:'parking', ic:'🅿️', key:'svc_parking', group:'publicevent'},
+  {id:'drinkingwater', ic:'💧', key:'svc_drinkingwater', group:'publicevent'},
+  {id:'cleaning', ic:'🧹', key:'svc_cleaning', group:'publicevent'},
+  {id:'electrical', ic:'⚡', key:'svc_electrical', group:'publicevent'},
+  {id:'watertanker', ic:'🚛', key:'svc_watertanker', group:'publicevent'},
+  {id:'equipmentrental', ic:'🛠️', key:'svc_equipmentrental', group:'publicevent'},
+  {id:'eventsupport', ic:'🎤', key:'svc_eventsupport', group:'publicevent'},
+  {id:'other', ic:'📦', key:'svc_other', group:'other'},
+  {id:'guide', ic:'🧭', key:'svc_guide', group:'kumbhservices'},
+  {id:'volunteer', ic:'🙋', key:'svc_volunteer', group:'kumbhservices'}
 ];
 let _svcReqUnsub = null;
 function renderServiceCategoryGrid(){
   const el = document.getElementById('svc-category-grid');
   if(!el) return;
   const T = MC_SVC_I18N[_lang] || MC_SVC_I18N.mr;
-  el.innerHTML = SERVICE_TYPES.map(s => `
-    <div class="svc-card" onclick="browseServiceProviders('${s.id}')">
-      <div class="svc-ic">${s.ic}</div>
-      <div class="svc-name">${T[s.key]}</div>
-    </div>`).join('');
+  const langKey = (_lang==='hi') ? 'hi' : (_lang==='en') ? 'en' : 'mr';
+  let html = '';
+  CATEGORY_GROUPS.forEach(g => {
+    const inGroup = SERVICE_TYPES.filter(s => s.group === g.id);
+    if(!inGroup.length) return;
+    html += `<div class="svc-group-hd"><span>${g.ic}</span> ${g[langKey]}</div>`;
+    html += `<div class="svc-group-grid">` + inGroup.map(s => `
+      <div class="svc-card" onclick="browseServiceProviders('${s.id}')">
+        <div class="svc-ic">${s.ic}</div>
+        <div class="svc-name">${T[s.key]}</div>
+      </div>`).join('') + `</div>`;
+  });
+  el.innerHTML = html;
 }
+
 const MC_SVC_I18N = {
-  mr: {svc_hotel:'Hotel Booking',svc_restaurant:'Restaurant',svc_roomstay:'Room / Homestay',svc_hall:'Lawn / कार्यालय',svc_travel:'Travel Service',svc_guide:'Guide Service',svc_volunteer:'Volunteer मदत',svc_religious:'धार्मिक साहित्य',svc_shopping:'Shopping मदत',svc_other:'इतर'},
-  hi: {svc_hotel:'Hotel Booking',svc_restaurant:'Restaurant',svc_roomstay:'Room / Homestay',svc_hall:'Lawn / कार्यालय',svc_travel:'Travel Service',svc_guide:'Guide Service',svc_volunteer:'Volunteer सहायता',svc_religious:'धार्मिक सामग्री',svc_shopping:'Shopping सहायता',svc_other:'अन्य'},
-  en: {svc_hotel:'Hotel Booking',svc_restaurant:'Restaurant',svc_roomstay:'Room / Homestay',svc_hall:'Lawn / Function Hall',svc_travel:'Travel Service',svc_guide:'Guide Service',svc_volunteer:'Volunteer Help',svc_religious:'Religious Items',svc_shopping:'Shopping Assistance',svc_other:'Other'}
+  mr: {svc_hospital:'रुग्णालय',svc_clinic:'दवाखाना / क्लिनिक',svc_doctor:'डॉक्टर',svc_pharmacy:'औषध दुकान',svc_ambulance:'रुग्णवाहिका',svc_diagnostic:'डायग्नोस्टिक / लॅब',svc_travel:'ट्रॅव्हल सेवा',svc_bus:'बस / शटल',svc_taxi:'टॅक्सी / कॅब',svc_auto:'ऑटो',svc_localtransport:'स्थानिक वाहतूक',svc_hotel:'Hotel Booking',svc_roomstay:'रूम / होमस्टे',svc_dharamshala:'धर्मशाळा',svc_ashram:'आश्रम',svc_camp:'कॅम्प / तंबू',svc_hall:'लॉन / कार्यालय',svc_restaurant:'रेस्टॉरंट',svc_foodprovider:'फूड प्रोव्हायडर',svc_catering:'केटरिंग',svc_tiffin:'टिफिन / जेवण सेवा',svc_kumbhguide:'कुंभ गाईड',svc_localguide:'लोकल गाईड',svc_multiguide:'बहुभाषिक गाईड',svc_touroperator:'टूर ऑपरेटर',svc_religious:'धार्मिक साहित्य / पूजा सेवा',svc_photographer:'फोटोग्राफर',svc_videographer:'व्हिडिओग्राफर',svc_grocery:'किराणा / जीवनावश्यक वस्तू',svc_shopping:'शॉपिंग मदत',svc_laundry:'लॉन्ड्री',svc_mobilerecharge:'मोबाईल / रिचार्ज',svc_repair:'दुरुस्ती',svc_courier:'कुरिअर / डिलिव्हरी',svc_printing:'प्रिंटिंग / फोटो',svc_parking:'पार्किंग',svc_drinkingwater:'पिण्याचे पाणी',svc_cleaning:'स्वच्छता',svc_electrical:'इलेक्ट्रिकल',svc_watertanker:'पाणी टँकर',svc_equipmentrental:'इक्विपमेंट भाड्याने',svc_eventsupport:'कार्यक्रम सहाय्य',svc_other:'इतर',svc_guide:'Guide Service',svc_volunteer:'Volunteer मदत'},
+  hi: {svc_hospital:'अस्पताल',svc_clinic:'क्लिनिक',svc_doctor:'डॉक्टर',svc_pharmacy:'फार्मेसी',svc_ambulance:'एम्बुलेंस',svc_diagnostic:'डायग्नोस्टिक / लैब',svc_travel:'ट्रैवल सेवा',svc_bus:'बस / शटल',svc_taxi:'टैक्सी / कैब',svc_auto:'ऑटो',svc_localtransport:'स्थानीय परिवहन',svc_hotel:'Hotel Booking',svc_roomstay:'रूम / होमस्टे',svc_dharamshala:'धर्मशाला',svc_ashram:'आश्रम',svc_camp:'कैंप / तंबू',svc_hall:'लॉन / कार्यालय',svc_restaurant:'रेस्टोरेंट',svc_foodprovider:'फूड प्रोवाइडर',svc_catering:'केटरिंग',svc_tiffin:'टिफिन / भोजन सेवा',svc_kumbhguide:'कुंभ गाइड',svc_localguide:'लोकल गाइड',svc_multiguide:'बहुभाषी गाइड',svc_touroperator:'टूर ऑपरेटर',svc_religious:'धार्मिक सामग्री / पूजा सेवा',svc_photographer:'फोटोग्राफर',svc_videographer:'वीडियोग्राफर',svc_grocery:'किराना / आवश्यक वस्तुएं',svc_shopping:'शॉपिंग सहायता',svc_laundry:'लॉन्ड्री',svc_mobilerecharge:'मोबाइल / रिचार्ज',svc_repair:'मरम्मत',svc_courier:'कूरियर / डिलीवरी',svc_printing:'प्रिंटिंग / फोटो',svc_parking:'पार्किंग',svc_drinkingwater:'पीने का पानी',svc_cleaning:'सफाई',svc_electrical:'इलेक्ट्रिकल',svc_watertanker:'पानी टैंकर',svc_equipmentrental:'उपकरण किराए पर',svc_eventsupport:'आयोजन सहायता',svc_other:'अन्य',svc_guide:'Guide Service',svc_volunteer:'Volunteer सहायता'},
+  en: {svc_hospital:'Hospital',svc_clinic:'Clinic',svc_doctor:'Doctor',svc_pharmacy:'Pharmacy',svc_ambulance:'Ambulance',svc_diagnostic:'Diagnostic / Lab',svc_travel:'Travel Service',svc_bus:'Bus / Shuttle',svc_taxi:'Taxi / Cab',svc_auto:'Auto',svc_localtransport:'Local Transport',svc_hotel:'Hotel Booking',svc_roomstay:'Room / Homestay',svc_dharamshala:'Dharamshala',svc_ashram:'Ashram',svc_camp:'Camp / Tent',svc_hall:'Lawn / Function Hall',svc_restaurant:'Restaurant',svc_foodprovider:'Food Provider',svc_catering:'Catering',svc_tiffin:'Tiffin / Meal Service',svc_kumbhguide:'Kumbh Guide',svc_localguide:'Local Guide',svc_multiguide:'Multilingual Guide',svc_touroperator:'Tour Operator',svc_religious:'Puja / Religious Services',svc_photographer:'Photographer',svc_videographer:'Videographer',svc_grocery:'Grocery / Essentials',svc_shopping:'Shopping Assistance',svc_laundry:'Laundry',svc_mobilerecharge:'Mobile / Recharge',svc_repair:'Repair',svc_courier:'Courier / Delivery',svc_printing:'Printing / Photo',svc_parking:'Parking',svc_drinkingwater:'Drinking Water',svc_cleaning:'Cleaning',svc_electrical:'Electrical',svc_watertanker:'Water Tanker',svc_equipmentrental:'Equipment Rental',svc_eventsupport:'Event Support',svc_other:'Other',svc_guide:'Guide Service',svc_volunteer:'Volunteer Help'}
 };
 async function openServiceRequestModal(typeId, listingId, providerName){
   if(!_kcUser){ toast('कृपया आधी Login करा'); return; }
@@ -4565,14 +4716,25 @@ async function openServiceRequestModal(typeId, listingId, providerName){
   document.getElementById('svc-details').value = '';
   openModal('svc-request-modal');
 }
+let _svcProvidersCache = [];   // last-loaded provider array for the open category (client-side search source)
+let _svcProvidersTypeId = null;
+let _svcProvidersS = null;
 async function browseServiceProviders(typeId){
   if(!_kcUser){ toast('कृपया आधी Login करा'); return; }
   const T = MC_SVC_I18N[_lang] || MC_SVC_I18N.mr;
   const s = SERVICE_TYPES.find(x=>x.id===typeId);
   document.getElementById('svc-providers-title').textContent = s.ic + ' ' + T[s.key] + ' — Providers';
   const listEl = document.getElementById('svc-providers-list');
+  const searchRow = document.getElementById('svc-providers-search-row');
+  const searchInput = document.getElementById('svc-providers-search');
+  searchRow.style.display = 'none';
+  searchInput.value = '';
+  document.getElementById('svc-providers-search-clear').style.display = 'none';
   listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3)">लोड होत आहे…</div>';
   openModal('svc-providers-modal');
+  _svcProvidersCache = [];
+  _svcProvidersTypeId = typeId;
+  _svcProvidersS = s;
   try{
     let query;
     if(typeId==='guide' || typeId==='volunteer'){
@@ -4608,24 +4770,64 @@ async function browseServiceProviders(typeId){
       p._liveAvgRating = count ? sum / count : 0;
       p._liveReviewCount = count;
     });
-    listEl.innerHTML = arr.map(p => {
-      const stars = '★'.repeat(Math.round(p._liveAvgRating)) + '☆'.repeat(5-Math.round(p._liveAvgRating));
-      const safePhotoUrl = p.photos && p.photos[0] ? KCSecurity.sanitizeUrl(p.photos[0]) : '';
-      const photoStyle = safePhotoUrl ? `background-image:url('${safePhotoUrl}')` : '';
-      const photoInner = safePhotoUrl ? '' : s.ic;
-      return `<div class="prov-card" onclick="closeModal('svc-providers-modal');openServiceRequestModal('${typeId}','${p.id}','${(p.name||'').replace(/'/g,"&#39;")}')">
-        <div class="prov-photo" style="${photoStyle}">${photoStyle?'':'${s.ic}'}</div>
-        <div class="prov-info">
-          <div class="prov-name">${KCSecurity.escapeHtml(p.name)}</div>
-          <div class="prov-stars">${stars} <span class="prov-rating-n">(${p._liveReviewCount})</span></div>
-          <div style="font-size:.7rem;color:var(--t3)">📍 ${KCSecurity.escapeHtml(p.address||'')}</div>
-        </div>
-      </div>`;
-    }).join('') + `<button class="btn-outline" onclick="closeModal('svc-providers-modal');openServiceRequestModal('${typeId}')">वरीलपैकी नाही — सामान्य Request पाठवा</button>`;
+    // Client-side dataset only — no additional Firestore reads happen for
+    // search/filter below; it all runs against this already-loaded array.
+    _svcProvidersCache = arr;
+    searchRow.style.display = arr.length > 1 ? 'flex' : 'none';
+    renderSvcProvidersList(arr);
   }catch(err){
     console.error(err);
     listEl.innerHTML = '<div class="mc-empty"><p>Providers लोड करताना अडचण आली</p></div>';
   }
+}
+function renderSvcProvidersList(list){
+  const listEl = document.getElementById('svc-providers-list');
+  const typeId = _svcProvidersTypeId;
+  const s = _svcProvidersS;
+  if(!list.length){
+    listEl.innerHTML = `<div class="mc-empty"><div class="mc-empty-ic">🔍</div><p>या शोधासाठी कुणीही Provider सापडला नाही.</p></div>
+      <button class="btn-outline" onclick="closeModal('svc-providers-modal');openServiceRequestModal('${typeId}')">वरीलपैकी नाही — सामान्य Request पाठवा</button>`;
+    return;
+  }
+  listEl.innerHTML = list.map(p => {
+    const stars = '★'.repeat(Math.round(p._liveAvgRating)) + '☆'.repeat(5-Math.round(p._liveAvgRating));
+    const safePhotoUrl = p.photos && p.photos[0] ? KCSecurity.sanitizeUrl(p.photos[0]) : '';
+    const photoStyle = safePhotoUrl ? `background-image:url('${safePhotoUrl}')` : '';
+    const addr = p.address || '';
+    const safeAddrAttr = KCSecurity.escapeHtml(addr).replace(/"/g,'&quot;');
+    const dirBtn = addr ? `<button type="button" class="prov-directions-btn" onclick="event.stopPropagation();openProviderDirections('${safeAddrAttr}')">🧭 दिशा / Directions</button>` : '';
+    return `<div class="prov-card" onclick="closeModal('svc-providers-modal');openServiceRequestModal('${typeId}','${p.id}','${(p.name||'').replace(/'/g,"&#39;")}')">
+      <div class="prov-photo" style="${photoStyle}">${photoStyle?'':'${s.ic}'}</div>
+      <div class="prov-info">
+        <div class="prov-name">${KCSecurity.escapeHtml(p.name)}</div>
+        <div class="prov-stars">${stars} <span class="prov-rating-n">(${p._liveReviewCount})</span></div>
+        <div style="font-size:.7rem;color:var(--t3)">📍 ${KCSecurity.escapeHtml(addr)}</div>
+        ${dirBtn}
+      </div>
+    </div>`;
+  }).join('') + `<button class="btn-outline" onclick="closeModal('svc-providers-modal');openServiceRequestModal('${typeId}')">वरीलपैकी नाही — सामान्य Request पाठवा</button>`;
+}
+function filterSvcProviders(){
+  const q = (document.getElementById('svc-providers-search').value || '').trim().toLowerCase();
+  document.getElementById('svc-providers-search-clear').style.display = q ? 'block' : 'none';
+  if(!q){ renderSvcProvidersList(_svcProvidersCache); return; }
+  const filtered = _svcProvidersCache.filter(p => {
+    const haystack = [p.name, p.servicesList, p.description, p.address].filter(Boolean).join(' ').toLowerCase();
+    return haystack.includes(q);
+  });
+  renderSvcProvidersList(filtered);
+}
+function clearSvcProvidersSearch(){
+  document.getElementById('svc-providers-search').value = '';
+  filterSvcProviders();
+}
+// Directions using existing address text — kc_listings has no lat/lng field
+// today (only a free-text address), so this reuses Google Maps' address
+// search (no API key, no extra library) rather than the Leaflet/lat-lng
+// pattern used elsewhere in the app for landmarks with known coordinates.
+function openProviderDirections(address){
+  if(!address) return;
+  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
 }
 async function submitServiceRequest(e){
   e.preventDefault();
