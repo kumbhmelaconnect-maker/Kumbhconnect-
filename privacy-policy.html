@@ -2,9 +2,10 @@
 <html lang="mr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
 <meta name="theme-color" content="#C8410A"/>
 <title>Privacy Policy — KumbhConnect</title>
+<link rel="icon" type="image/png" href="icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -151,7 +152,8 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
       <p>KumbhConnect <strong>तुमच्या परवानगीशिवाय</strong> GPS access करत नाही.</p>
       <ul>
         <li>Location access करण्यापूर्वी स्पष्ट Consent popup दाखवले जाते</li>
-        <li>Location फक्त SOS/Grievance पाठवताना वापरली जाते</li>
+        <li>Location तुम्ही स्वतः एखादं location-based feature वापरता तेव्हाच access केली जाते — उदा. SOS/Grievance पाठवताना, किंवा listing/business जोडताना/एडिट करताना "📍 माझे स्थान वापरा" हा पर्याय निवडल्यास</li>
+        <li>Listing साठी वापरलेलं location त्या listing चा भाग म्हणून saved होतं, फक्त तुम्ही listing submit केल्यास</li>
         <li>तुमचे Live Location कधीही स्वयंचलितपणे share होत नाही</li>
         <li>GPS नाकारल्यास Manual location entry उपलब्ध आहे</li>
       </ul>
@@ -250,7 +252,6 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
       <p>गोपनीयतेबाबत काही प्रश्न असल्यास संपर्क करा:</p>
       <ul>
         <li>📧 Email: kumbhmelaconnect@gmail.com</li>
-        <li>💬 WhatsApp: +91 7499354042</li>
         <li>🌐 Platform: KumbhConnect PWA</li>
       </ul>
     </div>
@@ -300,7 +301,8 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
       <p>KumbhConnect <strong>never accesses GPS without your permission.</strong></p>
       <ul>
         <li>A clear consent popup is shown before any location access</li>
-        <li>Location is used only when submitting SOS or Grievance</li>
+        <li>Location is accessed only when you explicitly use a location-based feature — for example when sending SOS/Grievance, or when you choose "📍 Use My Location" while adding/editing a listing/business</li>
+        <li>Location used for a listing is stored as part of that listing only if you submit it</li>
         <li>Your live location is never shared automatically</li>
         <li>Manual location entry is available if GPS is denied</li>
       </ul>
@@ -399,7 +401,6 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
       <p>For any privacy concerns, contact us:</p>
       <ul>
         <li>📧 Email: kumbhmelaconnect@gmail.com</li>
-        <li>💬 WhatsApp: +91 7499354042</li>
         <li>🌐 Platform: KumbhConnect PWA</li>
       </ul>
     </div>
@@ -449,7 +450,8 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
       <p>KumbhConnect <strong>आपकी अनुमति के बिना</strong> GPS एक्सेस नहीं करता।</p>
       <ul>
         <li>Location एक्सेस से पहले स्पष्ट Consent popup दिखाया जाता है</li>
-        <li>Location केवल SOS/Grievance भेजते समय इस्तेमाल होती है</li>
+        <li>Location केवल तभी access की जाती है जब आप स्वयं कोई location-based feature इस्तेमाल करते हैं — जैसे SOS/Grievance भेजते समय, या listing/business जोड़ते/एडिट करते समय "📍 मेरा स्थान उपयोग करें" चुनने पर</li>
+        <li>listing के लिए इस्तेमाल किया गया location उस listing के हिस्से के रूप में तभी सेव होता है जब आप listing submit करते हैं</li>
         <li>आपकी Live Location कभी स्वचालित रूप से शेयर नहीं होती</li>
         <li>GPS अस्वीकार करने पर Manual location entry उपलब्ध है</li>
       </ul>
@@ -548,7 +550,6 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
       <p>गोपनीयता संबंधी किसी भी प्रश्न के लिए संपर्क करें:</p>
       <ul>
         <li>📧 Email: kumbhmelaconnect@gmail.com</li>
-        <li>💬 WhatsApp: +91 7499354042</li>
         <li>🌐 Platform: KumbhConnect PWA</li>
       </ul>
     </div>
@@ -561,7 +562,6 @@ body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
   <h3>📞 संपर्क करा / Contact Us</h3>
   <p>गोपनीयतेबाबत कोणताही प्रश्न असल्यास संपर्क करा</p>
   <div class="contact-links">
-    <a href="https://wa.me/917499354042?text=KumbhConnect%20Privacy%20Query" class="clink-btn clink-wa" target="_blank">💬 WhatsApp</a>
     <a href="mailto:kumbhmelaconnect@gmail.com?subject=Privacy%20Query%20-%20KumbhConnect" class="clink-btn clink-mail">📧 Email</a>
   </div>
 </div>
@@ -581,7 +581,17 @@ function setLang(lang, el) {
   document.querySelectorAll('.ltab').forEach(b => b.classList.remove('on'));
   document.getElementById('lang-' + lang).classList.add('on');
   if (el) el.classList.add('on');
+  localStorage.setItem('kc_lang', lang);
+  document.documentElement.lang = lang;
 }
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('kc_lang');
+  if (saved && document.getElementById('lang-' + saved)) {
+    const tabs = document.querySelectorAll('.ltab');
+    const idx = { mr: 0, hi: 1, en: 2 }[saved];
+    setLang(saved, idx !== undefined ? tabs[idx] : null);
+  }
+});
 </script>
 </body>
 </html>
