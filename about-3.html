@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
+<meta name="theme-color" content="#C8410A"/>
+<meta name="description" content="KumbhConnect — a digital platform for pilgrims visiting Nashik and Trimbakeshwar."/>
+<title data-i18n="doc_title">About — KumbhConnect</title>
+<link rel="icon" type="image/png" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ===== Tokens (existing brand variables kept; --nv/--mr2 added for the AI band and hero depth) ===== */
+:root{--sf:#C8410A;--sf2:#E85D1A;--mr:#7B1616;--mr2:#4F0E1A;--gd:#C9920A;--gd2:#F0B429;--cr:#FFF9F3;--cd:#FFFCF8;--cs:#FFF3E6;--br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;--wh:#FFFFFF;--gn:#15803D;--nv:#16203A;--nv2:#1F2C4D;--r:14px;--r2:10px;--fn:'Poppins','Mukta','Khand',sans-serif;--fd:'Khand','Mukta',sans-serif;--sh:0 2px 12px rgba(200,65,10,.10)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);min-height:100vh;overflow-x:hidden;line-height:1.6}
+html[lang="mr"] body,html[lang="hi"] body{line-height:1.75}
+img{max-width:100%}
+:focus-visible{outline:3px solid var(--nv);outline-offset:2px}
+.hero :focus-visible,.ai :focus-visible{outline-color:var(--gd2)}
+.skip{position:absolute;left:8px;top:-64px;background:var(--nv);color:#fff;padding:10px 14px;border-radius:8px;z-index:300;font-size:.85rem;text-decoration:none}
+.skip:focus{top:8px}
+
+/* ===== App shell ===== */
+.app-wrap{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+@media(min-width:700px){
+  body{background:#EDE5D8}
+  .app-wrap{max-width:860px;box-shadow:0 8px 60px rgba(0,0,0,.16);border-radius:20px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden;background:var(--cr)}
+  .topbar{border-radius:20px 20px 0 0}
+}
+@media(min-width:1024px){.app-wrap{max-width:1120px}}
+
+/* ===== Top bar (structure and language buttons unchanged: .lbtn / #lbtn-xx / setLang) ===== */
+.topbar{background:var(--wh);border-bottom:1px solid var(--br);padding:8px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.back-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--br);background:var(--cs);color:var(--mr);font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}
+.tb-logo{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.topbar-title{flex:1;min-width:0;font-family:var(--fd);font-size:1.05rem;line-height:1.15;font-weight:700;color:var(--mr);overflow-wrap:anywhere}
+@media(max-width:400px){.tb-logo{display:none}}
+@media(min-width:700px){.topbar-title{font-size:1.2rem}}
+.lang{display:flex;gap:4px}
+.lbtn{min-width:38px;min-height:36px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--br);background:var(--wh);color:var(--t2);font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);transition:background-color .15s,color .15s}
+.lbtn.on{background:var(--mr);color:#fff;border-color:var(--mr)}
+
+/* ===== Shared type ===== */
+.section{padding:30px 16px}
+.h2{font-family:var(--fd);font-size:clamp(1.4rem,4.2vw,1.9rem);line-height:1.2;font-weight:700;color:var(--mr)}
+.h3{font-family:var(--fd);font-size:1.1rem;line-height:1.3;font-weight:700;color:var(--t1)}
+.rule{position:relative;width:96px;height:10px;margin:8px 0 18px}
+.rule::before{content:"";position:absolute;left:0;right:0;top:4px;height:2px;background:linear-gradient(90deg,var(--sf),var(--gd2))}
+.rule::after{content:"";position:absolute;left:50%;top:0;width:8px;height:8px;margin-left:-4px;background:var(--gd);transform:rotate(45deg);box-shadow:0 0 0 3px var(--rule-bg,var(--cr))}
+.lead-p{color:var(--t2);font-size:.95rem;max-width:68ch}
+@media(min-width:700px){.section{padding:44px 36px}}
+
+/* ===== Hero ===== */
+.hero{position:relative;overflow:hidden;color:#fff;text-align:center;padding:34px 18px 76px;background:linear-gradient(160deg,#8A1B1B 0%,var(--mr) 45%,var(--mr2) 100%)}
+.hero .mandala{position:absolute;left:50%;top:-70px;width:min(120%,560px);height:auto;transform:translateX(-50%);color:var(--gd2);opacity:.22;pointer-events:none}
+.hero-in{position:relative;max-width:640px;margin:0 auto}
+.hero-logo{position:relative;width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:#fff;border:3px solid var(--gd2);box-shadow:0 6px 20px rgba(0,0,0,.28);overflow:hidden}
+.hero-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-logo .ph{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:2rem;color:var(--mr);font-family:var(--fd)}
+.hero-logo.failed img{display:none}.hero-logo.failed .ph{display:flex}
+.brand-tag{color:var(--gd2);font-size:.78rem;font-weight:600;letter-spacing:.14em;margin-bottom:10px}
+.hero h1{font-family:var(--fd);font-size:clamp(2.1rem,7vw,3.2rem);line-height:1.1;font-weight:700;color:#fff}
+.hero-sub{margin:10px auto 0;font-family:var(--fd);font-size:clamp(1.05rem,3.2vw,1.35rem);font-weight:600;color:var(--gd2);line-height:1.35}
+.hero-desc{margin:14px auto 0;color:#fff;font-size:.92rem;max-width:56ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 22px;border-radius:var(--r);font-family:var(--fd);font-size:1.02rem;font-weight:700;text-decoration:none;cursor:pointer;transition:background-color .15s,color .15s}
+.btn-primary{background:var(--gd2);color:#3A1200;border:2px solid var(--gd2)}
+.btn-primary:hover{background:#FFD36B;border-color:#FFD36B}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.7)}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:44px;display:block}
+
+/* ===== About ===== */
+.about-grid{display:grid;grid-template-columns:1fr;gap:20px}
+.about-item{border-left:3px solid var(--gd2);padding-left:14px}
+.about-item p{margin-top:6px;color:var(--t2);font-size:.92rem}
+@media(min-width:700px){.about-grid{grid-template-columns:1fr 1fr;gap:26px 36px}}
+.chips{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--br);border-radius:999px;background:var(--wh);font-size:.84rem;font-weight:600;color:var(--t2)}
+.chip::before,.obj li::before{content:"";flex:0 0 7px;width:7px;height:7px;background:var(--gd);transform:rotate(45deg)}
+.feat{padding-top:0}
+
+/* ===== AI band ===== */
+.ai{--rule-bg:var(--nv);position:relative;overflow:hidden;color:#EFE7DC;background:radial-gradient(rgba(240,180,41,.16) 1px,transparent 1.5px) 0 0/22px 22px,linear-gradient(160deg,var(--nv) 0%,var(--nv2) 100%)}
+.ai .mandala{position:absolute;right:-120px;bottom:-120px;width:380px;height:auto;color:var(--gd2);opacity:.12;pointer-events:none}
+.ai-in{position:relative}
+.ai .h2{color:#fff}
+.ai .lead-p{color:#EFE7DC}
+.ai-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:22px}
+@media(min-width:700px){.ai-grid{grid-template-columns:1fr 1fr}.ai-grid .span2{grid-column:1/-1}}
+.ai-card{background:rgba(255,255,255,.06);border:1px solid rgba(240,180,41,.35);border-radius:var(--r);padding:16px 18px}
+.ai-card .h3{color:var(--gd2);margin-bottom:6px}
+.ai-card p{font-size:.88rem;color:#F4EEE6}
+.cap-list{list-style:none;display:grid;gap:10px;margin-top:8px}
+.cap-list li{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;font-size:.9rem;color:#F4EEE6}
+.pill{flex:0 0 auto;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.pill.avail{background:#DCFCE7;color:#14532D}
+.pill.planned{background:var(--gd2);color:#3A1200}
+.ai-note{border-left:4px solid var(--gd2);background:rgba(240,180,41,.12)}
+
+/* ===== Team ===== */
+.team-sub{color:var(--t2);font-size:.92rem}
+.team-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:20px}
+.pcard{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;background:var(--wh);border:1.5px solid var(--br);border-radius:var(--r);padding:20px 16px;box-shadow:var(--sh)}
+.pcard.lead{border-color:var(--gd);background:linear-gradient(180deg,#FFF6E4,var(--wh) 55%)}
+.portrait{position:relative;width:min(100%,220px);aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:linear-gradient(160deg,#FFE9D2,#F7C99C);box-shadow:0 0 0 3px var(--wh),0 0 0 4.5px var(--gd)}
+.pcard.lead .portrait{width:min(100%,250px)}
+.portrait img{width:100%;height:100%;object-fit:cover;object-position:50% 18%;display:block}
+.portrait .ph{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mr);font-size:.78rem;font-weight:600;padding:8px}
+.portrait .ini{font-family:var(--fd);font-size:2.4rem;font-weight:700;line-height:1}
+.portrait.failed img{display:none}.portrait.failed .ph{display:flex}
+.pname{font-family:var(--fd);font-size:1.3rem;line-height:1.25;font-weight:700;color:var(--t1);overflow-wrap:break-word}
+.pcard.lead .pname{font-size:1.5rem}
+.prole{margin-top:4px;color:var(--mr);font-size:.88rem;font-weight:700}
+.pdesc{margin-top:8px;color:var(--t2);font-size:.88rem}
+.pquote{margin-top:12px;padding-top:12px;border-top:1px solid var(--br);color:var(--t2);font-size:.88rem;font-style:italic;max-width:46ch}
+.pquote p::before{content:"\201C"}.pquote p::after{content:"\201D"}
+.pbody{min-width:0;width:100%}
+@media(min-width:600px){
+  .team-grid{grid-template-columns:repeat(2,1fr)}
+  .pcard.lead{grid-column:1/-1;flex-direction:row;text-align:left;align-items:center;gap:24px;padding:22px}
+  .pcard.lead .portrait{flex:0 0 220px}
+  .pcard.lead .pquote{margin-left:0}
+}
+@media(min-width:1024px){
+  .team-grid{grid-template-columns:1.25fr 1fr 1fr;align-items:stretch}
+  .pcard.lead{grid-column:auto;flex-direction:column;text-align:center;padding:24px 18px}
+  .pcard.lead .portrait{flex:none;width:min(100%,260px)}
+  .pcard.lead .pquote{margin-left:auto;margin-right:auto}
+}
+
+/* ===== Vision / Mission / Values ===== */
+.vm-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:700px){.vm-grid{grid-template-columns:1fr 1fr}}
+.vm{border-radius:var(--r);padding:20px}
+.vm .h3{margin-bottom:8px}
+.vm p{font-size:.95rem}
+.vm.vision{background:var(--cs);border:1.5px solid var(--gd);color:var(--t2)}
+.vm.mission{background:var(--mr);color:#fff}
+.vm.mission .h3{color:var(--gd2)}
+.values{list-style:none;display:grid;grid-template-columns:1fr;gap:0 32px;margin-top:6px}
+.values li{padding:14px 0;border-top:1px solid var(--br)}
+.values p{margin-top:4px;font-size:.88rem;color:var(--t2)}
+@media(min-width:700px){.values{grid-template-columns:1fr 1fr}}
+@media(min-width:1024px){.values{grid-template-columns:repeat(3,1fr)}}
+.obj{list-style:none;display:grid;gap:10px;margin-top:6px}
+.obj li{display:flex;gap:12px;align-items:flex-start;font-size:.92rem;color:var(--t2)}
+.obj li::before{margin-top:.55em}
+
+/* ===== Disclaimer ===== */
+.disclaimer{border-left:4px solid var(--mr);background:var(--cs);border-radius:0 var(--r) var(--r) 0;padding:14px 16px}
+.disclaimer .h3{color:var(--mr);margin-bottom:4px;font-size:1rem}
+.disclaimer p{font-size:.84rem;color:var(--t2)}
+
+/* ===== Bottom nav (unchanged behaviour) ===== */
+.botnav{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1px solid var(--br);display:flex;justify-content:center;align-items:center;padding:8px 16px calc(12px + env(safe-area-inset-bottom));z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+.back-home{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 24px;background:linear-gradient(90deg,var(--sf),var(--mr));color:#fff;border:none;border-radius:var(--r);font-family:var(--fd);font-size:1rem;font-weight:700;text-decoration:none}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to main content</a>
+
+<!-- Decorative SVG symbols (hidden; referenced with <use>) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="kc-mandala" viewBox="0 0 200 200">
+      <g fill="none" stroke="currentColor" stroke-width="1">
+        <circle cx="100" cy="100" r="97"/><circle cx="100" cy="100" r="93.5" stroke-width=".6"/>
+        <circle cx="100.00" cy="8.50" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="117.85" cy="10.26" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="135.02" cy="15.47" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="150.83" cy="23.92" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="164.70" cy="35.30" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="176.08" cy="49.17" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="184.53" cy="64.98" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="189.74" cy="82.15" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="191.50" cy="100.00" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="189.74" cy="117.85" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="184.53" cy="135.02" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="176.08" cy="150.83" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="164.70" cy="164.70" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="150.83" cy="176.08" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="135.02" cy="184.53" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="117.85" cy="189.74" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="100.00" cy="191.50" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="82.15" cy="189.74" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="64.98" cy="184.53" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="49.17" cy="176.08" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="35.30" cy="164.70" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="23.92" cy="150.83" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="15.47" cy="135.02" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="10.26" cy="117.85" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="8.50" cy="100.00" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="10.26" cy="82.15" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="15.47" cy="64.98" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="23.92" cy="49.17" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="35.30" cy="35.30" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="49.17" cy="23.92" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="64.98" cy="15.47" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="82.15" cy="10.26" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="100" cy="100" r="88" stroke-width=".6"/>
+        <path d="M100.00 18.00C108.00 28.00 108.00 40.00 100.00 48.00C92.00 40.00 92.00 28.00 100.00 18.00ZM131.38 24.24C134.94 36.54 130.35 47.63 119.90 51.96C115.57 41.51 120.16 30.42 131.38 24.24ZM157.98 42.02C156.57 54.75 148.08 63.23 136.77 63.23C136.77 51.92 145.25 43.43 157.98 42.02ZM175.76 68.62C169.58 79.84 158.49 84.43 148.04 80.10C152.37 69.65 163.46 65.06 175.76 68.62ZM182.00 100.00C172.00 108.00 160.00 108.00 152.00 100.00C160.00 92.00 172.00 92.00 182.00 100.00ZM175.76 131.38C163.46 134.94 152.37 130.35 148.04 119.90C158.49 115.57 169.58 120.16 175.76 131.38ZM157.98 157.98C145.25 156.57 136.77 148.08 136.77 136.77C148.08 136.77 156.57 145.25 157.98 157.98ZM131.38 175.76C120.16 169.58 115.57 158.49 119.90 148.04C130.35 152.37 134.94 163.46 131.38 175.76ZM100.00 182.00C92.00 172.00 92.00 160.00 100.00 152.00C108.00 160.00 108.00 172.00 100.00 182.00ZM68.62 175.76C65.06 163.46 69.65 152.37 80.10 148.04C84.43 158.49 79.84 169.58 68.62 175.76ZM42.02 157.98C43.43 145.25 51.92 136.77 63.23 136.77C63.23 148.08 54.75 156.57 42.02 157.98ZM24.24 131.38C30.42 120.16 41.51 115.57 51.96 119.90C47.63 130.35 36.54 134.94 24.24 131.38ZM18.00 100.00C28.00 92.00 40.00 92.00 48.00 100.00C40.00 108.00 28.00 108.00 18.00 100.00ZM24.24 68.62C36.54 65.06 47.63 69.65 51.96 80.10C41.51 84.43 30.42 79.84 24.24 68.62ZM42.02 42.02C54.75 43.43 63.23 51.92 63.23 63.23C51.92 63.23 43.43 54.75 42.02 42.02ZM68.62 24.24C79.84 30.42 84.43 41.51 80.10 51.96C69.65 47.63 65.06 36.54 68.62 24.24Z"/>
+        <path d="M113.27 33.31C117.00 40.17 115.63 47.03 109.36 52.92C105.83 45.08 107.19 38.22 113.27 33.31ZM137.78 43.46C138.60 51.23 134.71 57.05 126.67 60.09C126.40 51.49 130.29 45.67 137.78 43.46ZM156.54 62.22C154.33 69.71 148.51 73.60 139.91 73.33C142.95 65.29 148.77 61.40 156.54 62.22ZM166.69 86.73C161.78 92.81 154.92 94.17 147.08 90.64C152.97 84.37 159.83 83.00 166.69 86.73ZM166.69 113.27C159.83 117.00 152.97 115.63 147.08 109.36C154.92 105.83 161.78 107.19 166.69 113.27ZM156.54 137.78C148.77 138.60 142.95 134.71 139.91 126.67C148.51 126.40 154.33 130.29 156.54 137.78ZM137.78 156.54C130.29 154.33 126.40 148.51 126.67 139.91C134.71 142.95 138.60 148.77 137.78 156.54ZM113.27 166.69C107.19 161.78 105.83 154.92 109.36 147.08C115.63 152.97 117.00 159.83 113.27 166.69ZM86.73 166.69C83.00 159.83 84.37 152.97 90.64 147.08C94.17 154.92 92.81 161.78 86.73 166.69ZM62.22 156.54C61.40 148.77 65.29 142.95 73.33 139.91C73.60 148.51 69.71 154.33 62.22 156.54ZM43.46 137.78C45.67 130.29 51.49 126.40 60.09 126.67C57.05 134.71 51.23 138.60 43.46 137.78ZM33.31 113.27C38.22 107.19 45.08 105.83 52.92 109.36C47.03 115.63 40.17 117.00 33.31 113.27ZM33.31 86.73C40.17 83.00 47.03 84.37 52.92 90.64C45.08 94.17 38.22 92.81 33.31 86.73ZM43.46 62.22C51.23 61.40 57.05 65.29 60.09 73.33C51.49 73.60 45.67 69.71 43.46 62.22ZM62.22 43.46C69.71 45.67 73.60 51.49 73.33 60.09C65.29 57.05 61.40 51.23 62.22 43.46ZM86.73 33.31C92.81 38.22 94.17 45.08 90.64 52.92C84.37 47.03 83.00 40.17 86.73 33.31Z"/>
+        <circle cx="100" cy="100" r="52" stroke-width=".6"/>
+        <path d="M100.00 56.00C105.00 62.00 105.00 70.00 100.00 78.00C95.00 70.00 95.00 62.00 100.00 56.00ZM131.11 68.89C130.41 76.67 124.75 82.32 115.56 84.44C117.68 75.25 123.33 69.59 131.11 68.89ZM144.00 100.00C138.00 105.00 130.00 105.00 122.00 100.00C130.00 95.00 138.00 95.00 144.00 100.00ZM131.11 131.11C123.33 130.41 117.68 124.75 115.56 115.56C124.75 117.68 130.41 123.33 131.11 131.11ZM100.00 144.00C95.00 138.00 95.00 130.00 100.00 122.00C105.00 130.00 105.00 138.00 100.00 144.00ZM68.89 131.11C69.59 123.33 75.25 117.68 84.44 115.56C82.32 124.75 76.67 130.41 68.89 131.11ZM56.00 100.00C62.00 95.00 70.00 95.00 78.00 100.00C70.00 105.00 62.00 105.00 56.00 100.00ZM68.89 68.89C76.67 69.59 82.32 75.25 84.44 84.44C75.25 82.32 69.59 76.67 68.89 68.89Z"/>
+        <circle cx="100" cy="100" r="19"/>
+        <path d="M100.00 84.00L103.06 92.61L111.31 88.69L107.39 96.94L116.00 100.00L107.39 103.06L111.31 111.31L103.06 107.39L100.00 116.00L96.94 107.39L88.69 111.31L92.61 103.06L84.00 100.00L92.61 96.94L88.69 88.69L96.94 92.61Z"/>
+        <circle cx="100" cy="100" r="3"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app-wrap">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <a href="index.html" class="back-btn" data-i18n-aria="back_aria" aria-label="Back to Home"><span aria-hidden="true">←</span></a>
+  <img class="tb-logo" src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="" width="30" height="30"/>
+  <p class="topbar-title" data-i18n="page_title">About KumbhConnect</p>
+  <div class="lang" role="group" data-i18n-aria="lang_group_aria" aria-label="Language">
+    <button type="button" class="lbtn on" id="lbtn-mr" data-lang="mr" lang="mr" aria-label="मराठी" aria-pressed="true">म</button>
+    <button type="button" class="lbtn" id="lbtn-hi" data-lang="hi" lang="hi" aria-label="हिन्दी" aria-pressed="false">हि</button>
+    <button type="button" class="lbtn" id="lbtn-en" data-lang="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-h">
+  <svg class="mandala" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use href="#kc-mandala"/></svg>
+  <div class="hero-in">
+    <div class="hero-logo">
+      <img src="https://i.ibb.co/HLF7C0fc/file-000000002a5c7208ab4c69ebcffadb76.png" alt="KumbhConnect logo" data-i18n-alt="logo_alt" width="84" height="84" decoding="async"/>
+      <span class="ph" aria-hidden="true">ॐ</span>
+    </div>
+    <p class="brand-tag" lang="en" translate="no">STAY · NAVIGATE · CONNECT</p>
+    <h1 id="hero-h" data-i18n="hero_title">About KumbhConnect</h1>
+    <p class="hero-sub" data-i18n="hero_sub">Connecting Pilgrims, Sacred Places, and Digital Innovation</p>
+    <p class="hero-desc" data-i18n="hero_desc">KumbhConnect is a digital platform that helps pilgrims discover information about Nashik Kumbh Mela, important places in Nashik and Trimbakeshwar, travel-related information, and available digital services. It also includes Kumbh AI, a conversational assistant that uses Artificial Intelligence to help users find information.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="index.html" data-i18n="hero_cta">Explore the App</a>
+      <a class="btn btn-ghost" href="#team" data-i18n="hero_cta2">Meet the Team</a>
+    </div>
+  </div>
+  <!-- Godavari-inspired wave edge -->
+  <svg class="wave" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path d="M0 22C120 4 240 40 360 22S600 4 720 22 960 40 1080 22 1160 12 1200 18V44H0Z" fill="#F0B429" opacity=".35"/>
+    <path d="M0 30C150 12 300 46 450 30S750 12 900 30 1100 44 1200 28V44H0Z" fill="#FFF9F3"/>
+  </svg>
+</section>
+
+<!-- ABOUT THE PROJECT -->
+<section class="section" aria-labelledby="about-h">
+  <h2 class="h2" id="about-h" data-i18n="about_title">About the Project</h2>
+  <div class="rule" aria-hidden="true"></div>
+  <div class="about-grid">
+    <div class="about-item"><h3 class="h3" data-i18n="about_what_h">What is KumbhConnect?</h3><p data-i18n="about_what">KumbhConnect is a Smart Pilgrimage Platform created for pilgrims visiting Nashik and Trimbakeshwar during the Sinhastha Kumbh Mela 2027. It brings maps, SOS assistance, guide services, and multilingual information together in one place.</p></div>
+    <div class="about-item"><h3 class="h3" data-i18n="about_why_h">Why it was developed</h3><p data-i18n="about_why">A large pilgrimage involves many places, schedules, and services. KumbhConnect was developed to make this information easier to find, so that pilgrims can plan their visit with greater confidence.</p></div>
+    <div class="about-item"><h3 class="h3" data-i18n="about_how_h">How it helps pilgrims</h3><p data-i18n="about_how">Pilgrims can explore places, find travel-related information and available services, and ask questions through a conversational assistant. The platform is designed for Marathi, Hindi, and English.</p></div>
+    <div class="about-item"><h3 class="h3" data-i18n="about_place_h">Nashik and Trimbakeshwar</h3><p data-i18n="about_place">Nashik, on the banks of the Godavari, and Trimbakeshwar, home to the Trimbakeshwar Jyotirlinga, are places of deep spiritual importance for the Kumbh Mela. KumbhConnect is built with respect for this heritage.</p></div>
+  </div>
+</section>
+
+<!-- WHAT THE APP OFFERS (feature list carried over from the existing page) -->
+<section class="section feat" aria-labelledby="feat-h">
+  <h2 class="h2" id="feat-h" data-i18n="feat_title">What the App Offers</h2>
+  <div class="rule" aria-hidden="true"></div>
+  <ul class="chips">
+    <li class="chip" data-i18n="w1">Smart Navigation</li>
+    <li class="chip" data-i18n="w2">SOS Assistance</li>
+    <li class="chip" data-i18n="w3">Kumbh Calendar</li>
+    <li class="chip" data-i18n="w4">Guide Assistance</li>
+    <li class="chip" data-i18n="w5">Hospitals</li>
+    <li class="chip" data-i18n="w6">Parking Info</li>
+    <li class="chip" data-i18n="w7">Verified Places</li>
+    <li class="chip" data-i18n="w8">Multilingual Support</li>
+  </ul>
+</section>
+
+<!-- ARTIFICIAL INTELLIGENCE -->
+<section class="section ai" aria-labelledby="ai-h">
+  <svg class="mandala" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use href="#kc-mandala"/></svg>
+  <div class="ai-in">
+    <h2 class="h2" id="ai-h" data-i18n="ai_title">Artificial Intelligence at KumbhConnect</h2>
+    <div class="rule" aria-hidden="true"></div>
+    <p class="lead-p" data-i18n="ai_intro">Kumbh AI is intended to help users access information through a conversational interface. Users can ask questions in everyday language.</p>
+    <div class="ai-grid">
+      <div class="ai-card span2">
+        <h3 class="h3" data-i18n="ai_cap_h">Capability status</h3>
+        <!-- CONFIRM BEFORE RELEASE: only ai_cap1 is shown. ai_cap2–ai_cap5 are translated but hidden because
+             they could not be verified from the supplied source. For each one that is truly live, remove
+             "hidden" and keep the "Available" pill; if it is only planned, remove "hidden" and switch the
+             pill to class="pill planned" with data-i18n="ai_tag_planned". -->
+        <ul class="cap-list">
+          <li><span class="pill avail" data-i18n="ai_tag_avail">Available</span><span data-i18n="ai_cap1">Conversational assistance through a chat interface</span></li>
+          <li hidden data-confirm="places"><span class="pill avail" data-i18n="ai_tag_avail">Available</span><span data-i18n="ai_cap2">Information about places and locations</span></li>
+          <li hidden data-confirm="hotels"><span class="pill avail" data-i18n="ai_tag_avail">Available</span><span data-i18n="ai_cap3">Help finding hotels and service providers</span></li>
+          <li hidden data-confirm="multilingual"><span class="pill avail" data-i18n="ai_tag_avail">Available</span><span data-i18n="ai_cap4">Multilingual conversations</span></li>
+          <li hidden data-confirm="verified-data"><span class="pill avail" data-i18n="ai_tag_avail">Available</span><span data-i18n="ai_cap5">Answers drawn from verified information supplied to the assistant</span></li>
+        </ul>
+      </div>
+      <div class="ai-card ai-note span2" role="note">
+        <h3 class="h3" data-i18n="ai_note_h">Responsible AI use</h3>
+        <p data-i18n="ai_note">AI-generated responses may contain errors. Users should verify important travel, safety, and official information through appropriate authoritative sources.</p>
+      </div>
+      <div class="ai-card">
+        <h3 class="h3" data-i18n="ai_privacy_h">Protect your privacy</h3>
+        <p data-i18n="ai_privacy">Please avoid sharing personal information, such as identity documents, bank details, or contact numbers, with the AI assistant unless it is truly necessary.</p>
+      </div>
+      <div class="ai-card">
+        <h3 class="h3" data-i18n="ai_limits_h">Know its limits</h3>
+        <p data-i18n="ai_limits">Kumbh AI does not replace official authorities or emergency personnel. Please do not rely on it alone for emergencies, confirmed bookings, or real-time conditions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="section" id="team" aria-labelledby="team-h">
+  <h2 class="h2" id="team-h" data-i18n="team_title">Meet the Team</h2>
+  <div class="rule" aria-hidden="true"></div>
+  <p class="team-sub" data-i18n="team_sub">The people associated with KumbhConnect.</p>
+  <div class="team-grid">
+
+    <article class="pcard lead" aria-labelledby="n-founder">
+      <div class="portrait">
+        <img src="https://i.ibb.co/dJjb51Rj/IMG-20250524-133613-removebg-preview-2.jpg" alt="Portrait of Prasad Arvind Bhalekar" data-i18n-alt="alt_founder" width="480" height="600" loading="lazy" decoding="async"/>
+        <div class="ph"><span class="ini" aria-hidden="true" data-i18n="ini_founder">PB</span><span data-i18n="img_fail">Photo unavailable</span></div>
+      </div>
+      <div class="pbody">
+        <h3 class="pname" id="n-founder" data-i18n="name_founder">Prasad Arvind Bhalekar</h3>
+        <p class="prole" data-i18n="role_founder">Founder &amp; Developer</p>
+        <p class="pdesc" data-i18n="founder_desc">Founder and developer of KumbhConnect.</p>
+        <blockquote class="pquote"><p data-i18n="founder_quote">Making the journey of millions of pilgrims safe and simple — that is our mission. KumbhConnect is a service of faith and technology.</p></blockquote>
+      </div>
+    </article>
+
+    <article class="pcard" aria-labelledby="n-partner">
+      <div class="portrait">
+        <img src="https://i.ibb.co/5X44DZyC/file-00000000c6a8820b89f3cdc3b3a51c26.png" alt="Portrait of Prathmesh Sanjay Wankhede" data-i18n-alt="alt_partner" width="480" height="600" loading="lazy" decoding="async"/>
+        <div class="ph"><span class="ini" aria-hidden="true" data-i18n="ini_partner">PW</span><span data-i18n="img_fail">Photo unavailable</span></div>
+      </div>
+      <div class="pbody">
+        <h3 class="pname" id="n-partner" data-i18n="name_partner">Prathmesh Sanjay Wankhede</h3>
+        <p class="prole" data-i18n="role_partner">Presentation Partner &amp; Authorised Team Member</p>
+      </div>
+    </article>
+
+    <article class="pcard" aria-labelledby="n-ambassador">
+      <div class="portrait">
+        <img src="https://i.ibb.co/wN0Mvcv4/IMG-20251122-WA0005-1.jpg" alt="Portrait of Atharva Subhash Suryawanshi" data-i18n-alt="alt_ambassador" width="480" height="600" loading="lazy" decoding="async"/>
+        <div class="ph"><span class="ini" aria-hidden="true" data-i18n="ini_ambassador">AS</span><span data-i18n="img_fail">Photo unavailable</span></div>
+      </div>
+      <div class="pbody">
+        <h3 class="pname" id="n-ambassador" data-i18n="name_ambassador">Atharva Subhash Suryawanshi</h3>
+        <p class="prole" data-i18n="role_ambassador">Brand Ambassador</p>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- VISION & MISSION -->
+<section class="section" style="padding-top:0" aria-labelledby="vm-h">
+  <h2 class="h2" id="vm-h" data-i18n="vm_title">Our Vision and Mission</h2>
+  <div class="rule" aria-hidden="true"></div>
+  <div class="vm-grid">
+    <div class="vm vision"><h3 class="h3" data-i18n="vision_title">Vision</h3><p data-i18n="vision_text">To make pilgrimage-related information and digital guidance more accessible through a convenient, inclusive platform.</p></div>
+    <div class="vm mission"><h3 class="h3" data-i18n="mission_title">Mission</h3><p data-i18n="mission_text">To help users discover relevant places and information through an accessible digital experience, while respecting the cultural and spiritual importance of Nashik Kumbh Mela.</p></div>
+  </div>
+</section>
+
+<!-- CORE VALUES (proposed editorial copy — not an official policy statement) -->
+<section class="section" style="padding-top:0" aria-labelledby="values-h">
+  <h2 class="h2" id="values-h" data-i18n="values_title">Core Values</h2>
+  <div class="rule" aria-hidden="true"></div>
+  <ul class="values">
+    <li><h3 class="h3" data-i18n="v1">Devotion and Cultural Respect</h3><p data-i18n="v1d">We approach the spiritual and cultural importance of Nashik Kumbh Mela with respect.</p></li>
+    <li><h3 class="h3" data-i18n="v2">Accuracy and Responsible Information Sharing</h3><p data-i18n="v2d">We aim to share clear information and to be honest about its limits.</p></li>
+    <li><h3 class="h3" data-i18n="v3">Accessibility and Inclusion</h3><p data-i18n="v3d">We aim to make the platform usable for people of different languages and abilities.</p></li>
+    <li><h3 class="h3" data-i18n="v4">Privacy and Security</h3><p data-i18n="v4d">We aim to handle user information with care.</p></li>
+    <li><h3 class="h3" data-i18n="v5">Innovation and Responsible AI</h3><p data-i18n="v5d">We use AI thoughtfully and encourage users to verify important information.</p></li>
+    <li><h3 class="h3" data-i18n="v6">User Convenience</h3><p data-i18n="v6d">We aim to keep the experience simple and easy to use on a phone.</p></li>
+  </ul>
+</section>
+
+<!-- PLATFORM OBJECTIVES (carried over from the existing page; SOS wording softened) -->
+<section class="section" style="padding-top:0" aria-labelledby="obj-h">
+  <h2 class="h2" id="obj-h" data-i18n="obj_title">Platform Objectives</h2>
+  <div class="rule" aria-hidden="true"></div>
+  <ul class="obj">
+    <li data-i18n="obj1">Provide pilgrims with verified and up-to-date information</li>
+    <li data-i18n="obj2">Provide SOS assistance features for emergency situations</li>
+    <li data-i18n="obj3">Create opportunities for local guides, volunteers and businesses</li>
+    <li data-i18n="obj4">Ensure smooth multilingual (Marathi, Hindi, English) usage</li>
+    <li data-i18n="obj5">Make Nashik–Trimbakeshwar a Digital Information Hub</li>
+  </ul>
+</section>
+
+<!-- DISCLAIMER -->
+<section class="section" style="padding-top:0;padding-bottom:30px" aria-labelledby="disc-h">
+  <div class="disclaimer">
+    <h2 class="h3" id="disc-h" data-i18n="disc_title">Disclaimer</h2>
+    <p data-i18n="disc_text">KumbhConnect is an independent information platform and is not affiliated with any government authority. All information is provided in good faith and with best efforts in the public interest.</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<nav class="botnav" aria-label="Home">
+  <a href="index.html" class="back-home"><span data-i18n="home_btn">Home Page</span></a>
+</nav>
+
+<script>
+/* Same mechanism as before: inline I18N dictionary + data-i18n attributes + localStorage 'kc_lang'.
+   Additions: data-i18n-alt / data-i18n-aria, English fallback for missing keys, safe storage access. */
+(function(){
+'use strict';
+var I18N={
+  mr:{
+    doc_title:"आमच्याविषयी — KumbhConnect",
+    skip:"मुख्य मजकुराकडे जा",
+    back_aria:"मुखपृष्ठावर परत जा",
+    lang_group_aria:"भाषा",
+    page_title:"KumbhConnect विषयी",
+    logo_alt:"KumbhConnect लोगो",
+    hero_title:"KumbhConnect विषयी",
+    hero_sub:"यात्रेकरू, पुण्यस्थळे आणि आधुनिक तंत्रज्ञान यांना जोडणारा सेतू",
+    hero_desc:"KumbhConnect हे यात्रेकरूंसाठीचे डिजिटल व्यासपीठ आहे. नाशिक कुंभमेळा, नाशिक व त्र्यंबकेश्वर येथील महत्त्वाची ठिकाणे, प्रवासाची माहिती आणि उपलब्ध डिजिटल सेवा जाणून घेण्यात ते यात्रेकरूंना मदत करते. यात Kumbh AI हा संवादी साहाय्यकही आहे, जो कृत्रिम बुद्धिमत्तेच्या आधारे माहिती शोधण्यास मदत करतो.",
+    hero_cta:"अ‍ॅप पाहा",
+    hero_cta2:"आमचा संघ पाहा",
+    about_title:"प्रकल्पाविषयी",
+    about_what_h:"KumbhConnect म्हणजे काय?",
+    about_what:"KumbhConnect हे नाशिक आणि त्र्यंबकेश्वर येथे येणाऱ्या यात्रेकरूंसाठी साकारलेले आधुनिक डिजिटल व्यासपीठ आहे. सिंहस्थ कुंभमेळा २०२७ दरम्यान नकाशा, आपत्कालीन मदत (SOS), मार्गदर्शक सेवा आणि बहुभाषिक माहिती एकाच ठिकाणी देण्याचा हा प्रयत्न आहे.",
+    about_why_h:"हे का साकारले?",
+    about_why:"मोठ्या यात्रेत अनेक ठिकाणे, कार्यक्रम आणि सेवा असतात. ही माहिती सहज सापडावी आणि यात्रेकरूंना आपल्या भेटीचे नियोजन अधिक निश्चिंतपणे करता यावे, या हेतूने KumbhConnect साकारले आहे.",
+    about_how_h:"यात्रेकरूंना कशी मदत होते?",
+    about_how:"यात्रेकरू ठिकाणांची माहिती घेऊ शकतात, प्रवासाशी संबंधित माहिती व उपलब्ध सेवा शोधू शकतात आणि संवादी साहाय्यकाला प्रश्न विचारू शकतात. हे व्यासपीठ मराठी, हिंदी आणि इंग्रजी भाषांसाठी रचले आहे.",
+    about_place_h:"नाशिक आणि त्र्यंबकेश्वर",
+    about_place:"गोदावरीच्या तीरावरील नाशिक आणि त्र्यंबकेश्वर ज्योतिर्लिंगाचे क्षेत्र असलेले त्र्यंबकेश्वर ही कुंभमेळ्यासाठी अत्यंत पवित्र स्थाने आहेत. या वारशाचा आदर राखूनच KumbhConnect घडवले आहे.",
+    feat_title:"अ‍ॅपमधील सुविधा",
+    w1:"दिशादर्शन",
+    w2:"आपत्कालीन मदत (SOS)",
+    w3:"कुंभ दिनदर्शिका",
+    w4:"मार्गदर्शक सहाय्य",
+    w5:"रुग्णालये",
+    w6:"वाहनतळ माहिती",
+    w7:"पडताळलेली ठिकाणे",
+    w8:"बहुभाषिक सहाय्य",
+    ai_title:"KumbhConnect मधील कृत्रिम बुद्धिमत्ता",
+    ai_intro:"Kumbh AI चा उद्देश वापरकर्त्यांना संवादाच्या माध्यमातून माहिती मिळवण्यास मदत करणे हा आहे. वापरकर्ते आपल्या रोजच्या भाषेत प्रश्न विचारू शकतात.",
+    ai_cap_h:"सुविधांची सद्यस्थिती",
+    ai_tag_avail:"उपलब्ध",
+    ai_tag_planned:"नियोजित",
+    ai_cap1:"संवादाद्वारे (चॅट) साहाय्य",
+    ai_cap2:"ठिकाणांविषयी माहिती",
+    ai_cap3:"निवास व सेवा पुरवठादार शोधण्यास मदत",
+    ai_cap4:"अनेक भाषांतील संवाद",
+    ai_cap5:"साहाय्यकाला दिलेल्या पडताळलेल्या माहितीवर आधारित उत्तरे",
+    ai_note_h:"एआयचा जबाबदार वापर",
+    ai_note:"एआयने दिलेल्या उत्तरांत चुका असू शकतात. प्रवास, सुरक्षितता आणि अधिकृत बाबींबाबतची महत्त्वाची माहिती योग्य अधिकृत स्रोतांकडून खात्री करून घ्यावी.",
+    ai_privacy_h:"तुमच्या गोपनीयतेची काळजी घ्या",
+    ai_privacy:"ओळखीची कागदपत्रे, बँकेचा तपशील किंवा संपर्क क्रमांक यांसारखी वैयक्तिक माहिती खरोखर गरज असल्याशिवाय एआय साहाय्यकाला देऊ नका.",
+    ai_limits_h:"मर्यादा जाणून घ्या",
+    ai_limits:"Kumbh AI हे अधिकृत यंत्रणा किंवा आपत्कालीन सेवा कर्मचाऱ्यांना पर्याय नाही. आपत्कालीन प्रसंग, निश्चित आरक्षण किंवा प्रत्यक्ष वेळेतील स्थितीसाठी केवळ त्यावर अवलंबून राहू नका.",
+    team_title:"आमचा संघ",
+    team_sub:"KumbhConnect शी जोडलेली मंडळी.",
+    role_founder:"संस्थापक आणि विकसक",
+    role_partner:"सादरीकरण भागीदार आणि अधिकृत संघ सदस्य",
+    role_ambassador:"ब्रँड दूत",
+    founder_desc:"KumbhConnect चे संस्थापक आणि विकसक.",
+    founder_quote:"लाखो यात्रेकरूंची यात्रा सुरक्षित आणि सोपी बनवणे — हेच आमचे ध्येय आहे. KumbhConnect ही श्रद्धा आणि तंत्रज्ञान यांची सेवा आहे.",
+    alt_founder:"प्रसाद अरविंद भालेकर यांचे छायाचित्र",
+    alt_partner:"प्रथमेश संजय वानखेडे यांचे छायाचित्र",
+    alt_ambassador:"अथर्व सुभाष सुर्यवंशी यांचे छायाचित्र",
+    img_fail:"छायाचित्र उपलब्ध नाही",
+    vm_title:"आमचा संकल्प आणि ध्येय",
+    vision_title:"संकल्प",
+    vision_text:"सोयीच्या आणि सर्वांना सामावून घेणाऱ्या व्यासपीठाद्वारे यात्रेसंबंधी माहिती व डिजिटल मार्गदर्शन अधिक सुलभ करणे.",
+    mission_title:"ध्येय",
+    mission_text:"सुलभ डिजिटल अनुभवातून वापरकर्त्यांना उपयुक्त ठिकाणे आणि माहिती शोधण्यास मदत करणे, तसेच नाशिक कुंभमेळ्याचे सांस्कृतिक व आध्यात्मिक महत्त्व जपणे.",
+    values_title:"मार्गदर्शक मूल्ये",
+    v1:"श्रद्धा आणि सांस्कृतिक सन्मान",
+    v1d:"नाशिक कुंभमेळ्याच्या आध्यात्मिक व सांस्कृतिक महत्त्वाचा आम्ही आदर राखतो.",
+    v2:"अचूकता आणि जबाबदारीने माहिती देणे",
+    v2d:"स्पष्ट माहिती देण्याचा आणि तिच्या मर्यादा प्रामाणिकपणे सांगण्याचा आमचा प्रयत्न असतो.",
+    v3:"सुलभता आणि सर्वसमावेशकता",
+    v3d:"विविध भाषा आणि क्षमता असलेल्या सर्वांना हे व्यासपीठ वापरता यावे, असा आमचा प्रयत्न आहे.",
+    v4:"गोपनीयता आणि सुरक्षितता",
+    v4d:"वापरकर्त्यांच्या माहितीची काळजीपूर्वक हाताळणी करण्याचा आमचा प्रयत्न आहे.",
+    v5:"नवनिर्मिती आणि जबाबदार एआय",
+    v5d:"आम्ही एआयचा विचारपूर्वक वापर करतो आणि महत्त्वाची माहिती पडताळून पाहण्यास वापरकर्त्यांना प्रोत्साहन देतो.",
+    v6:"वापरकर्त्यांची सोय",
+    v6d:"अनुभव सोपा आणि मोबाइलवर वापरण्यास सोईचा ठेवण्याचा आमचा प्रयत्न आहे.",
+    obj_title:"व्यासपीठाची उद्दिष्टे",
+    obj1:"यात्रेकरूंना पडताळलेली आणि अद्ययावत माहिती उपलब्ध करून देणे",
+    obj2:"आपत्कालीन प्रसंगांसाठी मदतीच्या (SOS) सुविधा देणे",
+    obj3:"स्थानिक मार्गदर्शक, स्वयंसेवक आणि व्यावसायिकांना संधी निर्माण करणे",
+    obj4:"मराठी, हिंदी आणि इंग्रजीत सहज वापर शक्य करणे",
+    obj5:"नाशिक–त्र्यंबकेश्वरला डिजिटल माहिती केंद्र बनवणे",
+    disc_title:"अस्वीकरण",
+    disc_text:"KumbhConnect हे स्वतंत्र माहिती व्यासपीठ असून कोणत्याही सरकारी यंत्रणेशी संलग्न नाही. सर्व माहिती जनहितासाठी सर्वतोपरी प्रयत्नांनी दिली जाते.",
+    home_btn:"मुखपृष्ठ",
+    name_founder:"प्रसाद अरविंद भालेकर",
+    name_partner:"प्रथमेश संजय वानखेडे",
+    name_ambassador:"अथर्व सुभाष सुर्यवंशी",
+    ini_founder:"प्र.भा.",
+    ini_partner:"प्र.वा.",
+    ini_ambassador:"अ.सु."
+  },
+  hi:{
+    doc_title:"परिचय — KumbhConnect",
+    skip:"मुख्य सामग्री पर जाएँ",
+    back_aria:"होम पेज पर वापस जाएँ",
+    lang_group_aria:"भाषा",
+    page_title:"KumbhConnect परिचय",
+    logo_alt:"KumbhConnect लोगो",
+    hero_title:"KumbhConnect परिचय",
+    hero_sub:"तीर्थयात्रियों, पावन स्थलों और आधुनिक तकनीक को जोड़ने वाला सेतु",
+    hero_desc:"KumbhConnect तीर्थयात्रियों के लिए एक डिजिटल मंच है। यह नाशिक कुंभमेले, नाशिक व त्र्यंबकेश्वर के प्रमुख स्थानों, यात्रा की जानकारी और उपलब्ध डिजिटल सेवाओं को जानने में मदद करता है। इसमें Kumbh AI नाम का संवादी सहायक भी है, जो कृत्रिम बुद्धिमत्ता की सहायता से जानकारी खोजने में मदद करता है।",
+    hero_cta:"ऐप खोलें",
+    hero_cta2:"हमारी टीम से मिलें",
+    about_title:"परियोजना परिचय",
+    about_what_h:"KumbhConnect क्या है?",
+    about_what:"KumbhConnect नाशिक और त्र्यंबकेश्वर आने वाले तीर्थयात्रियों के लिए बनाया गया एक आधुनिक डिजिटल मंच है। सिंहस्थ कुंभमेला २०२७ के दौरान नक्शा, आपातकालीन सहायता (SOS), मार्गदर्शक सेवाएँ और बहुभाषी जानकारी एक ही स्थान पर देने का यह प्रयास है।",
+    about_why_h:"इसे क्यों बनाया गया?",
+    about_why:"बड़ी यात्रा में अनेक स्थान, कार्यक्रम और सेवाएँ होती हैं। यह जानकारी आसानी से मिले और यात्री अपनी यात्रा की योजना निश्चिंत होकर बना सकें, इसी उद्देश्य से KumbhConnect बनाया गया है।",
+    about_how_h:"तीर्थयात्रियों को कैसे मदद मिलती है?",
+    about_how:"यात्री स्थानों की जानकारी ले सकते हैं, यात्रा से जुड़ी जानकारी और उपलब्ध सेवाएँ खोज सकते हैं तथा संवादी सहायक से प्रश्न पूछ सकते हैं। यह मंच मराठी, हिंदी और अंग्रेज़ी भाषाओं के लिए रचा गया है।",
+    about_place_h:"नाशिक और त्र्यंबकेश्वर",
+    about_place:"गोदावरी तट पर बसा नाशिक और त्र्यंबकेश्वर ज्योतिर्लिंग का क्षेत्र त्र्यंबकेश्वर, कुंभमेले के लिए अत्यंत पावन स्थान हैं। इस विरासत के प्रति आदर रखते हुए ही KumbhConnect बनाया गया है।",
+    feat_title:"ऐप की सुविधाएँ",
+    w1:"दिशा-निर्देश",
+    w2:"आपातकालीन सहायता (SOS)",
+    w3:"कुंभ पंचांग",
+    w4:"मार्गदर्शक सहायता",
+    w5:"अस्पताल",
+    w6:"वाहन पार्किंग जानकारी",
+    w7:"जाँचे-परखे स्थान",
+    w8:"बहुभाषी सहायता",
+    ai_title:"KumbhConnect में कृत्रिम बुद्धिमत्ता",
+    ai_intro:"Kumbh AI का उद्देश्य उपयोगकर्ताओं को बातचीत के माध्यम से जानकारी पाने में मदद करना है। उपयोगकर्ता अपनी रोज़मर्रा की भाषा में प्रश्न पूछ सकते हैं।",
+    ai_cap_h:"सुविधाओं की वर्तमान स्थिति",
+    ai_tag_avail:"उपलब्ध",
+    ai_tag_planned:"प्रस्तावित",
+    ai_cap1:"बातचीत (चैट) के माध्यम से सहायता",
+    ai_cap2:"स्थानों की जानकारी",
+    ai_cap3:"आवास और सेवा प्रदाता खोजने में सहायता",
+    ai_cap4:"अनेक भाषाओं में बातचीत",
+    ai_cap5:"सहायक को दी गई जाँची हुई जानकारी पर आधारित उत्तर",
+    ai_note_h:"एआई का जिम्मेदार उपयोग",
+    ai_note:"एआई द्वारा दिए गए उत्तरों में गलतियाँ हो सकती हैं। यात्रा, सुरक्षा और आधिकारिक विषयों की महत्वपूर्ण जानकारी उचित आधिकारिक स्रोतों से अवश्य जाँच लें।",
+    ai_privacy_h:"अपनी निजता का ध्यान रखें",
+    ai_privacy:"पहचान-पत्र, बैंक का विवरण या संपर्क नंबर जैसी निजी जानकारी वास्तव में आवश्यक न हो तो एआई सहायक को न दें।",
+    ai_limits_h:"सीमाएँ जानें",
+    ai_limits:"Kumbh AI आधिकारिक प्राधिकरणों या आपातकालीन सेवाकर्मियों का विकल्प नहीं है। आपातकाल, पक्के आरक्षण या वर्तमान स्थिति के लिए केवल इस पर निर्भर न रहें।",
+    team_title:"हमारी टीम",
+    team_sub:"KumbhConnect से जुड़े लोग।",
+    role_founder:"संस्थापक एवं विकासकर्ता",
+    role_partner:"प्रस्तुति सहयोगी एवं अधिकृत टीम सदस्य",
+    role_ambassador:"ब्रांड दूत",
+    founder_desc:"KumbhConnect के संस्थापक और विकासकर्ता।",
+    founder_quote:"लाखों तीर्थयात्रियों की यात्रा सुरक्षित और सरल बनाना — यही हमारा लक्ष्य है। KumbhConnect आस्था और तकनीक की सेवा है।",
+    alt_founder:"प्रसाद अरविंद भालेकर का चित्र",
+    alt_partner:"प्रथमेश संजय वानखेड़े का चित्र",
+    alt_ambassador:"अथर्व सुभाष सूर्यवंशी का चित्र",
+    img_fail:"फ़ोटो उपलब्ध नहीं",
+    vm_title:"हमारा संकल्प और लक्ष्य",
+    vision_title:"संकल्प",
+    vision_text:"सुविधाजनक और सबको साथ लेकर चलने वाले मंच के द्वारा तीर्थयात्रा संबंधी जानकारी और डिजिटल मार्गदर्शन को अधिक सुलभ बनाना।",
+    mission_title:"लक्ष्य",
+    mission_text:"सुलभ डिजिटल अनुभव के जरिए उपयोगकर्ताओं को उपयोगी स्थान और जानकारी खोजने में मदद करना तथा नाशिक कुंभमेले के सांस्कृतिक व आध्यात्मिक महत्व का सम्मान करना।",
+    values_title:"हमारे मूल्य",
+    v1:"श्रद्धा और सांस्कृतिक सम्मान",
+    v1d:"हम नाशिक कुंभमेले के आध्यात्मिक और सांस्कृतिक महत्व का सम्मान करते हैं।",
+    v2:"सटीकता और जिम्मेदारी से जानकारी देना",
+    v2d:"हम स्पष्ट जानकारी देने और उसकी सीमाएँ ईमानदारी से बताने का प्रयास करते हैं।",
+    v3:"सुगमता और समावेश",
+    v3d:"हमारा प्रयास है कि अलग-अलग भाषाओं और क्षमताओं वाले सभी लोग इस मंच का उपयोग कर सकें।",
+    v4:"निजता और सुरक्षा",
+    v4d:"हम उपयोगकर्ताओं की जानकारी को सावधानी से संभालने का प्रयास करते हैं।",
+    v5:"नवाचार और जिम्मेदार एआई",
+    v5d:"हम एआई का सोच-समझकर उपयोग करते हैं और उपयोगकर्ताओं को महत्वपूर्ण जानकारी जाँचने के लिए प्रेरित करते हैं।",
+    v6:"उपयोगकर्ता की सुविधा",
+    v6d:"हम अनुभव को सरल और मोबाइल पर आसानी से उपयोग योग्य रखने का प्रयास करते हैं।",
+    obj_title:"मंच के उद्देश्य",
+    obj1:"तीर्थयात्रियों को जाँची हुई और नवीनतम जानकारी उपलब्ध कराना",
+    obj2:"आपातकालीन स्थितियों के लिए सहायता (SOS) सुविधाएँ देना",
+    obj3:"स्थानीय मार्गदर्शकों, स्वयंसेवकों और व्यवसायियों के लिए अवसर बनाना",
+    obj4:"मराठी, हिंदी और अंग्रेज़ी में सहज उपयोग सुनिश्चित करना",
+    obj5:"नाशिक–त्र्यंबकेश्वर को डिजिटल सूचना केंद्र बनाना",
+    disc_title:"अस्वीकरण",
+    disc_text:"KumbhConnect एक स्वतंत्र सूचना मंच है और किसी सरकारी संस्था से संबद्ध नहीं है। सारी जानकारी जनहित में पूरे प्रयास के साथ दी जाती है।",
+    home_btn:"मुख्य पृष्ठ",
+    name_founder:"प्रसाद अरविंद भालेकर",
+    name_partner:"प्रथमेश संजय वानखेड़े",
+    name_ambassador:"अथर्व सुभाष सूर्यवंशी",
+    ini_founder:"प्र.भा.",
+    ini_partner:"प्र.वा.",
+    ini_ambassador:"अ.सू."
+  },
+  en:{
+    doc_title:"About — KumbhConnect",
+    skip:"Skip to main content",
+    back_aria:"Back to Home",
+    lang_group_aria:"Language",
+    page_title:"About KumbhConnect",
+    logo_alt:"KumbhConnect logo",
+    hero_title:"About KumbhConnect",
+    hero_sub:"Connecting Pilgrims, Sacred Places, and Digital Innovation",
+    hero_desc:"KumbhConnect is a digital platform that helps pilgrims discover information about Nashik Kumbh Mela, important places in Nashik and Trimbakeshwar, travel-related information, and available digital services. It also includes Kumbh AI, a conversational assistant that uses Artificial Intelligence to help users find information.",
+    hero_cta:"Explore the App",
+    hero_cta2:"Meet the Team",
+    about_title:"About the Project",
+    about_what_h:"What is KumbhConnect?",
+    about_what:"KumbhConnect is a Smart Pilgrimage Platform created for pilgrims visiting Nashik and Trimbakeshwar during the Sinhastha Kumbh Mela 2027. It brings maps, SOS assistance, guide services, and multilingual information together in one place.",
+    about_why_h:"Why it was developed",
+    about_why:"A large pilgrimage involves many places, schedules, and services. KumbhConnect was developed to make this information easier to find, so that pilgrims can plan their visit with greater confidence.",
+    about_how_h:"How it helps pilgrims",
+    about_how:"Pilgrims can explore places, find travel-related information and available services, and ask questions through a conversational assistant. The platform is designed for Marathi, Hindi, and English.",
+    about_place_h:"Nashik and Trimbakeshwar",
+    about_place:"Nashik, on the banks of the Godavari, and Trimbakeshwar, home to the Trimbakeshwar Jyotirlinga, are places of deep spiritual importance for the Kumbh Mela. KumbhConnect is built with respect for this heritage.",
+    feat_title:"What the App Offers",
+    w1:"Smart Navigation",
+    w2:"SOS Assistance",
+    w3:"Kumbh Calendar",
+    w4:"Guide Assistance",
+    w5:"Hospitals",
+    w6:"Parking Info",
+    w7:"Verified Places",
+    w8:"Multilingual Support",
+    ai_title:"Artificial Intelligence at KumbhConnect",
+    ai_intro:"Kumbh AI is intended to help users access information through a conversational interface. Users can ask questions in everyday language.",
+    ai_cap_h:"Capability status",
+    ai_tag_avail:"Available",
+    ai_tag_planned:"Planned",
+    ai_cap1:"Conversational assistance through a chat interface",
+    ai_cap2:"Information about places and locations",
+    ai_cap3:"Help finding hotels and service providers",
+    ai_cap4:"Multilingual conversations",
+    ai_cap5:"Answers drawn from verified information supplied to the assistant",
+    ai_note_h:"Responsible AI use",
+    ai_note:"AI-generated responses may contain errors. Users should verify important travel, safety, and official information through appropriate authoritative sources.",
+    ai_privacy_h:"Protect your privacy",
+    ai_privacy:"Please avoid sharing personal information, such as identity documents, bank details, or contact numbers, with the AI assistant unless it is truly necessary.",
+    ai_limits_h:"Know its limits",
+    ai_limits:"Kumbh AI does not replace official authorities or emergency personnel. Please do not rely on it alone for emergencies, confirmed bookings, or real-time conditions.",
+    team_title:"Meet the Team",
+    team_sub:"The people associated with KumbhConnect.",
+    role_founder:"Founder & Developer",
+    role_partner:"Presentation Partner & Authorised Team Member",
+    role_ambassador:"Brand Ambassador",
+    founder_desc:"Founder and developer of KumbhConnect.",
+    founder_quote:"Making the journey of millions of pilgrims safe and simple — that is our mission. KumbhConnect is a service of faith and technology.",
+    alt_founder:"Portrait of Prasad Arvind Bhalekar",
+    alt_partner:"Portrait of Prathmesh Sanjay Wankhede",
+    alt_ambassador:"Portrait of Atharva Subhash Suryawanshi",
+    img_fail:"Photo unavailable",
+    vm_title:"Our Vision and Mission",
+    vision_title:"Vision",
+    vision_text:"To make pilgrimage-related information and digital guidance more accessible through a convenient, inclusive platform.",
+    mission_title:"Mission",
+    mission_text:"To help users discover relevant places and information through an accessible digital experience, while respecting the cultural and spiritual importance of Nashik Kumbh Mela.",
+    values_title:"Core Values",
+    v1:"Devotion and Cultural Respect",
+    v1d:"We approach the spiritual and cultural importance of Nashik Kumbh Mela with respect.",
+    v2:"Accuracy and Responsible Information Sharing",
+    v2d:"We aim to share clear information and to be honest about its limits.",
+    v3:"Accessibility and Inclusion",
+    v3d:"We aim to make the platform usable for people of different languages and abilities.",
+    v4:"Privacy and Security",
+    v4d:"We aim to handle user information with care.",
+    v5:"Innovation and Responsible AI",
+    v5d:"We use AI thoughtfully and encourage users to verify important information.",
+    v6:"User Convenience",
+    v6d:"We aim to keep the experience simple and easy to use on a phone.",
+    obj_title:"Platform Objectives",
+    obj1:"Provide pilgrims with verified and up-to-date information",
+    obj2:"Provide SOS assistance features for emergency situations",
+    obj3:"Create opportunities for local guides, volunteers and businesses",
+    obj4:"Ensure smooth multilingual (Marathi, Hindi, English) usage",
+    obj5:"Make Nashik–Trimbakeshwar a Digital Information Hub",
+    disc_title:"Disclaimer",
+    disc_text:"KumbhConnect is an independent information platform and is not affiliated with any government authority. All information is provided in good faith and with best efforts in the public interest.",
+    home_btn:"Home Page",
+    name_founder:"Prasad Arvind Bhalekar",
+    name_partner:"Prathmesh Sanjay Wankhede",
+    name_ambassador:"Atharva Subhash Suryawanshi",
+    ini_founder:"PB",
+    ini_partner:"PW",
+    ini_ambassador:"AS"
+  }
+};
+var DEFAULT='mr', FALLBACK='en', KEY='kc_lang';
+
+function tr(T,k){
+  if(T&&T[k]!==undefined)return T[k];
+  var f=I18N[FALLBACK];
+  return (f&&f[k]!==undefined)?f[k]:undefined;   /* undefined => keep the markup as authored */
+}
+
+function setLang(lang,el,persist){
+  if(!I18N[lang])lang=DEFAULT;
+  var T=I18N[lang];
+  document.documentElement.lang=lang;
+  if(persist!==false){try{localStorage.setItem(KEY,lang);}catch(e){}}
+  document.querySelectorAll('.lbtn').forEach(function(b){
+    var on=b.getAttribute('data-lang')===lang;
+    b.classList.toggle('on',on);
+    b.setAttribute('aria-pressed',on?'true':'false');
+  });
+  document.querySelectorAll('[data-i18n]').forEach(function(n){
+    var v=tr(T,n.getAttribute('data-i18n'));if(v!==undefined)n.textContent=v;
+  });
+  document.querySelectorAll('[data-i18n-alt]').forEach(function(n){
+    var v=tr(T,n.getAttribute('data-i18n-alt'));if(v!==undefined)n.setAttribute('alt',v);
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(function(n){
+    var v=tr(T,n.getAttribute('data-i18n-aria'));if(v!==undefined)n.setAttribute('aria-label',v);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(n){
+    var v=tr(T,n.getAttribute('data-i18n-ph'));if(v!==undefined)n.setAttribute('placeholder',v);
+  });
+  var d=tr(T,'doc_title');if(d!==undefined)document.title=d;
+}
+window.setLang=setLang;   /* kept global for compatibility */
+
+document.querySelectorAll('.lbtn').forEach(function(b){
+  b.addEventListener('click',function(){setLang(b.getAttribute('data-lang'),b);});
+});
+
+var saved=null;try{saved=localStorage.getItem(KEY);}catch(e){}
+setLang(I18N[saved]?saved:DEFAULT,null,false);   /* apply immediately; do not overwrite storage on load */
+
+/* Image fallbacks (no inline handlers) */
+function fail(img){var box=img.closest('.portrait,.hero-logo');if(box)box.classList.add('failed');}
+document.querySelectorAll('.portrait img,.hero-logo img').forEach(function(img){
+  img.addEventListener('error',function(){fail(img);});
+  if(img.complete&&img.naturalWidth===0&&img.currentSrc)fail(img);
+});
+var tb=document.querySelector('.tb-logo');
+if(tb)tb.addEventListener('error',function(){tb.style.display='none';});
+})();
+</script>
+</body>
+</html>
