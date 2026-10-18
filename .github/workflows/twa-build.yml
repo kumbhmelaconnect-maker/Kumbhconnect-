@@ -66,10 +66,6 @@ jobs:
         run: echo "BUILD_DIR=$RUNNER_TEMP/twa-build" >> "$GITHUB_ENV"
 
       - name: Check prerequisites (names only, no values printed)
-        env:
-          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
-          KS_PW: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
-          KEY_PW: ${{ secrets.TWA_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           miss=0
@@ -77,12 +73,24 @@ jobs:
           [[ "${IN_VERSION_CODE}" =~ ^[1-9][0-9]{0,8}$ ]] || { echo "::error::version_code must be a positive integer"; miss=1; }
           [[ "${IN_VERSION_NAME}" =~ ^[0-9]+(\.[0-9]+){1,3}([-.][A-Za-z0-9]+)?$ ]] || { echo "::error::version_name format invalid"; miss=1; }
           if [ "$IN_MODE" = "build" ]; then
-            for n in KS_B64 KS_PW KEY_PW; do
-              if [ -z "${!n}" ]; then echo "::error::Missing secret behind $n (TWA_KEYSTORE_BASE64 / TWA_KEYSTORE_PASSWORD / TWA_KEY_PASSWORD)"; miss=1; fi
-            done
             [ -n "${TWA_KEY_ALIAS}" ] || { echo "::error::Repository variable TWA_KEY_ALIAS is not set"; miss=1; }
             [ "${TWA_PACKAGE_ID_CONFIRMED}" = "true" ] || { echo "::error::Package ID is still proposed. Owner must set repository variable TWA_PACKAGE_ID_CONFIRMED=true"; miss=1; }
           fi
+          [ "$miss" -eq 0 ] || exit 1
+
+      # Signing secrets are only mapped into a step that runs in build mode, so probe mode never receives them.
+      - name: Check signing secrets are set (build mode only; names only, no values printed)
+        if: ${{ inputs.mode == 'build' }}
+        env:
+          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
+          KS_PW: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_PW: ${{ secrets.TWA_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          miss=0
+          for n in KS_B64 KS_PW KEY_PW; do
+            if [ -z "${!n}" ]; then echo "::error::Missing secret behind $n (TWA_KEYSTORE_BASE64 / TWA_KEYSTORE_PASSWORD / TWA_KEY_PASSWORD)"; miss=1; fi
+          done
           [ "$miss" -eq 0 ] || exit 1
 
       - uses: actions/setup-node@v4
@@ -156,13 +164,24 @@ jobs:
             echo "::error::Unresolved placeholder in resolved manifest"; exit 1
           fi
 
-      - name: Install pinned Bubblewrap, point it at JDK/SDK, run doctor
+      - name: Install pinned Bubblewrap CLI + core, verify both versions, point it at JDK/SDK, run doctor
         run: |
           set -euo pipefail
-          npm install --global "@bubblewrap/cli@${BUBBLEWRAP_VERSION}"
+          # The CLI depends on @bubblewrap/core with a floating range (^x.y.z), so pinning only the CLI lets npm pick a
+          # newer core. Installing both at the same exact version makes npm use one top-level core (checked below).
+          npm install --global "@bubblewrap/cli@${BUBBLEWRAP_VERSION}" "@bubblewrap/core@${BUBBLEWRAP_VERSION}"
           GOT=$(npm ls -g @bubblewrap/cli --depth=0 | grep -m1 -o '@bubblewrap/cli@[0-9][0-9.]*' || echo "not-found")
           [ "$GOT" = "@bubblewrap/cli@${BUBBLEWRAP_VERSION}" ] || { echo "::error::Installed $GOT, expected @bubblewrap/cli@${BUBBLEWRAP_VERSION}"; exit 1; }
           echo "Bubblewrap CLI: $GOT" >> "$GITHUB_STEP_SUMMARY"
+          # Resolve core exactly as the CLI (and twa/generate-project.mjs) will load it, and read its real version.
+          CORE_VER=$(NPM_ROOT="$(npm root -g)" node -e '
+            const { createRequire } = require("module"), path = require("path");
+            const req = createRequire(path.join(process.env.NPM_ROOT, "@bubblewrap", "cli", "package.json"));
+            process.stdout.write(String(req("@bubblewrap/core/package.json").version));
+          ') || { echo "::error::Could not resolve @bubblewrap/core from the installed CLI"; exit 1; }
+          CORE="@bubblewrap/core@${CORE_VER}"
+          [ "$CORE" = "@bubblewrap/core@${BUBBLEWRAP_VERSION}" ] || { echo "::error::Installed $CORE, expected @bubblewrap/core@${BUBBLEWRAP_VERSION}"; exit 1; }
+          echo "Bubblewrap core: $CORE" >> "$GITHUB_STEP_SUMMARY"
           mkdir -p "$HOME/.bubblewrap"
           printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
           bubblewrap doctor </dev/null 2>&1 | tee "$RUNNER_TEMP/doctor.txt"
