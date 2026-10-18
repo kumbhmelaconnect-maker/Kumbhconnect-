@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // CLI entry for the Firestore -> Supabase public listing sync.
 // Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (secrets, never printed);
-//      optional SYNC_DRY_RUN, SYNC_ALLOW_MASS_DELETE, FIREBASE_PROJECT_ID, FIREBASE_WEB_API_KEY.
+//      optional SYNC_DRY_RUN, SYNC_MASS_DELETE_CONFIRM (exact text DELETE), FIREBASE_PROJECT_ID, FIREBASE_WEB_API_KEY.
+//      In dry-run mode the Supabase variables are not required and not read.
 import { appendFileSync } from 'node:fs';
 import { runSync } from './lib.mjs';
 
@@ -13,6 +14,10 @@ try {
       `- reviews read: ${out.reviewsFetched}\n- result: ${out.result ? out.result.status : 'n/a'}\n`);
   }
 } catch (e) {
-  console.error(`sync failed: ${e && e.message ? e.message : 'unknown error'}`); // message only, no stack/config
+  const msg = e && e.message ? e.message : 'unknown error';
+  console.error(`sync failed: ${msg}`); // message only, no stack/config
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    try { appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Supabase listing sync\n- FAILED: ${msg}\n- nothing was written to or deleted from Supabase\n`); } catch { /* ignore */ }
+  }
   process.exit(1);
 }
