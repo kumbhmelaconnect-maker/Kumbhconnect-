@@ -1,0 +1,296 @@
+name: Build TWA (manual only; probe or signed APK + AAB)
+
+# MANUAL TRIGGER ONLY. Never publishes to any app store, never deploys the website,
+# never touches Firebase or Supabase. Target store: Indus Appstore (rules NOT VERIFIED).
+#
+# The repository contains NO Android project. Bubblewrap generates it from twa/twa-manifest.json
+# inside the runner. Two modes:
+#   probe : no secrets needed. Generates the project in an empty directory and runs an UNSIGNED build
+#           (`build --skipSigning`) so you can see, without any key, whether generation and Gradle work
+#           and which output files appear. Nothing is signed or uploaded.
+#   build : signed APK + AAB using your keystore secrets, then verification.
+# See twa/README.md and twa/PHONE-GUIDE.md.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "probe = no secrets, unsigned test build. build = signed APK + AAB. Run probe first."
+        type: choice
+        options: [probe, build]
+        default: probe
+      version_code:
+        description: "Android versionCode (integer; must be higher than any build already released)"
+        type: string
+        required: true
+        default: "1"
+      version_name:
+        description: "Android versionName, e.g. 1.0.0"
+        type: string
+        required: true
+        default: "1.0.0"
+      generation:
+        description: "How the Android project is generated. Use update (documented command) unless the probe shows it fails in an empty directory."
+        type: choice
+        options: [update, core-api]
+        default: update
+      upload_artifact:
+        description: "build mode only: upload APK/AAB as a workflow artifact. This repository is PUBLIC: any signed-in GitHub user can download artifacts. Leave false unless you accept that."
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: twa-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      BUBBLEWRAP_VERSION: ${{ vars.TWA_BUBBLEWRAP_VERSION }}
+      TWA_PACKAGE_ID_CONFIRMED: ${{ vars.TWA_PACKAGE_ID_CONFIRMED }}
+      TWA_KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
+      IN_MODE: ${{ inputs.mode }}
+      IN_GENERATION: ${{ inputs.generation }}
+      IN_VERSION_CODE: ${{ inputs.version_code }}
+      IN_VERSION_NAME: ${{ inputs.version_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set build directory (runner context is not available in job-level env)
+        run: echo "BUILD_DIR=$RUNNER_TEMP/twa-build" >> "$GITHUB_ENV"
+
+      - name: Check prerequisites (names only, no values printed)
+        env:
+          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
+          KS_PW: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_PW: ${{ secrets.TWA_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          miss=0
+          [[ "${BUBBLEWRAP_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Repository variable TWA_BUBBLEWRAP_VERSION must be an exact x.y.z version"; miss=1; }
+          [[ "${IN_VERSION_CODE}" =~ ^[1-9][0-9]{0,8}$ ]] || { echo "::error::version_code must be a positive integer"; miss=1; }
+          [[ "${IN_VERSION_NAME}" =~ ^[0-9]+(\.[0-9]+){1,3}([-.][A-Za-z0-9]+)?$ ]] || { echo "::error::version_name format invalid"; miss=1; }
+          if [ "$IN_MODE" = "build" ]; then
+            for n in KS_B64 KS_PW KEY_PW; do
+              if [ -z "${!n}" ]; then echo "::error::Missing secret behind $n (TWA_KEYSTORE_BASE64 / TWA_KEYSTORE_PASSWORD / TWA_KEY_PASSWORD)"; miss=1; fi
+            done
+            [ -n "${TWA_KEY_ALIAS}" ] || { echo "::error::Repository variable TWA_KEY_ALIAS is not set"; miss=1; }
+            [ "${TWA_PACKAGE_ID_CONFIRMED}" = "true" ] || { echo "::error::Package ID is still proposed. Owner must set repository variable TWA_PACKAGE_ID_CONFIRMED=true"; miss=1; }
+          fi
+          [ "$miss" -eq 0 ] || exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Validate static TWA configuration
+        run: |
+          set -euo pipefail
+          node twa/validate-twa.mjs
+          node --check twa/generate-project.mjs
+
+      - name: Android SDK - accept licenses and make the layout Bubblewrap expects (UNTESTED hedge)
+        run: |
+          set -euo pipefail
+          [ -n "${ANDROID_HOME:-}" ] && [ -d "$ANDROID_HOME" ] || { echo "::error::ANDROID_HOME is not set or missing on this runner"; exit 1; }
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$SDKM" ] || { echo "::error::sdkmanager not found at $SDKM"; exit 1; }
+          # Bubblewrap's docs say the SDK path must contain tools/bin. The hosted runner has cmdline-tools/latest instead.
+          if [ ! -w "$ANDROID_HOME" ]; then sudo chown -R "$(id -u):$(id -g)" "$ANDROID_HOME"; fi
+          if [ ! -e "$ANDROID_HOME/tools/bin/sdkmanager" ]; then ln -s "$ANDROID_HOME/cmdline-tools/latest" "$ANDROID_HOME/tools"; fi
+          printf 'y\n%.0s' $(seq 1 60) | "$SDKM" --licenses > /dev/null
+          echo "Android SDK path: $ANDROID_HOME" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Decode keystore (outside the workspace) and verify it opens (build mode only)
+        if: ${{ inputs.mode == 'build' }}
+        env:
+          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
+          KS_PW: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          KS="$RUNNER_TEMP/upload.keystore"
+          printf '%s' "$KS_B64" | base64 -d > "$KS"
+          [ -s "$KS" ] || { echo "::error::Keystore decoded to an empty file"; exit 1; }
+          keytool -list -keystore "$KS" -storepass:env KS_PW -alias "$TWA_KEY_ALIAS" >/dev/null 2>&1 \
+            || { echo "::error::Keystore cannot be opened or alias not found"; exit 1; }
+          echo "KS_PATH=$KS" >> "$GITHUB_ENV"
+          KT=$(keytool -list -v -keystore "$KS" -storepass:env KS_PW -alias "$TWA_KEY_ALIAS" 2>/dev/null)
+          FPV=$(grep -m1 'SHA256:' <<<"$KT" | sed 's/.*SHA256: *//' | tr -d '[:space:]')
+          [ -n "$FPV" ] || { echo "::error::Could not read certificate fingerprint"; exit 1; }
+          echo "KS_SHA256=$FPV" >> "$GITHUB_ENV"
+          echo "Release-key certificate SHA-256: $FPV" >> "$GITHUB_STEP_SUMMARY"
+          echo "_If the target store re-signs the app, assetlinks.json needs the store's signing certificate fingerprint instead (Indus behaviour NOT VERIFIED)._" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Resolve manifest into the persistent build directory
+        run: |
+          set -euo pipefail
+          mkdir -p "$BUILD_DIR"
+          if [ "$IN_MODE" = "build" ]; then MANIFEST_KS="$KS_PATH"; else MANIFEST_KS="$RUNNER_TEMP/unused-probe.keystore"; fi
+          export MANIFEST_KS MANIFEST_ALIAS="${TWA_KEY_ALIAS:-probe}"
+          node -e '
+            const fs=require("fs");
+            const t=JSON.parse(fs.readFileSync("twa/twa-manifest.json","utf8"));
+            t.signingKey={path:process.env.MANIFEST_KS,alias:process.env.MANIFEST_ALIAS};
+            t.appVersionCode=parseInt(process.env.IN_VERSION_CODE,10);
+            t.appVersionName=process.env.IN_VERSION_NAME;
+            if ("appVersion" in t) t.appVersion=process.env.IN_VERSION_NAME;
+            fs.writeFileSync(process.env.BUILD_DIR+"/twa-manifest.json",JSON.stringify(t,null,2));
+          '
+          if [ "$IN_MODE" = "build" ]; then
+            TWA_MANIFEST="$BUILD_DIR/twa-manifest.json" node twa/validate-twa.mjs --strict
+          else
+            TWA_MANIFEST="$BUILD_DIR/twa-manifest.json" node twa/validate-twa.mjs
+          fi
+          if grep -q "__[A-Z_]*__" "$BUILD_DIR/twa-manifest.json"; then
+            echo "::error::Unresolved placeholder in resolved manifest"; exit 1
+          fi
+
+      - name: Install pinned Bubblewrap, point it at JDK/SDK, run doctor
+        run: |
+          set -euo pipefail
+          npm install --global "@bubblewrap/cli@${BUBBLEWRAP_VERSION}"
+          GOT=$(npm ls -g @bubblewrap/cli --depth=0 | grep -m1 -o '@bubblewrap/cli@[0-9][0-9.]*' || echo "not-found")
+          [ "$GOT" = "@bubblewrap/cli@${BUBBLEWRAP_VERSION}" ] || { echo "::error::Installed $GOT, expected @bubblewrap/cli@${BUBBLEWRAP_VERSION}"; exit 1; }
+          echo "Bubblewrap CLI: $GOT" >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p "$HOME/.bubblewrap"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
+          bubblewrap doctor </dev/null 2>&1 | tee "$RUNNER_TEMP/doctor.txt"
+          { echo '<details><summary>bubblewrap doctor</summary>'; echo; echo '```'; cat "$RUNNER_TEMP/doctor.txt"; echo '```'; echo '</details>'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Generate Android project in the empty build directory
+        working-directory: ${{ runner.temp }}/twa-build
+        run: |
+          set -euo pipefail
+          # Documented: `update` "regenerates the Android project files from a twa-manifest.json file" and
+          # --skipVersionUpgrade "skips upgrading appVersion and appVersionCode". Documented for an existing project;
+          # that it also works in an EMPTY directory is NOT VERIFIED. This step fails loudly instead of guessing.
+          # --manifest is deliberately not used: its docs say "directory" but build's source treats it as a file path.
+          if [ "$IN_GENERATION" = "update" ]; then
+            bubblewrap update --skipVersionUpgrade </dev/null
+          else
+            node "$GITHUB_WORKSPACE/twa/generate-project.mjs"
+          fi
+          for f in gradlew build.gradle app/build.gradle twa-manifest.json; do
+            [ -e "$f" ] || { echo "::error::Android project file missing after generation: $f (generation=$IN_GENERATION). Re-run with the other generation option, or see twa/README.md."; ls -la; exit 1; }
+          done
+          node -e '
+            const fs=require("fs");
+            const a=JSON.parse(fs.readFileSync(process.env.GITHUB_WORKSPACE+"/twa/twa-manifest.json","utf8"));
+            const b=JSON.parse(fs.readFileSync("twa-manifest.json","utf8"));
+            const bad=["packageId","host","startUrl","fullScopeUrl","webManifestUrl","iconUrl","maskableIconUrl"].filter(k=>a[k]!==b[k]);
+            if (b.appVersionCode!==parseInt(process.env.IN_VERSION_CODE,10)) bad.push("appVersionCode");
+            if (bad.length){console.error("::error::Manifest fields changed or lost during generation: "+bad.join(", "));process.exit(1);}
+            console.log("Manifest fields intact after generation.");
+          '
+          # `bubblewrap build` compares a SHA-1 of twa-manifest.json with manifest-checksum.txt and, on a mismatch, offers to
+          # regenerate the project (default yes), which could bump versionCode. Documented only indirectly (Bubblewrap source,
+          # third-party report of 1.25.0 reading shared.js); NOT VERIFIED on the pinned version. So make the state explicit.
+          SUM=$(sha1sum twa-manifest.json | cut -d' ' -f1)
+          if [ ! -e manifest-checksum.txt ]; then
+            echo "::notice::manifest-checksum.txt not written by generation; writing it (same step Bubblewrap's init performs)"
+            printf '%s' "$SUM" > manifest-checksum.txt
+          elif [ "$(cat manifest-checksum.txt)" != "$SUM" ]; then
+            echo "::error::manifest-checksum.txt does not match twa-manifest.json; build could regenerate the project and change versionCode"; exit 1
+          fi
+          ls -la >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Probe - unsigned test build (no keystore, no secrets)
+        if: ${{ inputs.mode == 'probe' }}
+        working-directory: ${{ runner.temp }}/twa-build
+        run: |
+          set -euo pipefail
+          bubblewrap build --skipSigning </dev/null
+          { echo "### Files produced by the unsigned probe build"; find . -maxdepth 1 \( -name '*.apk' -o -name '*.aab' -o -name '*.idsig' \) -printf '%f  %s bytes\n'; } >> "$GITHUB_STEP_SUMMARY"
+          echo "PROBE COMPLETED: generation and unsigned build ran. Nothing was signed, uploaded or published." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build signed APK and AAB
+        if: ${{ inputs.mode == 'build' }}
+        working-directory: ${{ runner.temp }}/twa-build
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          bubblewrap build --signingKeyPath="$KS_PATH" --signingKeyAlias="$TWA_KEY_ALIAS" </dev/null
+
+      - name: Verify APK and AAB
+        if: ${{ inputs.mode == 'build' }}
+        run: |
+          set -euo pipefail
+          # File names are those documented in Bubblewrap's README for `build`.
+          AAB="$BUILD_DIR/app-release-bundle.aab"; APK="$BUILD_DIR/app-release-signed.apk"
+          for f in "$AAB" "$APK"; do
+            [ -s "$f" ] || { echo "::error::Missing or empty: $(basename "$f")"; ls -la "$BUILD_DIR"; exit 1; }
+            unzip -tq "$f"
+          done
+          # Capture output first: `cmd | grep -q` under pipefail can fail spuriously (SIGPIPE) even on a match.
+          AAB_LIST=$(unzip -l "$AAB"); APK_LIST=$(unzip -l "$APK")
+          grep -q 'BundleConfig.pb' <<<"$AAB_LIST" || { echo "::error::BundleConfig.pb missing"; exit 1; }
+          grep -q 'base/manifest/AndroidManifest.xml' <<<"$AAB_LIST" || { echo "::error::AAB base manifest missing"; exit 1; }
+          grep -q 'AndroidManifest.xml' <<<"$APK_LIST" || { echo "::error::APK manifest missing"; exit 1; }
+          JS=$(jarsigner -verify "$AAB" 2>&1) || { echo "::error::jarsigner -verify failed on the AAB"; exit 1; }
+          grep -q 'jar verified' <<<"$JS" || { echo "::error::AAB signature verification failed"; exit 1; }
+          BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          [ -n "$BT" ] || { echo "::error::No build-tools directory under $ANDROID_HOME"; exit 1; }
+          [ -x "$ANDROID_HOME/build-tools/$BT/apksigner" ] || { echo "::error::apksigner not found in build-tools"; exit 1; }
+          "$ANDROID_HOME/build-tools/$BT/apksigner" verify --print-certs "$APK" > "$RUNNER_TEMP/apksigner.txt" \
+            || { echo "::error::apksigner verify failed; APK signature is not valid"; exit 1; }
+          # Certificate comparison FAILS CLOSED. Every path below that cannot positively confirm "APK certificate ==
+          # keystore certificate" exits non-zero. Nothing here skips the comparison or downgrades it to a warning.
+          # `|| true` only stops `set -e -o pipefail` from aborting silently when grep finds no line, so that the
+          # explicit check on the next line can report a clear error.
+          APK_FP_LINES=$(grep -i 'certificate SHA-256 digest' "$RUNNER_TEMP/apksigner.txt" || true)
+          [ -n "$APK_FP_LINES" ] || { echo "::error::No certificate SHA-256 digest found in apksigner output; refusing to continue without certificate comparison"; exit 1; }
+          KS_FP=$(printf '%s' "${KS_SHA256:-}" | tr -d ':[:space:]' | tr 'a-f' 'A-F')
+          [[ "$KS_FP" =~ ^[0-9A-F]{64}$ ]] || { echo "::error::Keystore SHA-256 fingerprint is missing or not 64 hex characters; cannot compare"; exit 1; }
+          APK_FP_COUNT=0
+          while IFS= read -r FP_LINE; do
+            APK_FP=$(printf '%s' "${FP_LINE##*:}" | tr -d ':[:space:]' | tr 'a-f' 'A-F')
+            [[ "$APK_FP" =~ ^[0-9A-F]{64}$ ]] || { echo "::error::Could not parse a 64-hex SHA-256 certificate fingerprint from apksigner output; refusing to continue"; exit 1; }
+            [ "$APK_FP" = "$KS_FP" ] || { echo "::error::APK is not signed with the certificate in the keystore (fingerprint mismatch)"; exit 1; }
+            APK_FP_COUNT=$((APK_FP_COUNT + 1))
+          done <<<"$APK_FP_LINES"
+          [ "$APK_FP_COUNT" -ge 1 ] || { echo "::error::No certificate fingerprint was compared; refusing to continue"; exit 1; }
+          echo "APK signing certificate SHA-256 matches the keystore certificate ($APK_FP_COUNT signer line(s) compared)" >> "$GITHUB_STEP_SUMMARY"
+          # Expected package ID and versionCode come from the RESOLVED manifest, never from a hardcoded value.
+          EXP_PKG=$(node -p 'JSON.parse(require("fs").readFileSync(process.env.BUILD_DIR+"/twa-manifest.json","utf8")).packageId')
+          EXP_VC=$(node -p 'JSON.parse(require("fs").readFileSync(process.env.BUILD_DIR+"/twa-manifest.json","utf8")).appVersionCode')
+          [ -n "$EXP_PKG" ] && [ "$EXP_PKG" != "undefined" ] || { echo "::error::packageId missing in resolved manifest"; exit 1; }
+          AAPT2="$ANDROID_HOME/build-tools/$BT/aapt2"
+          if [ -x "$AAPT2" ]; then
+            BADGE_ALL=$("$AAPT2" dump badging "$APK")
+            BADGE=$(grep -m1 '^package:' <<<"$BADGE_ALL")
+            grep -qF "name='${EXP_PKG}'" <<<"$BADGE" || { echo "::error::APK package id differs from resolved manifest packageId ($EXP_PKG): $BADGE"; exit 1; }
+            grep -qF "versionCode='${EXP_VC}'" <<<"$BADGE" || { echo "::error::APK versionCode differs from resolved manifest ($EXP_VC): $BADGE"; exit 1; }
+          else
+            echo "::error::aapt2 not found in build-tools; cannot verify package id (refusing to skip)"; exit 1
+          fi
+          echo "Verified package id $EXP_PKG, versionCode $EXP_VC, from the resolved manifest" >> "$GITHUB_STEP_SUMMARY"
+          sha256sum "$AAB" "$APK" >> "$GITHUB_STEP_SUMMARY"
+          echo "AAB_PATH=$AAB" >> "$GITHUB_ENV"; echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+
+      - name: Upload APK and AAB (opt-in, short retention)
+        if: ${{ inputs.mode == 'build' && inputs.upload_artifact }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: kumbhconnect-twa-builds
+          path: |
+            ${{ env.APK_PATH }}
+            ${{ env.AAB_PATH }}
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.keystore"
