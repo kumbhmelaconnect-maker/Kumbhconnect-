@@ -1,0 +1,29 @@
+# Android signing keys
+*.jks
+*.keystore
+*.p12
+*.pfx
+key.properties
+
+# Android build outputs
+.apk
+.aab
+*.apk
+*.aab
+.gradle/
+build/
+app/build/
+.output/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Node dependencies
+node_modules/
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
