@@ -1,15 +1,24 @@
 // Firestore (public reads) -> Supabase public replica. Node >= 20, no dependencies.
 //
 // LEAST PRIVILEGE: this reads ONLY what firestore.rules already makes world-readable
-// (kc_listings where status == 'approved', and kc_reviews). It uses NO Firebase
+// (kc_listings where status == 'approved', and kc_review_public).
+// kc_reviews is PRIVATE (reviewerUid, comment; SEC-PASS-8 R-1) and is never read here;
+// kc_review_public is its public mirror holding only { listingId, rating, createdAt }. It uses NO Firebase
 // admin credential. The only secret is the Supabase service-role / secret key,
 // used solely to call the sync_public_listings RPC.
 //
 // If App Check ENFORCEMENT is later switched on for Firestore, these unauthenticated
 // REST reads will be refused and the sync will fail closed (nothing is deleted).
+//
+// PRIVACY: queries use a field projection (`select`) so only the fields the sync needs
+// are ever downloaded (review mirror: listingId + rating only).
+// Any Firestore read failure aborts the run BEFORE any Supabase call (fail closed).
 
 export const LISTING_TYPES = ['business', 'service', 'guide', 'volunteer'];
 export const DEFAULT_FIREBASE_PROJECT_ID = 'kumbh-connect-e308e'; // from firebase-config.js
+export const LISTING_FIELDS = ['status', 'type', 'name', 'category', 'description', 'address', 'servicesList', 'photos', 'lat', 'lng'];
+export const REVIEW_FIELDS = ['listingId', 'rating'];
+export const REVIEW_COLLECTION = 'kc_review_public'; // public mirror; NOT kc_reviews (private)
 export const DEFAULT_CLOUD_NAME = 'fzntl3lv';                      // from firebase-config.js
 
 // ---------------------------------------------------------------- decoding
@@ -133,9 +142,36 @@ export async function requestWithRetry(fetchFn, url, init, { retries = 3, sleep 
   throw lastErr;
 }
 
-export async function runQueryPaged({ fetchFn, projectId, collection, where, pageSize, maxPages, apiKey, sleep }) {
+const safeText = (v, max) => String(v == null ? '' : v).replace(/[^\x20-\x7E]/g, ' ').slice(0, max);
+
+function firestoreRunQueryUrl(projectId, apiKey) {
   const base = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents`;
-  const url = `${base}:runQuery` + (apiKey ? `?key=${encodeURIComponent(apiKey)}` : '');
+  return `${base}:runQuery` + (apiKey ? `?key=${encodeURIComponent(apiKey)}` : '');
+}
+
+/** Firestore error body -> { code, detail } (Google's own status text; never contains our secrets). */
+async function readFirestoreError(res) {
+  try {
+    const b = await res.json();
+    const e = Array.isArray(b) ? (b[0] && b[0].error) : (b && b.error);
+    if (!e) return {};
+    return { code: safeText(e.status, 40), detail: safeText(e.message, 200) };
+  } catch { return {}; }
+}
+
+export class FirestoreError extends Error {
+  constructor(collection, httpStatus, code, detail) {
+    const extra = [code, detail].filter(Boolean).join(': ');
+    super(`firestore ${collection} failed: HTTP ${httpStatus}` + (extra ? ` (${extra})` : ''));
+    this.name = 'FirestoreError';
+    this.collection = collection;
+    this.httpStatus = httpStatus;
+    this.code = code || '';
+  }
+}
+
+export async function runQueryPaged({ fetchFn, projectId, collection, where, pageSize, maxPages, apiKey, sleep, select }) {
+  const url = firestoreRunQueryUrl(projectId, apiKey);
   const docs = [];
   let cursor = null;
   for (let page = 0; page < maxPages; page++) {
@@ -145,11 +181,15 @@ export async function runQueryPaged({ fetchFn, projectId, collection, where, pag
       limit: pageSize,
     };
     if (where) structuredQuery.where = where;
+    if (select && select.length) structuredQuery.select = { fields: select.map((f) => ({ fieldPath: f })) };
     if (cursor) structuredQuery.startAt = { values: [{ referenceValue: cursor }], before: false };
     const res = await requestWithRetry(fetchFn, url, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ structuredQuery }),
     }, { sleep, label: `firestore ${collection}` });
-    if (!res.ok) throw new Error(`firestore ${collection} failed: HTTP ${res.status}`);
+    if (!res.ok) {
+      const d = await readFirestoreError(res);
+      throw new FirestoreError(collection, res.status, d.code, d.detail);
+    }
     const body = await res.json();
     if (!Array.isArray(body)) throw new Error(`firestore ${collection} failed: unexpected response`);
     if (body.some((x) => x && x.error)) throw new Error(`firestore ${collection} failed: query error`);
@@ -167,6 +207,34 @@ export async function runQueryPaged({ fetchFn, projectId, collection, where, pag
   }
   // A truncated read would produce wrong deletions / aggregates: fail instead.
   throw new Error(`firestore ${collection} failed: exceeded ${maxPages} pages`);
+}
+
+// ---------------------------------------------------------------- diagnostics
+async function probeReviews({ fetchFn, projectId, apiKey, where }) {
+  const structuredQuery = { from: [{ collectionId: REVIEW_COLLECTION }], limit: 1, select: { fields: [{ fieldPath: 'rating' }] } };
+  if (where) structuredQuery.where = where;
+  try {
+    const res = await requestWithRetry(fetchFn, firestoreRunQueryUrl(projectId, apiKey), {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ structuredQuery }),
+    }, { retries: 0, label: `firestore ${REVIEW_COLLECTION} probe` });
+    if (res.ok) return 'allowed';
+    const d = await readFirestoreError(res);
+    return `HTTP ${res.status}` + (d.code ? ` ${d.code}` : '') + (d.detail ? `: ${d.detail}` : '');
+  } catch { return 'network error'; }
+}
+
+/** Read-only evidence for a 403 on kc_reviews: at most 2 requests, 1 doc each, no data logged. */
+export async function diagnoseReviewsAccess({ fetchFn, projectId, apiKey, sampleListingId, log }) {
+  const wholeCollection = await probeReviews({ fetchFn, projectId, apiKey, where: null });
+  log(`diagnosis: ${REVIEW_COLLECTION} unfiltered query -> ${wholeCollection}`);
+  if (sampleListingId) {
+    const filtered = await probeReviews({
+      fetchFn, projectId, apiKey,
+      where: { fieldFilter: { field: { fieldPath: 'listingId' }, op: 'EQUAL', value: { stringValue: sampleListingId } } },
+    });
+    log(`diagnosis: ${REVIEW_COLLECTION} query filtered by listingId -> ${filtered}`);
+  }
+  log(`diagnosis: Firestore Rules (not this script) decide this. Check that the deployed rules contain a public read rule for ${REVIEW_COLLECTION}. kc_listings was readable in the same run, so the project id and network path are fine.`);
 }
 
 // ---------------------------------------------------------------- config
@@ -222,12 +290,24 @@ export async function runSync({ env, fetchFn = globalThis.fetch, log = console.l
   const listingDocs = await runQueryPaged({
     fetchFn, projectId: cfg.projectId, collection: 'kc_listings', sleep,
     where: { fieldFilter: { field: { fieldPath: 'status' }, op: 'EQUAL', value: { stringValue: 'approved' } } },
-    pageSize: 300, maxPages: 100, apiKey: cfg.firebaseApiKey,
+    pageSize: 300, maxPages: 100, apiKey: cfg.firebaseApiKey, select: LISTING_FIELDS,
   });
-  const reviewDocs = await runQueryPaged({
-    fetchFn, projectId: cfg.projectId, collection: 'kc_reviews', sleep,
-    where: null, pageSize: 500, maxPages: 400, apiKey: cfg.firebaseApiKey,
-  });
+  let reviewDocs;
+  try {
+    reviewDocs = await runQueryPaged({
+      fetchFn, projectId: cfg.projectId, collection: REVIEW_COLLECTION, sleep,
+      where: null, pageSize: 500, maxPages: 400, apiKey: cfg.firebaseApiKey, select: REVIEW_FIELDS,
+    });
+  } catch (e) {
+    if (e instanceof FirestoreError && e.httpStatus === 403) {
+      await diagnoseReviewsAccess({
+        fetchFn, projectId: cfg.projectId, apiKey: cfg.firebaseApiKey,
+        sampleListingId: listingDocs.length ? listingDocs[0].id : '', log,
+      });
+      log('aborting: review data is required for aggregates; nothing was sent to Supabase and nothing was deleted');
+    }
+    throw e; // fail closed: never sync listings with missing/partial review data
+  }
 
   const rows = [], skipped = [], seen = new Set();
   for (const d of listingDocs) {
