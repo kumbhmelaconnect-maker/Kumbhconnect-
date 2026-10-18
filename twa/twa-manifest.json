@@ -1,0 +1,38 @@
+{
+  "packageId": "in.kumbhconnect.nashik",
+  "host": "kumbhmelaconnect-maker.github.io",
+  "name": "KumbhConnect — Smart Pilgrimage Platform",
+  "launcherName": "KumbhConnect",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#C8410A",
+  "themeColorDark": "#C8410A",
+  "navigationColor": "#C8410A",
+  "navigationColorDark": "#C8410A",
+  "navigationDividerColor": "#C8410A",
+  "navigationDividerColorDark": "#C8410A",
+  "backgroundColor": "#FBF6EC",
+  "startUrl": "/Kumbhconnect-/index.html",
+  "fullScopeUrl": "https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/",
+  "webManifestUrl": "https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/manifest.json",
+  "iconUrl": "https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/icon-512.png",
+  "maskableIconUrl": "https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": false,
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "appVersionName": "1.0.0",
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "minSdkVersion": 21,
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": { "enabled": false }
+  },
+  "signingKey": {
+    "path": "__SET_BY_WORKFLOW__",
+    "alias": "__SET_BY_WORKFLOW__"
+  },
+  "generatorApp": "bubblewrap-cli"
+}
