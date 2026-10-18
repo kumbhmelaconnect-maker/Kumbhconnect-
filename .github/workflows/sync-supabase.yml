@@ -37,11 +37,22 @@ jobs:
           node-version: "22"
       - name: Tests gate (no network, no secrets)
         run: node --test "tests/supabase/*.test.js"
-      - name: Sync
+
+      # Dry run: Supabase secrets are NOT exposed to this step at all.
+      - name: Sync (dry run - Firestore read only, no Supabase secrets)
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        env:
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          SYNC_DRY_RUN: "true"
+        run: node scripts/sync/sync-listings.mjs
+
+      # Live run: scheduled runs, or manual runs with dry_run unchecked.
+      - name: Sync (live)
+        if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
-          SYNC_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+          SYNC_DRY_RUN: "false"
           SYNC_MASS_DELETE_CONFIRM: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_mass_delete || '' }}
         run: node scripts/sync/sync-listings.mjs
