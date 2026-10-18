@@ -3,8 +3,8 @@
 // LEAST PRIVILEGE: this reads ONLY what firestore.rules already makes world-readable
 // (kc_listings where status == 'approved', and kc_review_public).
 // kc_reviews is PRIVATE (reviewerUid, comment; SEC-PASS-8 R-1) and is never read here;
-// kc_review_public is its public mirror holding only { listingId, rating, createdAt }. It uses NO Firebase
-// admin credential. The only secret is the Supabase service-role / secret key,
+// kc_review_public is its public mirror holding only { listingId, rating, createdAt }.
+// It uses NO Firebase admin credential. The only secret is the Supabase service-role / secret key,
 // used solely to call the sync_public_listings RPC.
 //
 // If App Check ENFORCEMENT is later switched on for Firestore, these unauthenticated
@@ -322,6 +322,10 @@ export async function runSync({ env, fetchFn = globalThis.fetch, log = console.l
     throw new Error(`${skipped.length} approved listing(s) failed validation; sync aborted before any database change`);
   }
   if (listingDocs.length === 0 && !cfg.allowMassDelete) {
+    // Evidence only; the protection itself is NOT relaxed. The query itself succeeded (HTTP 200),
+    // so this is not a permission failure: either no document matches, or project/collection differ.
+    log(`diagnosis: Firestore project "${cfg.projectId}" answered the query on kc_listings (status == "approved") with HTTP 200 and 0 documents.`);
+    log('diagnosis: check in the Firebase console, same project: (1) FIREBASE_PROJECT_ID repository variable (empty = built-in default), (2) collection name is exactly kc_listings, (3) at least one document has status exactly "approved" (lowercase, a string), (4) the database is "(default)".');
     throw new Error('Firestore returned zero approved listings; refusing to treat this as an empty dataset (set SYNC_MASS_DELETE_CONFIRM=DELETE only if intended)');
   }
   const aggregates = buildAggregates(rows.map((r) => r.id), reviewDocs);
