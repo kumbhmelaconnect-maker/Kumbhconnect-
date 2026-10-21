@@ -38,6 +38,7 @@ jobs:
           node-version: "22"
 
       - name: Verify project files
+        shell: bash
         run: |
           set -euo pipefail
 
@@ -47,6 +48,7 @@ jobs:
 
           node -e '
             const p = require("./package.json");
+
             for (const name of [
               "@capacitor/core",
               "@capacitor/cli",
@@ -60,7 +62,7 @@ jobs:
             }
           '
 
-          echo "Required project files found."
+          echo "Required project files verified."
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -69,6 +71,7 @@ jobs:
           java-version: "21"
 
       - name: Generate package lock if missing
+        shell: bash
         run: |
           set -euo pipefail
 
@@ -91,6 +94,7 @@ jobs:
         run: npx cap sync android
 
       - name: Verify Android package ID
+        shell: bash
         run: |
           set -euo pipefail
 
@@ -100,18 +104,17 @@ jobs:
           const config = fs.readFileSync("capacitor.config.ts", "utf8");
 
           if (!/appId\s*:\s*['"]in\.kumbhconnect\.nashik['"]/.test(config)) {
-            console.error("Unexpected Capacitor appId.");
-            process.exit(1);
+            throw new Error("Unexpected Capacitor appId");
           }
 
-          console.log("Expected Capacitor appId found.");
+          console.log("Capacitor appId verified.");
           NODE
 
           test -f android/app/build.gradle
-          grep -nE 'applicationId|namespace' android/app/build.gradle || true
 
       - name: Build debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
+        shell: bash
         run: |
           set -euo pipefail
           cd android
@@ -129,6 +132,7 @@ jobs:
 
       - name: Check release signing secrets
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
         env:
           KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
           KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
@@ -137,28 +141,29 @@ jobs:
         run: |
           set -euo pipefail
 
-          [ -n "$KS_B64" ] || {
+          test -n "$KS_B64" || {
             echo "::error::TWA_KEYSTORE_BASE64 is missing"
             exit 1
           }
 
-          [ -n "$KS_PASSWORD" ] || {
+          test -n "$KS_PASSWORD" || {
             echo "::error::TWA_KEYSTORE_PASSWORD is missing"
             exit 1
           }
 
-          [ -n "$KEY_ALIAS" ] || {
-            echo "::error::Repository variable TWA_KEY_ALIAS is missing"
+          test -n "$KEY_ALIAS" || {
+            echo "::error::TWA_KEY_ALIAS repository variable is missing"
             exit 1
           }
 
-          [ -n "$KEY_PASSWORD" ] || {
+          test -n "$KEY_PASSWORD" || {
             echo "::error::TWA_KEY_PASSWORD is missing"
             exit 1
           }
 
       - name: Decode and validate release keystore
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
         env:
           KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
           KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
@@ -173,7 +178,7 @@ jobs:
 
           printf '%s' "$KS_B64" | base64 --decode > "$KS"
 
-          [ -s "$KS" ] || {
+          test -s "$KS" || {
             echo "::error::Decoded keystore is empty"
             exit 1
           }
@@ -185,10 +190,11 @@ jobs:
 
           echo "ANDROID_KEYSTORE_PATH=$KS" >> "$GITHUB_ENV"
 
-          echo "Release keystore and alias validated."
+          echo "Keystore and alias validated."
 
       - name: Configure release signing
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
         env:
           KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
@@ -198,8 +204,28 @@ jobs:
 
           FILE="android/app/build.gradle"
 
-          [ -f "$FILE" ] || {
-            echo "::error::Expected android/app/build.gradle was not generated."
+          test -f "$FILE" || {
+            echo "::error::Generated app/build.gradle not found"
+            exit 1
+          }
+
+          test -n "${ANDROID_KEYSTORE_PATH:-}" || {
+            echo "::error::Keystore path is missing"
+            exit 1
+          }
+
+          test -n "$KS_PASSWORD" || {
+            echo "::error::Keystore password is missing"
+            exit 1
+          }
+
+          test -n "$KEY_PASSWORD" || {
+            echo "::error::Key password is missing"
+            exit 1
+          }
+
+          test -n "$KEY_ALIAS" || {
+            echo "::error::Key alias is missing"
             exit 1
           }
 
@@ -211,20 +237,23 @@ jobs:
           const file = "android/app/build.gradle";
           let text = fs.readFileSync(file, "utf8");
 
-          if (text.includes("signingConfigs") &&
-              text.includes("release")) {
-            console.error(
-              "Release signing configuration already exists. Refusing to patch blindly."
+          if (!/android\s*\{/.test(text)) {
+            throw new Error("Could not find android block");
+          }
+
+          if (!/buildTypes\s*\{/.test(text) ||
+              !/release\s*\{/.test(text)) {
+            throw new Error("Could not find release build type");
+          }
+
+          if (/signingConfigs\s*\{/.test(text)) {
+            throw new Error(
+              "Signing configuration already exists; refusing to patch blindly"
             );
-            process.exit(1);
           }
 
-          const androidBlock = text.match(/android\s*\{/);
-
-          if (!androidBlock) {
-            console.error("Could not locate android { block.");
-            process.exit(1);
-          }
+          const androidMatch = text.match(/android\s*\{/);
+          const insertAt = androidMatch.index + androidMatch[0].length;
 
           const signingBlock = `
               signingConfigs {
@@ -237,19 +266,16 @@ jobs:
               }
           `;
 
-          const start = androidBlock.index + androidBlock[0].length;
-
           text =
-            text.slice(0, start) +
-            "\n" +
-            signingBlock +
-            text.slice(start);
+            text.slice(0, insertAt) +
+            "\n" + signingBlock +
+            text.slice(insertAt);
 
-          const releasePattern = /buildTypes\s*\{[\s\S]*?release\s*\{/;
+          const releasePattern =
+            /(buildTypes\s*\{[\s\S]*?release\s*\{)/;
 
           if (!releasePattern.test(text)) {
-            console.error("Could not locate release buildType.");
-            process.exit(1);
+            throw new Error("Could not patch release build type");
           }
 
           text = text.replace(
@@ -259,12 +285,15 @@ jobs:
           );
 
           fs.writeFileSync(file, text);
-
-          console.log("Release signing configuration added.");
+          console.log("Release signing configuration written.");
           NODE
+
+          cd android
+          ./gradlew help
 
       - name: Build signed Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
         run: |
           set -euo pipefail
 
@@ -275,6 +304,7 @@ jobs:
 
       - name: Verify Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
         env:
           KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
@@ -285,13 +315,13 @@ jobs:
           AAB="android/app/build/outputs/bundle/release/app-release.aab"
           KS="$ANDROID_KEYSTORE_PATH"
 
-          [ -s "$APK" ] || {
-            echo "::error::Release APK missing"
+          test -s "$APK" || {
+            echo "::error::Release APK is missing"
             exit 1
           }
 
-          [ -s "$AAB" ] || {
-            echo "::error::Release AAB missing"
+          test -s "$AAB" || {
+            echo "::error::Release AAB is missing"
             exit 1
           }
 
@@ -307,15 +337,12 @@ jobs:
             -mindepth 1 -maxdepth 1 -type d |
             sort -V | tail -1)
 
-          [ -n "$BT" ] || {
+          test -n "$BT" || {
             echo "::error::Android build-tools not found"
             exit 1
           }
 
-          "$BT/apksigner" verify --verbose "$APK" || {
-            echo "::error::APK signature verification failed"
-            exit 1
-          }
+          "$BT/apksigner" verify --verbose "$APK"
 
           KS_FP=$(
             keytool -list -v \
@@ -336,12 +363,12 @@ jobs:
             tr 'a-f' 'A-F'
           )
 
-          [ -n "$KS_FP" ] && [ "$KS_FP" = "$APK_FP" ] || {
-            echo "::error::APK signing certificate does not match the keystore"
+          test -n "$KS_FP" && test "$KS_FP" = "$APK_FP" || {
+            echo "::error::APK certificate does not match the keystore"
             exit 1
           }
 
-          echo "APK signature matches the configured release keystore."
+          echo "APK signature matches the configured keystore."
           sha256sum "$APK" "$AAB" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Release APK and AAB
@@ -357,5 +384,8 @@ jobs:
 
       - name: Remove signing material
         if: always()
+        shell: bash
         run: |
-          rm -f "$RUNNER_TEMP/android-signing/release.keystore"
+          if [ -n "${RUNNER_TEMP:-}" ]; then
+            rm -f "$RUNNER_TEMP/android-signing/release.keystore"
+          fi
