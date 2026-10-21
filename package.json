@@ -6,11 +6,13 @@
   "scripts": {
     "prepare:web": "node scripts/android/prepare-web.mjs",
     "android:sync": "npm run prepare:web && cap sync android",
-    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug"
+    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:release": "npm run android:sync && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
-    "@capacitor/core": "^7.4.3"
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/splash-screen": "^7.0.2"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
