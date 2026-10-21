@@ -16,14 +16,21 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: kumbhconnect-android-build
+  cancel-in-progress: false
+
 jobs:
   android-build:
     name: Build KumbhConnect Android
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -32,9 +39,23 @@ jobs:
 
       - name: Verify project files
         run: |
+          set -euo pipefail
           test -f package.json
           test -f capacitor.config.ts
           test -f scripts/android/prepare-web.mjs
+          node -e '
+            const p = require("./package.json");
+            for (const name of [
+              "@capacitor/core",
+              "@capacitor/cli",
+              "@capacitor/android"
+            ]) {
+              if (!p.dependencies?.[name] && !p.devDependencies?.[name]) {
+                console.error("Missing dependency:", name);
+                process.exitCode = 1;
+              }
+            }
+          '
           echo "Required project files found."
 
       - name: Set up Java
@@ -43,11 +64,15 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Generate package lock
-        run: npm install --package-lock-only --ignore-scripts
-
       - name: Install dependencies
-        run: npm ci
+        run: |
+          set -euo pipefail
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "::error::package-lock.json is missing. Commit a lockfile before using reproducible CI builds."
+            exit 1
+          fi
 
       - name: Prepare web assets
         run: npm run prepare:web
@@ -58,9 +83,17 @@ jobs:
       - name: Sync Capacitor project
         run: npx cap sync android
 
+      - name: Check Android package ID
+        run: |
+          set -euo pipefail
+          grep -n 'appId' capacitor.config.ts
+          echo "Review the generated Android namespace/applicationId before publishing."
+          grep -R -nE 'applicationId|namespace' android/app/build.gradle android/app/build.gradle.kts 2>/dev/null || true
+
       - name: Build debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         run: |
+          set -euo pipefail
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
@@ -72,52 +105,154 @@ jobs:
           name: kumbhconnect-android-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 3
 
-      - name: Decode Android signing keystore
+      - name: Check release signing secrets
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
+          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
         run: |
-          test -n "$ANDROID_KEYSTORE_BASE64" || {
-            echo "ANDROID_KEYSTORE_BASE64 secret is missing."
+          set -euo pipefail
+          [ -n "$KS_B64" ] || { echo "::error::TWA_KEYSTORE_BASE64 is missing"; exit 1; }
+          [ -n "$KS_PASSWORD" ] || { echo "::error::TWA_KEYSTORE_PASSWORD is missing"; exit 1; }
+          [ -n "$KEY_ALIAS" ] || { echo "::error::Repository variable TWA_KEY_ALIAS is missing"; exit 1; }
+          [ -n "$KEY_PASSWORD" ] || { echo "::error::TWA_KEY_PASSWORD is missing"; exit 1; }
+
+      - name: Decode and validate release keystore
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        env:
+          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
+          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/android-signing"
+          KS="$RUNNER_TEMP/android-signing/release.keystore"
+          printf '%s' "$KS_B64" | base64 --decode > "$KS"
+          [ -s "$KS" ] || { echo "::error::Decoded keystore is empty"; exit 1; }
+          keytool -list \
+            -keystore "$KS" \
+            -storepass:env KS_PASSWORD \
+            -alias "$KEY_ALIAS" >/dev/null
+          echo "ANDROID_KEYSTORE_PATH=$KS" >> "$GITHUB_ENV"
+          echo "Release keystore decoded and alias validated."
+
+      - name: Configure release signing
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        env:
+          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+
+          # The Android project is generated fresh on this runner.
+          # Configure the generated app module for release signing.
+          FILE="android/app/build.gradle"
+          [ -f "$FILE" ] || {
+            echo "::error::Expected android/app/build.gradle was not generated."
             exit 1
           }
-          mkdir -p "$RUNNER_TEMP/android-signing"
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode \
-            > "$RUNNER_TEMP/android-signing/release.keystore"
-          test -s "$RUNNER_TEMP/android-signing/release.keystore"
 
-      - name: Build signed Release AAB
+          export ANDROID_KEYSTORE_PATH KS_PASSWORD KEY_PASSWORD KEY_ALIAS
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+
+          const file = "android/app/build.gradle";
+          let text = fs.readFileSync(file, "utf8");
+
+          if (text.includes("signingConfigs") &&
+              text.includes("release")) {
+            console.error("Release signing configuration already exists. Refusing to patch blindly.");
+            process.exit(1);
+          }
+
+          const block = `
+          signingConfigs {
+              release {
+                  storeFile file(System.getenv("ANDROID_KEYSTORE_PATH"))
+                  storePassword System.getenv("KS_PASSWORD")
+                  keyAlias System.getenv("KEY_ALIAS")
+                  keyPassword System.getenv("KEY_PASSWORD")
+              }
+          }
+          `;
+
+          const androidBlock = text.match(/android\s*\{/);
+          if (!androidBlock) {
+            console.error("Could not locate android { block in app/build.gradle");
+            process.exit(1);
+          }
+
+          const start = androidBlock.index + androidBlock[0].length;
+          text = text.slice(0, start) + "\n" + block + text.slice(start);
+
+          const releaseBuildType = /buildTypes\s*\{[\s\S]*?release\s*\{/;
+          if (!releaseBuildType.test(text)) {
+            console.error("Could not locate release buildType. Refusing to guess.");
+            process.exit(1);
+          }
+
+          text = text.replace(
+            releaseBuildType,
+            match => match + "\n            signingConfig signingConfigs.release"
+          );
+
+          fs.writeFileSync(file, text);
+          console.log("Release signing configured in generated app module.");
+          NODE
+
+      - name: Build signed Release APK and AAB
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        run: |
+          set -euo pipefail
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease
+
+      - name: Verify Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         env:
-          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/android-signing/release.keystore
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
         run: |
-          test -n "$ANDROID_KEYSTORE_PASSWORD"
-          test -n "$ANDROID_KEY_ALIAS"
-          test -n "$ANDROID_KEY_PASSWORD"
+          set -euo pipefail
 
-          cd android
-          ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file="$ANDROID_KEYSTORE_PATH" \
-            -Pandroid.injected.signing.store.password="$ANDROID_KEYSTORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$ANDROID_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD"
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          KS="$ANDROID_KEYSTORE_PATH"
 
-      - name: Verify Release AAB
-        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
-        run: |
-          test -s android/app/build/outputs/bundle/release/app-release.aab
-          echo "Release AAB generated successfully."
+          [ -s "$APK" ] || { echo "::error::Release APK missing"; exit 1; }
+          [ -s "$AAB" ] || { echo "::error::Release AAB missing"; exit 1; }
 
-      - name: Upload Release AAB
+          unzip -tq "$APK"
+          unzip -tq "$AAB"
+          jarsigner -verify "$AAB" >/dev/null
+
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          [ -n "$BT" ] || { echo "::error::Android build-tools not found"; exit 1; }
+
+          "$BT/apksigner" verify --verbose "$APK"
+
+          echo "Release APK and AAB exist and signature checks passed."
+          sha256sum "$APK" "$AAB" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
         with:
-          name: kumbhconnect-android-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: kumbhconnect-android-release
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 3
+
+      - name: Remove signing material
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/android-signing/release.keystore"
