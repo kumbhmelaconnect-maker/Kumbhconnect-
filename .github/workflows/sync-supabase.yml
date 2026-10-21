@@ -1,0 +1,58 @@
+name: Sync public listings to Supabase
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Read Firestore and validate, but do not contact Supabase"
+        type: boolean
+        default: true
+      confirm_mass_delete:
+        description: "Type DELETE to allow removing more than half of the replica rows (or all of them). Leave empty normally."
+        type: string
+        default: ""
+        required: false
+  # Optional schedule: only runs if repository variable SUPABASE_SYNC_SCHEDULE_ENABLED == 'true'
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-supabase
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.event_name == 'workflow_dispatch' || vars.SUPABASE_SYNC_SCHEDULE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false   # sync needs no git push; do not leave the token in .git/config
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Tests gate (no network, no secrets)
+        run: node --test "tests/supabase/*.test.js"
+
+      # Dry run: Supabase secrets are NOT exposed to this step at all.
+      - name: Sync (dry run - Firestore read only, no Supabase secrets)
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        env:
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          SYNC_DRY_RUN: "true"
+        run: node scripts/sync/sync-listings.mjs
+
+      # Live run: scheduled runs, or manual runs with dry_run unchecked.
+      - name: Sync (live)
+        if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          SYNC_DRY_RUN: "false"
+          SYNC_MASS_DELETE_CONFIRM: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_mass_delete || '' }}
+        run: node scripts/sync/sync-listings.mjs
