@@ -1,14 +1,24 @@
-name: KumbhConnect Android Debug Build
+name: KumbhConnect Android Build
 
 on:
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Select Android build type"
+        required: true
+        default: "debug"
+        type: choice
+        options:
+          - debug
+          - release
+          - both
 
 permissions:
   contents: read
 
 jobs:
-  android-debug:
-    name: Build KumbhConnect Android APK
+  android-build:
+    name: Build KumbhConnect Android
     runs-on: ubuntu-latest
 
     steps:
@@ -18,21 +28,20 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Verify project files
         run: |
-          echo "Checking required project files..."
           test -f package.json
           test -f capacitor.config.ts
           test -f scripts/android/prepare-web.mjs
-          echo "Required files found."
+          echo "Required project files found."
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
 
       - name: Generate package lock
         run: npm install --package-lock-only --ignore-scripts
@@ -50,15 +59,65 @@ jobs:
         run: npx cap sync android
 
       - name: Build debug APK
+        if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload debug APK
+        if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
         with:
           name: kumbhconnect-android-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Decode Android signing keystore
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64" || {
+            echo "ANDROID_KEYSTORE_BASE64 secret is missing."
+            exit 1
+          }
+          mkdir -p "$RUNNER_TEMP/android-signing"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode \
+            > "$RUNNER_TEMP/android-signing/release.keystore"
+          test -s "$RUNNER_TEMP/android-signing/release.keystore"
+
+      - name: Build signed Release AAB
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/android-signing/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+
+          cd android
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file="$ANDROID_KEYSTORE_PATH" \
+            -Pandroid.injected.signing.store.password="$ANDROID_KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD"
+
+      - name: Verify Release AAB
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        run: |
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          echo "Release AAB generated successfully."
+
+      - name: Upload Release AAB
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: kumbhconnect-android-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 7
