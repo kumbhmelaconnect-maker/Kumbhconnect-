@@ -33,16 +33,17 @@ jobs:
       APP_VERSION_CODE: "5"
 
     steps:
-      # 1. Checkout source
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # 2. Setup Node.js
+      # npm cache disabled because package-lock.json
+      # may not exist in the repository yet.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       # 3. Setup Java
       - name: Setup Java
@@ -51,7 +52,7 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      # 4. Verify project files and dependencies
+      # 4. Verify project files
       - name: Verify project files
         shell: bash
         run: |
@@ -86,28 +87,45 @@ jobs:
           console.log('Project dependencies verified.');
           NODE
 
-      # 5. Create lockfile only if missing
+      # 5. Generate lock file if missing
       - name: Generate package lock if missing
         if: ${{ hashFiles('package-lock.json') == '' }}
-        run: npm install --package-lock-only --ignore-scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts
+
+          test -s package-lock.json
 
       # 6. Install dependencies
       - name: Install dependencies
-        run: npm ci
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
 
       # 7. Prepare web assets
       - name: Prepare web assets
-        run: node scripts/android/prepare-web.mjs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/android/prepare-web.mjs
 
       # 8. Add Android platform
       - name: Add Android platform
-        run: npx cap add android
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx cap add android
 
       # 9. Sync Capacitor
       - name: Sync Capacitor
-        run: npx cap sync android
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx cap sync android
 
-      # 10. Set Android version
+      # 10. Configure Android version
       - name: Set Android app version
         shell: bash
         run: |
@@ -307,13 +325,10 @@ jobs:
           test -s app/build/outputs/apk/release/app-release.apk
           test -s app/build/outputs/bundle/release/app-release.aab
 
-      # 16. Verify release artifacts and signatures
+      # 16. Verify Release APK and AAB
       - name: Verify Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
         run: |
           set -euo pipefail
 
