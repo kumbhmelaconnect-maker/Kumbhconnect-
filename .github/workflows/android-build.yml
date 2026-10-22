@@ -30,42 +30,28 @@ jobs:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
       APP_VERSION: "1.3.0"
-
-      # IMPORTANT:
-      # Set this higher than the versionCode of the
-      # previously accepted Indus Appstore APK/AAB.
-      APP_VERSION_CODE: "131"
-
-      ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/android-signing/release.keystore
+      APP_VERSION_CODE: "5"
 
     steps:
-      # --------------------------------------------------
-      # 1. Checkout repository
-      # --------------------------------------------------
+      # 1. Checkout source
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --------------------------------------------------
-      # 2. Install Node.js
-      # --------------------------------------------------
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
 
-      # --------------------------------------------------
-      # 3. Install Java
-      # --------------------------------------------------
+      # 3. Setup Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      # --------------------------------------------------
-      # 4. Verify project files
-      # --------------------------------------------------
+      # 4. Verify project files and dependencies
       - name: Verify project files
         shell: bash
         run: |
@@ -82,76 +68,50 @@ jobs:
             fs.readFileSync('package.json', 'utf8')
           );
 
-          const required = [
-            '@capacitor/core',
-            '@capacitor/cli',
-            '@capacitor/android'
-          ];
-
-          const deps = {
+          const dependencies = {
             ...pkg.dependencies,
             ...pkg.devDependencies
           };
 
-          for (const name of required) {
-            if (!deps[name]) {
-              throw new Error(
-                `Missing required dependency: ${name}`
-              );
+          for (const name of [
+            '@capacitor/core',
+            '@capacitor/cli',
+            '@capacitor/android'
+          ]) {
+            if (!dependencies[name]) {
+              throw new Error(`Missing dependency: ${name}`);
             }
           }
 
-          console.log('Package:', pkg.name ?? '(unnamed)');
-          console.log('Package version:', pkg.version ?? '(unset)');
-          console.log('Required Capacitor dependencies verified.');
+          console.log('Project dependencies verified.');
           NODE
 
-          echo "Project files verified."
-
-      # --------------------------------------------------
-      # 5. Ensure lockfile exists
-      # --------------------------------------------------
+      # 5. Create lockfile only if missing
       - name: Generate package lock if missing
         if: ${{ hashFiles('package-lock.json') == '' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --package-lock-only --ignore-scripts
+        run: npm install --package-lock-only --ignore-scripts
 
-      # --------------------------------------------------
       # 6. Install dependencies
-      # --------------------------------------------------
       - name: Install dependencies
         run: npm ci
 
-      # --------------------------------------------------
       # 7. Prepare web assets
-      # --------------------------------------------------
       - name: Prepare web assets
         run: node scripts/android/prepare-web.mjs
 
-      # --------------------------------------------------
       # 8. Add Android platform
-      # --------------------------------------------------
       - name: Add Android platform
         run: npx cap add android
 
-      # --------------------------------------------------
       # 9. Sync Capacitor
-      # --------------------------------------------------
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # --------------------------------------------------
-      # 10. Configure Android version
-      # --------------------------------------------------
+      # 10. Set Android version
       - name: Set Android app version
         shell: bash
         run: |
           set -euo pipefail
-
-          FILE="android/app/build.gradle"
-          test -f "$FILE"
 
           python3 <<'PY'
           import os
@@ -159,19 +119,22 @@ jobs:
           from pathlib import Path
 
           path = Path("android/app/build.gradle")
+
+          if not path.is_file():
+              raise SystemExit(
+                  "ERROR: android/app/build.gradle not found."
+              )
+
           text = path.read_text()
 
           version_code = int(os.environ["APP_VERSION_CODE"])
           version_name = os.environ["APP_VERSION"]
 
-          if version_code < 1:
-              raise SystemExit("ERROR: versionCode must be positive.")
-
           match = re.search(r'\bdefaultConfig\s*\{', text)
 
           if not match:
               raise SystemExit(
-                  "ERROR: defaultConfig block not found in build.gradle"
+                  "ERROR: defaultConfig block not found."
               )
 
           start = match.end()
@@ -185,7 +148,7 @@ jobs:
                   depth -= 1
               i += 1
 
-          if depth != 0:
+          if depth:
               raise SystemExit(
                   "ERROR: defaultConfig block is incomplete."
               )
@@ -214,16 +177,11 @@ jobs:
           text = text[:start] + block + text[i - 1:]
           path.write_text(text)
 
-          print(f"Android versionName: {version_name}")
-          print(f"Android versionCode: {version_code}")
+          print(f"Version name: {version_name}")
+          print(f"Version code: {version_code}")
           PY
 
-          echo "Configured Android version:"
-          grep -A 12 'defaultConfig {' "$FILE"
-
-      # --------------------------------------------------
       # 11. Verify generated Android project
-      # --------------------------------------------------
       - name: Verify generated Android project
         shell: bash
         run: |
@@ -235,17 +193,18 @@ jobs:
 
           chmod +x android/gradlew
 
-          grep -q 'in.kumbhconnect.nashik' \
+          grep -Fq 'in.kumbhconnect.nashik' \
             android/app/build.gradle
 
-          grep -q 'versionCode 131' \
+          grep -Eq 'versionCode[[:space:]]+5([[:space:]]|$)' \
             android/app/build.gradle
 
-          echo "Generated Android project verified."
+          grep -Fq 'versionName "1.3.0"' \
+            android/app/build.gradle
 
-      # --------------------------------------------------
+          echo "Android project and version verified."
+
       # 12. Build Debug APK
-      # --------------------------------------------------
       - name: Build Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         shell: bash
@@ -257,9 +216,7 @@ jobs:
 
           test -s app/build/outputs/apk/debug/app-debug.apk
 
-      # --------------------------------------------------
       # 13. Upload Debug APK
-      # --------------------------------------------------
       - name: Upload Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -269,9 +226,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # --------------------------------------------------
       # 14. Prepare release signing
-      # --------------------------------------------------
       - name: Prepare release signing
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -294,7 +249,7 @@ jobs:
           }
 
           test -n "$KEY_ALIAS" || {
-            echo "ERROR: TWA_KEY_ALIAS repository variable is missing."
+            echo "ERROR: TWA_KEY_ALIAS variable is missing."
             exit 1
           }
 
@@ -302,6 +257,8 @@ jobs:
             echo "ERROR: TWA_KEY_PASSWORD secret is missing."
             exit 1
           }
+
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/android-signing/release.keystore"
 
           mkdir -p "$(dirname "$ANDROID_KEYSTORE_PATH")"
 
@@ -319,11 +276,9 @@ jobs:
           echo "ANDROID_KEYSTORE_PATH=$ANDROID_KEYSTORE_PATH" \
             >> "$GITHUB_ENV"
 
-          echo "Release keystore verified."
+          echo "Release signing key verified."
 
-      # --------------------------------------------------
       # 15. Build signed Release APK and AAB
-      # --------------------------------------------------
       - name: Build signed Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -352,9 +307,7 @@ jobs:
           test -s app/build/outputs/apk/release/app-release.apk
           test -s app/build/outputs/bundle/release/app-release.aab
 
-      # --------------------------------------------------
-      # 16. Verify release artifacts
-      # --------------------------------------------------
+      # 16. Verify release artifacts and signatures
       - name: Verify Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -374,24 +327,12 @@ jobs:
           unzip -t "$AAB" >/dev/null
 
           jarsigner -verify "$AAB"
-
           apksigner verify --verbose "$APK"
 
-          echo "Release APK and AAB passed basic integrity checks."
+          echo "Release artifacts verified."
+          ls -lh "$APK" "$AAB"
 
-          echo "APK details:"
-          ls -lh "$APK"
-
-          echo "AAB details:"
-          ls -lh "$AAB"
-
-          echo "Configured app ID: $APP_ID"
-          echo "Configured version name: $APP_VERSION"
-          echo "Configured version code: $APP_VERSION_CODE"
-
-      # --------------------------------------------------
       # 17. Upload Release APK
-      # --------------------------------------------------
       - name: Upload Release APK
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -401,9 +342,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # --------------------------------------------------
       # 18. Upload Release AAB
-      # --------------------------------------------------
       - name: Upload Release AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -413,17 +352,13 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # --------------------------------------------------
-      # 19. Clean up signing key
-      # --------------------------------------------------
+      # 19. Clean up temporary signing key
       - name: Clean up signing key
         if: ${{ always() && (inputs.build_type == 'release' || inputs.build_type == 'both') }}
         shell: bash
+        env:
+          SIGNING_DIR: ${{ runner.temp }}/android-signing
         run: |
           set -euo pipefail
-
-          if [ -n "${ANDROID_KEYSTORE_PATH:-}" ]; then
-            rm -f "$ANDROID_KEYSTORE_PATH"
-          fi
-
-          echo "Temporary signing key cleanup completed."
+          rm -rf "$SIGNING_DIR"
+          echo "Temporary signing files removed."
