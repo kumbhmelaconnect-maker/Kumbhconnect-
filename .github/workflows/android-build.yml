@@ -1,4 +1,4 @@
-name: KumbhConnect Android Build
+name: Build KumbhConnect Android
 
 on:
   workflow_dispatch:
@@ -7,22 +7,22 @@ on:
         description: "Select Android build type"
         required: true
         type: choice
-        default: release
         options:
           - debug
           - release
           - both
+        default: release
 
 permissions:
   contents: read
 
 concurrency:
-  group: kumbhconnect-android-build
-  cancel-in-progress: false
+  group: kumbhconnect-android-build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-android:
-    name: Build KumbhConnect Android
+  build:
+    name: Build Android App
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -30,29 +30,41 @@ jobs:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
       APP_VERSION: "1.3.0"
+      # IMPORTANT: Set this higher than the previously accepted
+      # Android app versionCode on Indus Appstore.
       APP_VERSION_CODE: "5"
 
     steps:
-      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
-      # npm cache disabled because package-lock.json
-      # may not exist in the repository yet.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      # 3. Setup Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
+          cache: gradle
 
-      # 4. Verify project files
+      - name: Locate Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+
+          if [ -z "$SDK" ] || [ ! -d "$SDK" ]; then
+            echo "::error::Android SDK directory was not found."
+            exit 1
+          fi
+
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "Android SDK found."
+
       - name: Verify project files
         shell: bash
         run: |
@@ -62,97 +74,115 @@ jobs:
           test -f capacitor.config.ts
           test -f scripts/android/prepare-web.mjs
 
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-
-          const pkg = JSON.parse(
-            fs.readFileSync('package.json', 'utf8')
-          );
-
-          const dependencies = {
-            ...pkg.dependencies,
-            ...pkg.devDependencies
-          };
-
-          for (const name of [
-            '@capacitor/core',
-            '@capacitor/cli',
-            '@capacitor/android'
-          ]) {
-            if (!dependencies[name]) {
-              throw new Error(`Missing dependency: ${name}`);
+          node -e "
+            const p = require('./package.json');
+            for (const d of [
+              '@capacitor/core',
+              '@capacitor/cli',
+              '@capacitor/android'
+            ]) {
+              if (!(p.dependencies?.[d] || p.devDependencies?.[d])) {
+                console.error('Missing dependency:', d);
+                process.exitCode = 1;
+              }
             }
-          }
+          "
 
-          console.log('Project dependencies verified.');
-          NODE
+          echo "Project files verified."
 
-      # 5. Generate lock file if missing
-      - name: Generate package lock if missing
-        if: ${{ hashFiles('package-lock.json') == '' }}
+      - name: Ensure npm lock file exists
         shell: bash
         run: |
           set -euo pipefail
-          npm install --package-lock-only --ignore-scripts
 
-          test -s package-lock.json
+          if [ ! -f package-lock.json ] &&
+             [ ! -f npm-shrinkwrap.json ] &&
+             [ ! -f yarn.lock ]; then
+            echo "No lock file found. Generating package-lock.json."
+            npm install --package-lock-only --ignore-scripts
+          fi
 
-      # 6. Install dependencies
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            echo "npm lock file found."
+          elif [ -f yarn.lock ]; then
+            echo "::error::This workflow uses npm; yarn.lock alone is not supported."
+            exit 1
+          fi
+
       - name: Install dependencies
         shell: bash
         run: |
           set -euo pipefail
-          npm ci
 
-      # 7. Prepare web assets
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            npm ci
+          else
+            echo "::error::npm lock file is missing."
+            exit 1
+          fi
+
       - name: Prepare web assets
         shell: bash
         run: |
           set -euo pipefail
           node scripts/android/prepare-web.mjs
 
-      # 8. Add Android platform
+      - name: Verify web assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -d www ]; then
+            echo "::error::The www directory was not generated."
+            exit 1
+          fi
+
+          if [ ! -f www/index.html ]; then
+            echo "::error::www/index.html is missing."
+            exit 1
+          fi
+
       - name: Add Android platform
         shell: bash
         run: |
           set -euo pipefail
           npx cap add android
 
-      # 9. Sync Capacitor
       - name: Sync Capacitor
         shell: bash
         run: |
           set -euo pipefail
           npx cap sync android
 
-      # 10. Configure Android version
-      - name: Set Android app version
+      - name: Configure Android version
         shell: bash
+        env:
+          VERSION_NAME: ${{ env.APP_VERSION }}
+          VERSION_CODE: ${{ env.APP_VERSION_CODE }}
         run: |
           set -euo pipefail
 
-          python3 <<'PY'
+          FILE="android/app/build.gradle"
+          test -f "$FILE"
+
+          python3 - <<'PY'
           import os
           import re
           from pathlib import Path
 
           path = Path("android/app/build.gradle")
-
-          if not path.is_file():
-              raise SystemExit(
-                  "ERROR: android/app/build.gradle not found."
-              )
-
           text = path.read_text()
 
-          version_code = int(os.environ["APP_VERSION_CODE"])
-          version_name = os.environ["APP_VERSION"]
+          version_code = int(os.environ["VERSION_CODE"])
+          version_name = os.environ["VERSION_NAME"]
+
+          if version_code < 1:
+              raise SystemExit("ERROR: VERSION_CODE must be positive.")
 
           match = re.search(r'\bdefaultConfig\s*\{', text)
-
           if not match:
               raise SystemExit(
-                  "ERROR: defaultConfig block not found."
+                  "ERROR: defaultConfig block not found in build.gradle."
               )
 
           start = match.end()
@@ -167,62 +197,47 @@ jobs:
               i += 1
 
           if depth:
-              raise SystemExit(
-                  "ERROR: defaultConfig block is incomplete."
-              )
+              raise SystemExit("ERROR: defaultConfig block is incomplete.")
 
           block = text[start:i - 1]
 
           block = re.sub(
-              r'(?m)^[ \t]*versionCode\s+.*(?:\n|$)',
+              r'(?m)^\s*versionCode\s+.*$',
               '',
               block
           )
-
           block = re.sub(
-              r'(?m)^[ \t]*versionName\s+.*(?:\n|$)',
+              r'(?m)^\s*versionName\s+.*$',
               '',
               block
           )
 
-          version_lines = (
+          block = (
               f'\n        versionCode {version_code}\n'
               f'        versionName "{version_name}"\n'
+              + block
           )
-
-          block = version_lines + block
 
           text = text[:start] + block + text[i - 1:]
           path.write_text(text)
 
-          print(f"Version name: {version_name}")
-          print(f"Version code: {version_code}")
+          print(f"Android versionName: {version_name}")
+          print(f"Android versionCode: {version_code}")
           PY
 
-      # 11. Verify generated Android project
       - name: Verify generated Android project
         shell: bash
         run: |
           set -euo pipefail
 
           test -f android/gradlew
-          test -f android/settings.gradle
           test -f android/app/build.gradle
 
           chmod +x android/gradlew
 
-          grep -Fq 'in.kumbhconnect.nashik' \
-            android/app/build.gradle
+          grep -nE 'versionCode|versionName|applicationId' \
+            android/app/build.gradle || true
 
-          grep -Eq 'versionCode[[:space:]]+5([[:space:]]|$)' \
-            android/app/build.gradle
-
-          grep -Fq 'versionName "1.3.0"' \
-            android/app/build.gradle
-
-          echo "Android project and version verified."
-
-      # 12. Build Debug APK
       - name: Build Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         shell: bash
@@ -234,7 +249,6 @@ jobs:
 
           test -s app/build/outputs/apk/debug/app-debug.apk
 
-      # 13. Upload Debug APK
       - name: Upload Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -244,8 +258,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # 14. Prepare release signing
-      - name: Prepare release signing
+      - name: Decode release keystore
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
         env:
@@ -256,47 +269,27 @@ jobs:
         run: |
           set -euo pipefail
 
-          test -n "$KEYSTORE_BASE64" || {
-            echo "ERROR: TWA_KEYSTORE_BASE64 secret is missing."
-            exit 1
-          }
+          test -n "$KEYSTORE_BASE64"
+          test -n "$KEYSTORE_PASSWORD"
+          test -n "$KEY_ALIAS"
+          test -n "$KEY_PASSWORD"
 
-          test -n "$KEYSTORE_PASSWORD" || {
-            echo "ERROR: TWA_KEYSTORE_PASSWORD secret is missing."
-            exit 1
-          }
+          KEYSTORE_PATH="$RUNNER_TEMP/kumbhconnect-release.keystore"
 
-          test -n "$KEY_ALIAS" || {
-            echo "ERROR: TWA_KEY_ALIAS variable is missing."
-            exit 1
-          }
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode \
+            > "$KEYSTORE_PATH"
 
-          test -n "$KEY_PASSWORD" || {
-            echo "ERROR: TWA_KEY_PASSWORD secret is missing."
-            exit 1
-          }
-
-          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/android-signing/release.keystore"
-
-          mkdir -p "$(dirname "$ANDROID_KEYSTORE_PATH")"
-
-          printf '%s' "$KEYSTORE_BASE64" \
-            | base64 --decode > "$ANDROID_KEYSTORE_PATH"
-
-          test -s "$ANDROID_KEYSTORE_PATH"
-          chmod 600 "$ANDROID_KEYSTORE_PATH"
+          test -s "$KEYSTORE_PATH"
 
           keytool -list \
-            -keystore "$ANDROID_KEYSTORE_PATH" \
+            -keystore "$KEYSTORE_PATH" \
             -storepass "$KEYSTORE_PASSWORD" \
-            -alias "$KEY_ALIAS"
+            -alias "$KEY_ALIAS" >/dev/null
 
-          echo "ANDROID_KEYSTORE_PATH=$ANDROID_KEYSTORE_PATH" \
-            >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
 
-          echo "Release signing key verified."
+          echo "Release keystore validated."
 
-      # 15. Build signed Release APK and AAB
       - name: Build signed Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -314,9 +307,7 @@ jobs:
 
           cd android
 
-          ./gradlew --no-daemon \
-            assembleRelease \
-            bundleRelease \
+          ./gradlew --no-daemon assembleRelease bundleRelease \
             "-Pandroid.injected.signing.store.file=$ANDROID_KEYSTORE_PATH" \
             "-Pandroid.injected.signing.store.password=$ANDROID_KEYSTORE_PASSWORD" \
             "-Pandroid.injected.signing.key.alias=$ANDROID_KEY_ALIAS" \
@@ -325,10 +316,32 @@ jobs:
           test -s app/build/outputs/apk/release/app-release.apk
           test -s app/build/outputs/bundle/release/app-release.aab
 
-      # 16. Verify Release APK and AAB
-      - name: Verify Release APK and AAB
+      - name: Locate and verify APK signer
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
+        run: |
+          set -euo pipefail
+
+          SDK="$ANDROID_SDK_ROOT"
+
+          APKSIGNER="$(find "$SDK/build-tools" \
+            -type f -name apksigner -print 2>/dev/null |
+            sort -V | tail -n 1)"
+
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::apksigner was not found in Android SDK Build Tools."
+            exit 1
+          fi
+
+          echo "APKSIGNER=$APKSIGNER" >> "$GITHUB_ENV"
+          "$APKSIGNER" version
+
+      - name: Verify release artifacts and signatures
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
         run: |
           set -euo pipefail
 
@@ -338,42 +351,56 @@ jobs:
           test -s "$APK"
           test -s "$AAB"
 
+          echo "Checking APK ZIP integrity..."
           unzip -t "$APK" >/dev/null
+
+          echo "Checking AAB ZIP integrity..."
           unzip -t "$AAB" >/dev/null
 
+          echo "Verifying APK signature..."
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+
+          echo "Verifying AAB signature..."
           jarsigner -verify "$AAB"
-          apksigner verify --verbose "$APK"
 
-          echo "Release artifacts verified."
-          ls -lh "$APK" "$AAB"
+          echo "Release artifacts passed signature checks."
 
-      # 17. Upload Release APK
-      - name: Upload Release APK
+      - name: Report artifact details
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: KumbhConnect-Release-APK
-          path: android/app/build/outputs/apk/release/app-release.apk
-          if-no-files-found: error
-          retention-days: 14
-
-      # 18. Upload Release AAB
-      - name: Upload Release AAB
-        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: KumbhConnect-Release-AAB
-          path: android/app/build/outputs/bundle/release/app-release.aab
-          if-no-files-found: error
-          retention-days: 14
-
-      # 19. Clean up temporary signing key
-      - name: Clean up signing key
-        if: ${{ always() && (inputs.build_type == 'release' || inputs.build_type == 'both') }}
         shell: bash
-        env:
-          SIGNING_DIR: ${{ runner.temp }}/android-signing
         run: |
           set -euo pipefail
-          rm -rf "$SIGNING_DIR"
-          echo "Temporary signing files removed."
+
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+
+          echo "=== APK ==="
+          ls -lh "$APK"
+          sha256sum "$APK"
+
+          echo "=== AAB ==="
+          ls -lh "$AAB"
+          sha256sum "$AAB"
+
+      - name: Upload Release APK and AAB
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: KumbhConnect-Release-APK-AAB
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Cleanup signing keystore
+        if: ${{ always() && (inputs.build_type == 'release' || inputs.build_type == 'both') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "${ANDROID_KEYSTORE_PATH:-}" ] &&
+             [ -f "$ANDROID_KEYSTORE_PATH" ]; then
+            rm -f "$ANDROID_KEYSTORE_PATH"
+            echo "Temporary keystore removed."
+          fi
