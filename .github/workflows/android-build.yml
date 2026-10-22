@@ -29,10 +29,17 @@ jobs:
     env:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
-      APP_VERSION: "1.3.0"
-      # IMPORTANT: Set this higher than the previously accepted
-      # Android app versionCode on Indus Appstore.
-      APP_VERSION_CODE: "5"
+      APP_VERSION: "1.3.1"
+      # IMPORTANT: Must be higher than the previously accepted
+      # versionCode on Indus Appstore.
+      APP_VERSION_CODE: "8"
+      # Indus Appstore already has a build with a higher target SDK,
+      # so we target Android 16 (API 36).
+      TARGET_SDK: "36"
+      COMPILE_SDK: "36"
+      # AGP 8.9.1+ is needed for API 36 (requires Gradle 8.11.1+).
+      AGP_VERSION: "8.9.1"
+      MIN_GRADLE_VERSION: "8.11.1"
 
     steps:
       - name: Checkout repository
@@ -48,7 +55,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-          
 
       - name: Locate Android SDK
         shell: bash
@@ -64,6 +70,26 @@ jobs:
 
           echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
           echo "Android SDK found."
+
+      - name: Install Android SDK platform and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SDKMANAGER="$(find "$ANDROID_SDK_ROOT/cmdline-tools" \
+            -type f -name sdkmanager -print 2>/dev/null |
+            sort -V | tail -n 1)"
+
+          if [ -z "$SDKMANAGER" ]; then
+            echo "::error::sdkmanager was not found."
+            exit 1
+          fi
+
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+
+          "$SDKMANAGER" \
+            "platforms;android-${COMPILE_SDK}" \
+            "build-tools;${COMPILE_SDK}.0.0"
 
       - name: Verify project files
         shell: bash
@@ -153,6 +179,74 @@ jobs:
         run: |
           set -euo pipefail
           npx cap sync android
+
+      - name: Configure target SDK, AGP and Gradle
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          target = os.environ["TARGET_SDK"]
+          compile_sdk = os.environ["COMPILE_SDK"]
+          agp = os.environ["AGP_VERSION"]
+          min_gradle = os.environ["MIN_GRADLE_VERSION"]
+
+          def ver(s):
+              return tuple(int(x) for x in s.split("."))
+
+          # 1) compileSdk / targetSdk in variables.gradle
+          p = Path("android/variables.gradle")
+          if not p.exists():
+              raise SystemExit("ERROR: android/variables.gradle not found.")
+          t = p.read_text()
+          t, n1 = re.subn(
+              r'(compileSdkVersion\s*=\s*)\d+',
+              r'\g<1>' + compile_sdk, t)
+          t, n2 = re.subn(
+              r'(targetSdkVersion\s*=\s*)\d+',
+              r'\g<1>' + target, t)
+          if n1 != 1 or n2 != 1:
+              raise SystemExit(
+                  "ERROR: compileSdkVersion/targetSdkVersion "
+                  "not found in variables.gradle.")
+          p.write_text(t)
+          print(f"compileSdk={compile_sdk}, targetSdk={target}")
+
+          # 2) Android Gradle Plugin version
+          p = Path("android/build.gradle")
+          t = p.read_text()
+          m = re.search(
+              r'(com\.android\.tools\.build:gradle:)(\d+(?:\.\d+)*)', t)
+          if not m:
+              raise SystemExit("ERROR: AGP classpath not found.")
+          if ver(m.group(2)) < ver(agp):
+              t = t.replace(m.group(0), m.group(1) + agp)
+              p.write_text(t)
+              print(f"AGP {m.group(2)} -> {agp}")
+          else:
+              print(f"AGP {m.group(2)} already >= {agp}")
+
+          # 3) Gradle wrapper must satisfy AGP requirement
+          p = Path("android/gradle/wrapper/gradle-wrapper.properties")
+          t = p.read_text()
+          m = re.search(r'gradle-(\d+(?:\.\d+)*)-(bin|all)\.zip', t)
+          if not m:
+              raise SystemExit("ERROR: Gradle wrapper version not found.")
+          if ver(m.group(1)) < ver(min_gradle):
+              t = t.replace(
+                  m.group(0), f"gradle-{min_gradle}-{m.group(2)}.zip")
+              p.write_text(t)
+              print(f"Gradle {m.group(1)} -> {min_gradle}")
+          else:
+              print(f"Gradle {m.group(1)} already >= {min_gradle}")
+          PY
+
+          grep -nE 'compileSdkVersion|targetSdkVersion|minSdkVersion' \
+            android/variables.gradle
 
       - name: Configure Android version
         shell: bash
@@ -364,6 +458,38 @@ jobs:
           jarsigner -verify "$AAB"
 
           echo "Release artifacts passed signature checks."
+
+      - name: Verify versionCode, versionName and target SDK
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+
+          AAPT2="$(find "$ANDROID_SDK_ROOT/build-tools" \
+            -type f -name aapt2 -print 2>/dev/null |
+            sort -V | tail -n 1)"
+
+          if [ -z "$AAPT2" ]; then
+            echo "::error::aapt2 was not found in Android SDK Build Tools."
+            exit 1
+          fi
+
+          BADGING="$("$AAPT2" dump badging "$APK")"
+
+          echo "$BADGING" | grep -E "^package:|^sdkVersion|^targetSdkVersion"
+
+          echo "$BADGING" | grep -q "name='${APP_ID}'" || {
+            echo "::error::Unexpected package name."; exit 1; }
+          echo "$BADGING" | grep -q "versionCode='${APP_VERSION_CODE}'" || {
+            echo "::error::versionCode mismatch."; exit 1; }
+          echo "$BADGING" | grep -q "versionName='${APP_VERSION}'" || {
+            echo "::error::versionName mismatch."; exit 1; }
+          echo "$BADGING" | grep -q "targetSdkVersion:'${TARGET_SDK}'" || {
+            echo "::error::targetSdkVersion is not ${TARGET_SDK}."; exit 1; }
+
+          echo "Version and target SDK verified."
 
       - name: Report artifact details
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
