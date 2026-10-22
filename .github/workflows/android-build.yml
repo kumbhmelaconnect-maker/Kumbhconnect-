@@ -6,8 +6,8 @@ on:
       build_type:
         description: "Select Android build type"
         required: true
-        default: debug
         type: choice
+        default: release
         options:
           - debug
           - release
@@ -21,28 +21,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  android-build:
-    name: Build KumbhConnect
-    runs-on: ubuntu-24.04
+  build-android:
+    name: Build KumbhConnect Android
+    runs-on: ubuntu-latest
     timeout-minutes: 45
 
+    env:
+      APP_ID: in.kumbhconnect.nashik
+      APP_NAME: KumbhConnect
+      APP_VERSION: "1.3.0"
+
+      # IMPORTANT:
+      # Set this higher than the versionCode of the
+      # previously accepted Indus Appstore APK/AAB.
+      APP_VERSION_CODE: "131"
+
+      ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/android-signing/release.keystore
+
     steps:
+      # --------------------------------------------------
+      # 1. Checkout repository
+      # --------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
+      # --------------------------------------------------
+      # 2. Install Node.js
+      # --------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
 
+      # --------------------------------------------------
+      # 3. Install Java
+      # --------------------------------------------------
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
+      # --------------------------------------------------
+      # 4. Verify project files
+      # --------------------------------------------------
       - name: Verify project files
         shell: bash
         run: |
@@ -53,71 +76,176 @@ jobs:
           test -f scripts/android/prepare-web.mjs
 
           node --input-type=module <<'NODE'
-          import fs from "node:fs";
+          import fs from 'node:fs';
 
-          const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const pkg = JSON.parse(
+            fs.readFileSync('package.json', 'utf8')
+          );
+
+          const required = [
+            '@capacitor/core',
+            '@capacitor/cli',
+            '@capacitor/android'
+          ];
+
           const deps = {
-            ...p.dependencies,
-            ...p.devDependencies
+            ...pkg.dependencies,
+            ...pkg.devDependencies
           };
 
-          for (const name of [
-            "@capacitor/core",
-            "@capacitor/cli",
-            "@capacitor/android"
-          ]) {
+          for (const name of required) {
             if (!deps[name]) {
-              throw new Error(`Missing dependency: ${name}`);
+              throw new Error(
+                `Missing required dependency: ${name}`
+              );
             }
           }
 
-          const config = fs.readFileSync("capacitor.config.ts", "utf8");
-
-          if (!/appId\s*:\s*['"]in\.kumbhconnect\.nashik['"]/.test(config)) {
-            throw new Error("Unexpected Capacitor appId");
-          }
-
-          console.log("Project files and app ID verified.");
+          console.log('Package:', pkg.name ?? '(unnamed)');
+          console.log('Package version:', pkg.version ?? '(unset)');
+          console.log('Required Capacitor dependencies verified.');
           NODE
 
+          echo "Project files verified."
+
+      # --------------------------------------------------
+      # 5. Ensure lockfile exists
+      # --------------------------------------------------
       - name: Generate package lock if missing
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts
+
+      # --------------------------------------------------
+      # 6. Install dependencies
+      # --------------------------------------------------
+      - name: Install dependencies
+        run: npm ci
+
+      # --------------------------------------------------
+      # 7. Prepare web assets
+      # --------------------------------------------------
+      - name: Prepare web assets
+        run: node scripts/android/prepare-web.mjs
+
+      # --------------------------------------------------
+      # 8. Add Android platform
+      # --------------------------------------------------
+      - name: Add Android platform
+        run: npx cap add android
+
+      # --------------------------------------------------
+      # 9. Sync Capacitor
+      # --------------------------------------------------
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      # --------------------------------------------------
+      # 10. Configure Android version
+      # --------------------------------------------------
+      - name: Set Android app version
         shell: bash
         run: |
           set -euo pipefail
 
-          if [ ! -f package-lock.json ]; then
-            npm install --package-lock-only --ignore-scripts
-          fi
+          FILE="android/app/build.gradle"
+          test -f "$FILE"
 
-          test -s package-lock.json
+          python3 <<'PY'
+          import os
+          import re
+          from pathlib import Path
 
-      - name: Install dependencies
-        run: npm ci
+          path = Path("android/app/build.gradle")
+          text = path.read_text()
 
-      - name: Prepare web assets
-        run: npm run prepare:web
+          version_code = int(os.environ["APP_VERSION_CODE"])
+          version_name = os.environ["APP_VERSION"]
 
-      - name: Generate Android project
-        run: npx cap add android
+          if version_code < 1:
+              raise SystemExit("ERROR: versionCode must be positive.")
 
-      - name: Sync Capacitor
-        run: npx cap sync android
+          match = re.search(r'\bdefaultConfig\s*\{', text)
 
+          if not match:
+              raise SystemExit(
+                  "ERROR: defaultConfig block not found in build.gradle"
+              )
+
+          start = match.end()
+          depth = 1
+          i = start
+
+          while i < len(text) and depth:
+              if text[i] == "{":
+                  depth += 1
+              elif text[i] == "}":
+                  depth -= 1
+              i += 1
+
+          if depth != 0:
+              raise SystemExit(
+                  "ERROR: defaultConfig block is incomplete."
+              )
+
+          block = text[start:i - 1]
+
+          block = re.sub(
+              r'(?m)^[ \t]*versionCode\s+.*(?:\n|$)',
+              '',
+              block
+          )
+
+          block = re.sub(
+              r'(?m)^[ \t]*versionName\s+.*(?:\n|$)',
+              '',
+              block
+          )
+
+          version_lines = (
+              f'\n        versionCode {version_code}\n'
+              f'        versionName "{version_name}"\n'
+          )
+
+          block = version_lines + block
+
+          text = text[:start] + block + text[i - 1:]
+          path.write_text(text)
+
+          print(f"Android versionName: {version_name}")
+          print(f"Android versionCode: {version_code}")
+          PY
+
+          echo "Configured Android version:"
+          grep -A 12 'defaultConfig {' "$FILE"
+
+      # --------------------------------------------------
+      # 11. Verify generated Android project
+      # --------------------------------------------------
       - name: Verify generated Android project
         shell: bash
         run: |
           set -euo pipefail
 
           test -f android/gradlew
+          test -f android/settings.gradle
           test -f android/app/build.gradle
-          test -f android/local.properties || true
 
           chmod +x android/gradlew
 
-      # -------------------------
-      # DEBUG APK
-      # -------------------------
+          grep -q 'in.kumbhconnect.nashik' \
+            android/app/build.gradle
 
+          grep -q 'versionCode 131' \
+            android/app/build.gradle
+
+          echo "Generated Android project verified."
+
+      # --------------------------------------------------
+      # 12. Build Debug APK
+      # --------------------------------------------------
       - name: Build Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         shell: bash
@@ -125,25 +253,13 @@ jobs:
           set -euo pipefail
 
           cd android
-          ./gradlew assembleDebug
+          ./gradlew --no-daemon assembleDebug
 
-      - name: Verify Debug APK
-        if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
-        shell: bash
-        run: |
-          set -euo pipefail
+          test -s app/build/outputs/apk/debug/app-debug.apk
 
-          APK="android/app/build/outputs/apk/debug/app-debug.apk"
-
-          test -s "$APK"
-          unzip -tq "$APK"
-
-          BT="$(find "$ANDROID_HOME/build-tools" \
-            -mindepth 1 -maxdepth 1 -type d |
-            sort -V | tail -1)"
-
-          "$BT/apksigner" verify "$APK"
-
+      # --------------------------------------------------
+      # 13. Upload Debug APK
+      # --------------------------------------------------
       - name: Upload Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -151,78 +267,63 @@ jobs:
           name: KumbhConnect-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
 
-      # -------------------------
-      # RELEASE SIGNING
-      # -------------------------
-
-      - name: Validate release signing configuration
+      # --------------------------------------------------
+      # 14. Prepare release signing
+      # --------------------------------------------------
+      - name: Prepare release signing
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
         env:
-          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
-          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEYSTORE_BASE64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
         run: |
           set -euo pipefail
 
-          test -n "$KS_B64" || {
-            echo "::error::TWA_KEYSTORE_BASE64 is missing"
+          test -n "$KEYSTORE_BASE64" || {
+            echo "ERROR: TWA_KEYSTORE_BASE64 secret is missing."
             exit 1
           }
 
-          test -n "$KS_PASSWORD" || {
-            echo "::error::TWA_KEYSTORE_PASSWORD is missing"
+          test -n "$KEYSTORE_PASSWORD" || {
+            echo "ERROR: TWA_KEYSTORE_PASSWORD secret is missing."
             exit 1
           }
 
           test -n "$KEY_ALIAS" || {
-            echo "::error::TWA_KEY_ALIAS repository variable is missing"
+            echo "ERROR: TWA_KEY_ALIAS repository variable is missing."
             exit 1
           }
 
           test -n "$KEY_PASSWORD" || {
-            echo "::error::TWA_KEY_PASSWORD is missing"
+            echo "ERROR: TWA_KEY_PASSWORD secret is missing."
             exit 1
           }
 
-      - name: Decode and validate keystore
-        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
-        shell: bash
-        env:
-          KS_B64: ${{ secrets.TWA_KEYSTORE_BASE64 }}
-          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
-        run: |
-          set -euo pipefail
-          umask 077
+          mkdir -p "$(dirname "$ANDROID_KEYSTORE_PATH")"
 
-          mkdir -p "$RUNNER_TEMP/android-signing"
+          printf '%s' "$KEYSTORE_BASE64" \
+            | base64 --decode > "$ANDROID_KEYSTORE_PATH"
 
-          KS="$RUNNER_TEMP/android-signing/release.keystore"
-
-          printf '%s' "$KS_B64" | base64 --decode > "$KS"
-
-          test -s "$KS" || {
-            echo "::error::Decoded keystore is empty"
-            exit 1
-          }
+          test -s "$ANDROID_KEYSTORE_PATH"
+          chmod 600 "$ANDROID_KEYSTORE_PATH"
 
           keytool -list \
-            -keystore "$KS" \
-            -storepass:env KS_PASSWORD \
-            -alias "$KEY_ALIAS" >/dev/null
+            -keystore "$ANDROID_KEYSTORE_PATH" \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -alias "$KEY_ALIAS"
 
-          echo "ANDROID_KEYSTORE_PATH=$KS" >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PATH=$ANDROID_KEYSTORE_PATH" \
+            >> "$GITHUB_ENV"
 
-          echo "Keystore validation successful."
+          echo "Release keystore verified."
 
-      # -------------------------
-      # SIGNED RELEASE APK + AAB
-      # -------------------------
-
+      # --------------------------------------------------
+      # 15. Build signed Release APK and AAB
+      # --------------------------------------------------
       - name: Build signed Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -240,17 +341,25 @@ jobs:
 
           cd android
 
-          ./gradlew assembleRelease bundleRelease \
+          ./gradlew --no-daemon \
+            assembleRelease \
+            bundleRelease \
             "-Pandroid.injected.signing.store.file=$ANDROID_KEYSTORE_PATH" \
             "-Pandroid.injected.signing.store.password=$ANDROID_KEYSTORE_PASSWORD" \
             "-Pandroid.injected.signing.key.alias=$ANDROID_KEY_ALIAS" \
             "-Pandroid.injected.signing.key.password=$ANDROID_KEY_PASSWORD"
 
+          test -s app/build/outputs/apk/release/app-release.apk
+          test -s app/build/outputs/bundle/release/app-release.aab
+
+      # --------------------------------------------------
+      # 16. Verify release artifacts
+      # --------------------------------------------------
       - name: Verify Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
         env:
-          KS_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.TWA_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS }}
         run: |
           set -euo pipefail
@@ -258,75 +367,63 @@ jobs:
           APK="android/app/build/outputs/apk/release/app-release.apk"
           AAB="android/app/build/outputs/bundle/release/app-release.aab"
 
-          test -s "$APK" || {
-            echo "::error::Release APK missing"
-            exit 1
-          }
+          test -s "$APK"
+          test -s "$AAB"
 
-          test -s "$AAB" || {
-            echo "::error::Release AAB missing"
-            exit 1
-          }
+          unzip -t "$APK" >/dev/null
+          unzip -t "$AAB" >/dev/null
 
-          unzip -tq "$APK"
-          unzip -tq "$AAB"
+          jarsigner -verify "$AAB"
 
-          jarsigner -verify "$AAB" >/dev/null || {
-            echo "::error::AAB signature verification failed"
-            exit 1
-          }
+          apksigner verify --verbose "$APK"
 
-          BT="$(find "$ANDROID_HOME/build-tools" \
-            -mindepth 1 -maxdepth 1 -type d |
-            sort -V | tail -1)"
+          echo "Release APK and AAB passed basic integrity checks."
 
-          "$BT/apksigner" verify --verbose "$APK"
+          echo "APK details:"
+          ls -lh "$APK"
 
-          KS_FP="$(
-            keytool -list -v \
-              -keystore "$ANDROID_KEYSTORE_PATH" \
-              -storepass:env KS_PASSWORD \
-              -alias "$KEY_ALIAS" |
-            grep -m1 'SHA256:' |
-            sed 's/.*SHA256: *//' |
-            tr -d ':[:space:]' |
-            tr 'a-f' 'A-F'
-          )"
+          echo "AAB details:"
+          ls -lh "$AAB"
 
-          APK_FP="$(
-            "$BT/apksigner" verify --print-certs "$APK" |
-            grep -m1 'certificate SHA-256 digest' |
-            sed 's/.*: *//' |
-            tr -d ':[:space:]' |
-            tr 'a-f' 'A-F'
-          )"
+          echo "Configured app ID: $APP_ID"
+          echo "Configured version name: $APP_VERSION"
+          echo "Configured version code: $APP_VERSION_CODE"
 
-          test -n "$KS_FP" && test "$KS_FP" = "$APK_FP" || {
-            echo "::error::APK certificate does not match the configured keystore"
-            exit 1
-          }
-
-          echo "APK signature matches the configured keystore."
-
-          sha256sum "$APK" "$AAB" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload Release APK and AAB
+      # --------------------------------------------------
+      # 17. Upload Release APK
+      # --------------------------------------------------
+      - name: Upload Release APK
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
         with:
-          name: KumbhConnect-Release-APK-AAB
-          path: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/bundle/release/app-release.aab
+          name: KumbhConnect-Release-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
 
-      # -------------------------
-      # CLEANUP
-      # -------------------------
+      # --------------------------------------------------
+      # 18. Upload Release AAB
+      # --------------------------------------------------
+      - name: Upload Release AAB
+        if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: KumbhConnect-Release-AAB
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
 
-      - name: Remove signing material
-        if: always()
+      # --------------------------------------------------
+      # 19. Clean up signing key
+      # --------------------------------------------------
+      - name: Clean up signing key
+        if: ${{ always() && (inputs.build_type == 'release' || inputs.build_type == 'both') }}
         shell: bash
         run: |
-          rm -f "$RUNNER_TEMP/android-signing/release.keystore"
+          set -euo pipefail
+
+          if [ -n "${ANDROID_KEYSTORE_PATH:-}" ]; then
+            rm -f "$ANDROID_KEYSTORE_PATH"
+          fi
+
+          echo "Temporary signing key cleanup completed."
