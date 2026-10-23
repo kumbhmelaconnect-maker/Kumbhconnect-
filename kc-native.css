@@ -1,0 +1,46 @@
+/* KumbhConnect — kc-native.css (additive; no existing rule is overridden) */
+.kcn-ov{position:fixed;inset:0;z-index:100000;background:rgba(20,10,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.kcn-dlg{width:100%;max-width:440px;background:var(--wh,#fff);color:var(--tx,#2b1a0c);border-radius:16px;padding:18px 16px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);border-top:4px solid #E65100}
+.kcn-dlg h3{margin:0 0 8px;font-size:1.05rem;line-height:1.3}
+.kcn-dlg p{margin:0 0 14px;font-size:.88rem;line-height:1.55}
+.kcn-row{display:flex;gap:10px}
+.kcn-row button,.kcn-btn,.kcn-card{min-height:48px;font:inherit;cursor:pointer;border-radius:12px}
+.kcn-row button{flex:1;padding:10px 12px;font-weight:700;border:1.5px solid #E65100;background:#fff;color:#BF360C}
+.kcn-row .kcn-ok{background:#E65100;color:#fff}
+.kcn-row button:focus-visible,.kcn-btn:focus-visible,.kcn-card:focus-visible{outline:3px solid #1A237E;outline-offset:2px}
+.kcn-row button:active,.kcn-btn:active,.kcn-card:active{transform:scale(.98)}
+
+/* Complaint photo controls */
+.kcn-photo{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.kcn-btn{width:100%;padding:10px 12px;font-weight:700;border:1.5px solid #E65100;background:#FFF3E0;color:#BF360C}
+.kcn-ghost{background:transparent;border-color:var(--br,#e0c9a8);color:var(--t2,#5a4630);font-weight:600}
+.kcn-btn[hidden]{display:none}
+.kcn-photo #kcn-cam-btn{display:none}
+.kc-native-cam .kcn-photo #kcn-cam-btn{display:block}
+.kc-native-cam #sos-photo-input{display:none}
+
+/* Home tools */
+.kcn-home{margin:14px 14px 0;display:grid;gap:8px}
+.kcn-h{font-weight:800;font-size:.95rem;color:#BF360C}
+.kcn-card{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;text-align:left;background:var(--cd,#fff);border:1.5px solid var(--br,#e8d3b3);color:var(--tx,#2b1a0c)}
+.kcn-card .kcn-i{font-size:1.5rem;line-height:1}
+.kcn-card .kcn-tx{display:flex;flex-direction:column;gap:2px}
+.kcn-card b{font-size:.92rem}
+.kcn-card small{font-size:.74rem;color:var(--t2,#5a4630)}
+.kcn-card.kcn-sos{border-color:#B71C1C;background:#FFEBEE}
+.kcn-card.kcn-sos b{color:#B71C1C}
+.kcn-hint{margin:0;font-size:.72rem;line-height:1.5;color:var(--t2,#5a4630)}
+@media (prefers-reduced-motion:reduce){.kcn-row button:active,.kcn-btn:active,.kcn-card:active{transform:none}}
+
+
+/* Native-WebView polish: additive and limited to the Capacitor Android app. */
+html.kc-native{min-height:100%;overscroll-behavior-y:contain;-webkit-tap-highlight-color:transparent}
+html.kc-native body{overscroll-behavior-y:contain;-webkit-text-size-adjust:100%}
+html.kc-native button,html.kc-native a,html.kc-native [role="button"]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html.kc-native input,html.kc-native select,html.kc-native textarea{font-size:16px;max-width:100%}
+html.kc-native .kcn-ov{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+html.kc-native .kcn-dlg{max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain}
+html.kc-native .kcn-card,html.kc-native .kcn-btn{transition:transform .12s ease,box-shadow .12s ease}
+html.kc-native .kcn-card:active,html.kc-native .kcn-btn:active{box-shadow:0 2px 8px rgba(80,35,0,.12)}
+html.kc-native :focus-visible{scroll-margin-block:90px}
+@media (prefers-reduced-motion:reduce){html.kc-native .kcn-card,html.kc-native .kcn-btn{transition:none}}
