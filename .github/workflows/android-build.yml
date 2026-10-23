@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Android App
+    name: Build Android App — Android 16 / SDK 36
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -32,25 +32,54 @@ jobs:
       APP_VERSION: "1.3.3"
       APP_VERSION_CODE: "10"
 
+      ANDROID_COMPILE_SDK: "36"
+      ANDROID_TARGET_SDK: "36"
+      ANDROID_BUILD_TOOLS: "36.0.0"
+
     steps:
+      # --------------------------------------------------
+      # 1. Checkout repository
+      # --------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # --------------------------------------------------
+      # 2. Node.js
+      # --------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
+      # --------------------------------------------------
+      # 3. Java 21
+      # --------------------------------------------------
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      - name: Locate Android SDK
+      # --------------------------------------------------
+      # 4. Android SDK setup
+      # --------------------------------------------------
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # --------------------------------------------------
+      # 5. Install Android 16 SDK 36
+      # --------------------------------------------------
+      - name: Install Android SDK 36
         shell: bash
         run: |
           set -euo pipefail
+
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;36.0.0"
+
+          yes | sdkmanager --licenses
 
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
 
@@ -60,8 +89,16 @@ jobs:
           fi
 
           echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
-          echo "Android SDK found."
 
+          test -d "$SDK/platforms/android-36"
+          test -d "$SDK/build-tools/36.0.0"
+
+          echo "Android SDK 36 installed successfully."
+          echo "Build Tools 36.0.0 installed successfully."
+
+      # --------------------------------------------------
+      # 6. Verify project files and dependencies
+      # --------------------------------------------------
       - name: Verify project files and dependencies
         shell: bash
         run: |
@@ -107,6 +144,9 @@ jobs:
           if (process.exitCode) process.exit(process.exitCode);
           NODE
 
+      # --------------------------------------------------
+      # 7. Ensure npm lock file exists
+      # --------------------------------------------------
       - name: Ensure npm lock file exists
         shell: bash
         run: |
@@ -124,6 +164,9 @@ jobs:
             exit 1
           fi
 
+      # --------------------------------------------------
+      # 8. Install dependencies
+      # --------------------------------------------------
       - name: Install dependencies
         shell: bash
         run: |
@@ -135,6 +178,9 @@ jobs:
             npm install
           fi
 
+      # --------------------------------------------------
+      # 9. Verify source files
+      # --------------------------------------------------
       - name: Verify native source files
         shell: bash
         run: |
@@ -150,12 +196,18 @@ jobs:
 
           echo "Native source files verified."
 
+      # --------------------------------------------------
+      # 10. Prepare web assets
+      # --------------------------------------------------
       - name: Prepare web assets
         shell: bash
         run: |
           set -euo pipefail
           node scripts/android/prepare-web.mjs
 
+      # --------------------------------------------------
+      # 11. Verify prepared web assets
+      # --------------------------------------------------
       - name: Verify prepared web assets
         shell: bash
         run: |
@@ -181,51 +233,119 @@ jobs:
           }
 
           if (process.exitCode) process.exit(process.exitCode);
+
           console.log('Native JS/CSS references verified.');
           NODE
 
+      # --------------------------------------------------
+      # 12. Add Android platform
+      # --------------------------------------------------
       - name: Add Android platform
         shell: bash
         run: |
           set -euo pipefail
+
           npx cap add android
 
+      # --------------------------------------------------
+      # 13. Sync Capacitor
+      # --------------------------------------------------
       - name: Sync Capacitor
         shell: bash
         run: |
           set -euo pipefail
+
           npx cap sync android
 
-      - name: Configure Android version
+      # --------------------------------------------------
+      # 14. Configure SDK 36 and app version
+      # --------------------------------------------------
+      - name: Configure Android SDK and version
         shell: bash
         env:
           VERSION_NAME: ${{ env.APP_VERSION }}
           VERSION_CODE: ${{ env.APP_VERSION_CODE }}
+          COMPILE_SDK: ${{ env.ANDROID_COMPILE_SDK }}
+          TARGET_SDK: ${{ env.ANDROID_TARGET_SDK }}
+          BUILD_TOOLS: ${{ env.ANDROID_BUILD_TOOLS }}
         run: |
           set -euo pipefail
-
-          FILE="android/app/build.gradle"
-          test -f "$FILE"
 
           python3 - <<'PY'
           import os
           import re
           from pathlib import Path
 
-          path = Path("android/app/build.gradle")
+          candidates = [
+              Path("android/app/build.gradle"),
+              Path("android/app/build.gradle.kts"),
+          ]
+
+          path = next((p for p in candidates if p.is_file()), None)
+
+          if path is None:
+              raise SystemExit(
+                  "ERROR: android/app/build.gradle or "
+                  "android/app/build.gradle.kts was not found."
+              )
+
           text = path.read_text()
 
           version_code = int(os.environ["VERSION_CODE"])
           version_name = os.environ["VERSION_NAME"]
+          compile_sdk = int(os.environ["COMPILE_SDK"])
+          target_sdk = int(os.environ["TARGET_SDK"])
+          build_tools = os.environ["BUILD_TOOLS"]
 
           if version_code < 1:
               raise SystemExit("ERROR: VERSION_CODE must be positive.")
 
-          match = re.search(r'\bdefaultConfig\s*\{', text)
-          if not match:
+          if compile_sdk != 36 or target_sdk != 36:
+              raise SystemExit(
+                  "ERROR: This workflow is configured for SDK 36."
+              )
+
+          # Update or insert compileSdk declaration.
+          compile_patterns = [
+              r'(?m)^(\s*)compileSdkVersion\s+\d+\s*$',
+              r'(?m)^(\s*)compileSdk\s*=\s*\d+\s*$',
+              r'(?m)^(\s*)compileSdk\s+\d+\s*$',
+          ]
+
+          compile_replacement = "compileSdkVersion 36"
+
+          if path.suffix == ".kts":
+              compile_replacement = "compileSdk = 36"
+
+          compile_updated = False
+
+          for pattern in compile_patterns:
+              match = re.search(pattern, text)
+              if match:
+                  indent = match.group(1)
+                  replacement = indent + compile_replacement
+                  text = re.sub(
+                      pattern,
+                      lambda m: replacement,
+                      text,
+                      count=1
+                  )
+                  compile_updated = True
+                  break
+
+          if not compile_updated:
+              raise SystemExit(
+                  "ERROR: Could not safely locate compileSdk declaration. "
+                  "Inspect the generated Gradle file before editing."
+              )
+
+          # Update or insert targetSdk in defaultConfig.
+          default_match = re.search(r'\bdefaultConfig\s*\{', text)
+
+          if not default_match:
               raise SystemExit("ERROR: defaultConfig block not found.")
 
-          start = match.end()
+          start = default_match.end()
           depth = 1
           i = start
 
@@ -241,35 +361,144 @@ jobs:
 
           block = text[start:i - 1]
 
-          block = re.sub(r'(?m)^\s*versionCode\s+.*$', '', block)
-          block = re.sub(r'(?m)^\s*versionName\s+.*$', '', block)
+          target_patterns = [
+              r'(?m)^(\s*)targetSdkVersion\s+\d+\s*$',
+              r'(?m)^(\s*)targetSdk\s*=\s*\d+\s*$',
+              r'(?m)^(\s*)targetSdk\s+\d+\s*$',
+          ]
 
-          block = (
-              f'\n        versionCode {version_code}\n'
-              f'        versionName "{version_name}"\n'
-              + block
+          target_replacement = "targetSdkVersion 36"
+
+          if path.suffix == ".kts":
+              target_replacement = "targetSdk = 36"
+
+          target_updated = False
+
+          for pattern in target_patterns:
+              match = re.search(pattern, block)
+              if match:
+                  indent = match.group(1)
+                  block = re.sub(
+                      pattern,
+                      lambda m: indent + target_replacement,
+                      block,
+                      count=1
+                  )
+                  target_updated = True
+                  break
+
+          if not target_updated:
+              block = (
+                  block.rstrip()
+                  + "\n        "
+                  + target_replacement
+                  + "\n"
+              )
+
+          # Update or insert versionCode and versionName.
+          block = re.sub(
+              r'(?m)^\s*versionCode\s+.*$\n?',
+              '',
+              block
+          )
+          block = re.sub(
+              r'(?m)^\s*versionName\s+.*$\n?',
+              '',
+              block
           )
 
+          version_lines = (
+              f'\n        versionCode {version_code}\n'
+              f'        versionName "{version_name}"\n'
+          )
+
+          block = version_lines + block
+
           text = text[:start] + block + text[i - 1:]
+
+          # Pin Android build tools when this DSL declares buildToolsVersion.
+          build_tools_patterns = [
+              r'(?m)^(\s*)buildToolsVersion\s+["\'][^"\']+["\']\s*$',
+              r'(?m)^(\s*)buildToolsVersion\(["\'][^"\']+["\']\)\s*$',
+          ]
+
+          build_tools_updated = False
+
+          for pattern in build_tools_patterns:
+              match = re.search(pattern, text)
+              if match:
+                  indent = match.group(1)
+                  replacement = (
+                      f'{indent}buildToolsVersion "{build_tools}"'
+                      if path.suffix != ".kts"
+                      else f'{indent}buildToolsVersion = "{build_tools}"'
+                  )
+                  text = re.sub(
+                      pattern,
+                      lambda m: replacement,
+                      text,
+                      count=1
+                  )
+                  build_tools_updated = True
+                  break
+
           path.write_text(text)
 
-          print(f"versionName: {version_name}")
+          print(f"Gradle file: {path}")
+          print(f"compileSdk: {compile_sdk}")
+          print(f"targetSdk: {target_sdk}")
+          print(f"Build Tools requested: {build_tools}")
           print(f"versionCode: {version_code}")
+          print(f"versionName: {version_name}")
+          print(
+              "buildToolsVersion declaration: "
+              + ("updated" if build_tools_updated else
+                 "not explicitly declared; Gradle default will apply")
+          )
           PY
 
-      - name: Verify Android project
+      # --------------------------------------------------
+      # 15. Verify Android project and SDK values
+      # --------------------------------------------------
+      - name: Verify Android project and SDK 36
         shell: bash
         run: |
           set -euo pipefail
 
           test -f android/gradlew
-          test -f android/app/build.gradle
-
           chmod +x android/gradlew
 
-          grep -nE 'versionCode|versionName|applicationId' \
-            android/app/build.gradle || true
+          FILE=""
 
+          if [ -f android/app/build.gradle ]; then
+            FILE="android/app/build.gradle"
+          elif [ -f android/app/build.gradle.kts ]; then
+            FILE="android/app/build.gradle.kts"
+          else
+            echo "::error::Android app Gradle file not found."
+            exit 1
+          fi
+
+          echo "=== Android Gradle configuration ==="
+          grep -nE \
+            'compileSdk|targetSdk|buildToolsVersion|versionCode|versionName|applicationId' \
+            "$FILE" || true
+
+          grep -qE 'compileSdkVersion[[:space:]]+36|compileSdk[[:space:]]*=[[:space:]]*36|compileSdk[[:space:]]+36' "$FILE" || {
+            echo "::error::compileSdk 36 was not found."
+            exit 1
+          }
+
+          grep -qE 'targetSdkVersion[[:space:]]+36|targetSdk[[:space:]]*=[[:space:]]*36|targetSdk[[:space:]]+36' "$FILE" || {
+            echo "::error::targetSdk 36 was not found."
+            exit 1
+          }
+
+          echo "SDK 36 Gradle configuration verified."
+
+      # --------------------------------------------------
+      # 16. Build Debug APK
+      # --------------------------------------------------
       - name: Build Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         shell: bash
@@ -281,15 +510,21 @@ jobs:
 
           test -s app/build/outputs/apk/debug/app-debug.apk
 
+      # --------------------------------------------------
+      # 17. Upload Debug APK
+      # --------------------------------------------------
       - name: Upload Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
         with:
-          name: KumbhConnect-Debug-APK
+          name: KumbhConnect-Android16-SDK36-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
 
+      # --------------------------------------------------
+      # 18. Decode release keystore
+      # --------------------------------------------------
       - name: Decode release keystore
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -319,8 +554,12 @@ jobs:
             -alias "$KEY_ALIAS" >/dev/null
 
           echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+
           echo "Release keystore validated."
 
+      # --------------------------------------------------
+      # 19. Build signed Release APK and AAB
+      # --------------------------------------------------
       - name: Build signed Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -347,6 +586,9 @@ jobs:
           test -s app/build/outputs/apk/release/app-release.apk
           test -s app/build/outputs/bundle/release/app-release.aab
 
+      # --------------------------------------------------
+      # 20. Locate Android apksigner
+      # --------------------------------------------------
       - name: Locate Android apksigner
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -370,6 +612,9 @@ jobs:
           echo "APKSIGNER=$APKSIGNER" >> "$GITHUB_ENV"
           "$APKSIGNER" version
 
+      # --------------------------------------------------
+      # 21. Verify release artifacts and signatures
+      # --------------------------------------------------
       - name: Verify release artifacts and signatures
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -390,6 +635,9 @@ jobs:
 
           echo "Artifact verification completed."
 
+      # --------------------------------------------------
+      # 22. Report artifact details
+      # --------------------------------------------------
       - name: Report artifact details
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -405,17 +653,23 @@ jobs:
             sha256sum "$FILE"
           done
 
+      # --------------------------------------------------
+      # 23. Upload Release APK and AAB
+      # --------------------------------------------------
       - name: Upload Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
         with:
-          name: KumbhConnect-Release-APK-AAB
+          name: KumbhConnect-Android16-SDK36-Release-APK-AAB
           path: |
             android/app/build/outputs/apk/release/app-release.apk
             android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
 
+      # --------------------------------------------------
+      # 24. Cleanup signing keystore
+      # --------------------------------------------------
       - name: Cleanup signing keystore
         if: ${{ always() && (inputs.build_type == 'release' || inputs.build_type == 'both') }}
         shell: bash
