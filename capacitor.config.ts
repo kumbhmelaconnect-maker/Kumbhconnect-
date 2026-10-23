@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'in.kumbhconnect.nashik',
   appName: 'KumbhConnect',
   webDir: 'www',
-  bundledWebRuntime: false,
 
   server: {
     androidScheme: 'https'
