@@ -35,8 +35,8 @@ jobs:
       APP_VERSION_CODE: "9"
       # Indus Appstore already has a build with a higher target SDK,
       # so we target Android 16 (API 36).
-      TARGET_SDK: "37"
-      COMPILE_SDK: "37"
+      TARGET_SDK: "36"
+      COMPILE_SDK: "36"
       # AGP 8.9.1+ is needed for API 36 (requires Gradle 8.11.1+).
       AGP_VERSION: "8.9.1"
       MIN_GRADLE_VERSION: "8.11.1"
