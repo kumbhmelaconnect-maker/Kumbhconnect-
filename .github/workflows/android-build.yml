@@ -23,15 +23,15 @@ concurrency:
 
 jobs:
   build:
-    name: Build Android App (SDK 36) for Indus Appstore
+    name: Build Android App v1.4 (SDK 36) for Indus Appstore
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     env:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
-      APP_VERSION: "1.3.3"
-      APP_VERSION_CODE: "10"   # Indus var update karatana ha number wadhva (11, 12...)
+      APP_VERSION: "1.4"
+      APP_VERSION_CODE: "12"   # Pudhchya update la ha number wadhva (13, 14...). Aadhicha APK = 10
 
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
@@ -182,6 +182,45 @@ jobs:
           node scripts/android/prepare-web.mjs
 
       # ------------------------------------------------
+      # 10b. Leaflet local kara (unpkg.com var avlambun rahu naye)
+      #      Fakt www/ madhe badal hoto; original index.html tasach rahto.
+      # ------------------------------------------------
+      - name: Bundle Leaflet locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          L=node_modules/leaflet/dist
+          [ -s "$L/leaflet.js" ]  || { echo "::error::leaflet.js missing - package.json madhe leaflet dependency add kara"; exit 1; }
+          [ -s "$L/leaflet.css" ] || { echo "::error::leaflet.css missing"; exit 1; }
+          [ -d "$L/images" ]      || { echo "::error::leaflet images missing"; exit 1; }
+
+          mkdir -p www/vendor/leaflet
+          cp "$L/leaflet.js" "$L/leaflet.css" www/vendor/leaflet/
+          cp -r "$L/images" www/vendor/leaflet/images
+
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          f = Path("www/index.html")
+          t = f.read_text(encoding="utf-8")
+          pairs = [
+              ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", "vendor/leaflet/leaflet.css"),
+              ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",  "vendor/leaflet/leaflet.js"),
+          ]
+          for old, new in pairs:
+              if old not in t:
+                  print("::error::Not found in www/index.html: " + old)
+                  sys.exit(1)
+              t = t.replace(old, new)
+          f.write_text(t, encoding="utf-8")
+          print("Leaflet now loads from vendor/leaflet/")
+          PY
+
+          if grep -rl "unpkg.com" www --include=*.html --include=*.js >/tmp/unpkg.txt 2>/dev/null && [ -s /tmp/unpkg.txt ]; then
+            echo "::warning::unpkg.com still referenced in:"; cat /tmp/unpkg.txt
+          fi
+
+      # ------------------------------------------------
       # 11. Verify prepared web assets
       # ------------------------------------------------
       - name: Verify prepared web assets
@@ -192,6 +231,10 @@ jobs:
             [ -s "$f" ] || { echo "::error::Missing or empty: $f"; exit 1; }
           done
           node --check www/kc-native.js
+          if grep -q "unpkg.com/leaflet" www/index.html; then
+            echo "::error::www/index.html still loads Leaflet from unpkg"; exit 1
+          fi
+          [ -s www/vendor/leaflet/leaflet.js ] || { echo "::error::Local Leaflet missing"; exit 1; }
 
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
@@ -228,6 +271,52 @@ jobs:
         run: |
           set -euo pipefail
           npx cap sync android
+
+      # ------------------------------------------------
+      # 13b. AndroidManifest permissions (Indus reviewer fix)
+      #      android/ gitignored aahe, mhanun build madhech patch karto.
+      #      - Location permission add (nahitar Nearby/SOS GPS chalnar nahi)
+      #      - Push band aahe (pushConfigured:false) mhanun boot/wake/notification kadhto
+      #      Push chalu karayche tar ya 3 'remove' oli kadha.
+      # ------------------------------------------------
+      - name: Patch AndroidManifest permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          if not p.is_file():
+              print("::error::AndroidManifest.xml not found")
+              sys.exit(1)
+          t = p.read_text(encoding="utf-8")
+
+          if "xmlns:tools" not in t:
+              t = t.replace("<manifest ", '<manifest xmlns:tools="http://schemas.android.com/tools" ', 1)
+
+          lines = []
+          for perm in ("ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"):
+              name = "android.permission." + perm
+              if 'android:name="%s"' % name not in t:
+                  lines.append('    <uses-permission android:name="%s" />' % name)
+
+          for feat in ("android.hardware.location.gps", "android.hardware.camera"):
+              if 'android:name="%s"' % feat not in t:
+                  lines.append('    <uses-feature android:name="%s" android:required="false" />' % feat)
+
+          for perm in ("RECEIVE_BOOT_COMPLETED", "WAKE_LOCK", "POST_NOTIFICATIONS"):
+              name = "android.permission." + perm
+              if ('android:name="%s" tools:node="remove"' % name) not in t:
+                  lines.append('    <uses-permission android:name="%s" tools:node="remove" />' % name)
+
+          if lines:
+              t = t.replace("</manifest>", "\n".join(lines) + "\n</manifest>", 1)
+          p.write_text(t, encoding="utf-8")
+          print("Manifest patched:")
+          print(t)
+          PY
 
       # ------------------------------------------------
       # 14. Configure SDK 36 + version
@@ -349,6 +438,25 @@ jobs:
           cd android
           ./gradlew --no-daemon --console=plain --stacktrace assembleDebug
           [ -s app/build/outputs/apk/debug/app-debug.apk ] || { echo "::error::Debug APK not produced"; exit 1; }
+
+      - name: Verify Debug APK (version, SDK, permissions)
+        if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT2="$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS/aapt2"
+          [ -x "$AAPT2" ] || { echo "::error::aapt2 not found"; exit 1; }
+          B="$("$AAPT2" dump badging android/app/build/outputs/apk/debug/app-debug.apk)"
+          echo "$B" | grep -E "^package:|^sdkVersion|^targetSdkVersion|uses-permission"
+          echo "$B" | grep -q "versionCode='${APP_VERSION_CODE}'" || { echo "::error::versionCode != ${APP_VERSION_CODE}"; exit 1; }
+          echo "$B" | grep -q "versionName='${APP_VERSION}'"     || { echo "::error::versionName != ${APP_VERSION}"; exit 1; }
+          echo "$B" | grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" || { echo "::error::targetSdk != ${ANDROID_TARGET_SDK}"; exit 1; }
+          echo "$B" | grep -q "android.permission.ACCESS_FINE_LOCATION"  || { echo "::error::ACCESS_FINE_LOCATION missing"; exit 1; }
+          echo "$B" | grep -q "android.permission.ACCESS_COARSE_LOCATION" || { echo "::error::ACCESS_COARSE_LOCATION missing"; exit 1; }
+          if echo "$B" | grep -qE "RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS"; then
+            echo "::error::Unused permission still present"; exit 1
+          fi
+          echo "Debug APK checks passed."
 
       - name: Upload Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
@@ -475,6 +583,18 @@ jobs:
 
           unzip -tq "$APK"
           unzip -tq "$AAB"
+
+          AAPT2="$BT/aapt2"
+          B="$("$AAPT2" dump badging "$APK")"
+          echo "$B" | grep -E "^package:|^sdkVersion|^targetSdkVersion|uses-permission"
+          echo "$B" | grep -q "versionCode='${APP_VERSION_CODE}'" || { echo "::error::versionCode != ${APP_VERSION_CODE}"; exit 1; }
+          echo "$B" | grep -q "versionName='${APP_VERSION}'"     || { echo "::error::versionName != ${APP_VERSION}"; exit 1; }
+          echo "$B" | grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" || { echo "::error::targetSdk != ${ANDROID_TARGET_SDK}"; exit 1; }
+          echo "$B" | grep -q "android.permission.ACCESS_FINE_LOCATION"  || { echo "::error::ACCESS_FINE_LOCATION missing"; exit 1; }
+          echo "$B" | grep -q "android.permission.ACCESS_COARSE_LOCATION" || { echo "::error::ACCESS_COARSE_LOCATION missing"; exit 1; }
+          if echo "$B" | grep -qE "RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS"; then
+            echo "::error::Unused permission still present"; exit 1
+          fi
 
           "$BT/apksigner" verify --verbose --print-certs "$APK"
           jarsigner -verify -verbose:summary "$AAB" | tail -n 5
