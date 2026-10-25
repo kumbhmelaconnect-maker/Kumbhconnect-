@@ -1,6 +1,6 @@
 {
   "name": "kumbhconnect-android",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "private": true,
   "description": "Capacitor Android build scaffold for KumbhConnect",
   "scripts": {
@@ -20,7 +20,8 @@
     "@capacitor/share": "^7.0.2",
     "@capacitor/network": "^7.0.2",
     "@capacitor/haptics": "^7.0.2",
-    "@capacitor/app": "^7.0.2"
+    "@capacitor/app": "^7.0.2",
+    "leaflet": "1.9.4"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
