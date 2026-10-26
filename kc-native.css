@@ -143,3 +143,11 @@ html.kc-native button:focus-visible,html.kc-native a:focus-visible,html.kc-nativ
     transition-duration:.01ms !important;
   }
 }
+
+/* ---------- v2.1: nearby filter chips + hide web-install/update bars in the native app ---------- */
+.kcn-chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;margin:0 -2px;-webkit-overflow-scrolling:touch}
+.kcn-chip{flex:none;min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid #E65100;background:#fff;color:#BF360C;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;touch-action:manipulation}
+.kcn-chip[aria-pressed="true"]{background:#E65100;color:#fff}
+.kcn-chip:focus-visible{outline:3px solid #1A237E;outline-offset:2px}
+.kcn-item .kcn-i{flex:none;font-size:1.3rem;line-height:1}
+html.kc-native #ibar,html.kc-native #updatebar{display:none !important}
