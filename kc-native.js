@@ -40,7 +40,8 @@
     // Optional: function(token){...} that sends the FCM token to a backend YOU configured.
     // Left null: the token is not stored or sent.
     onPushToken: null,
-    // Optional list for the "Nearby places" card: [{ name, lat, lng, note? }]. Empty = card hidden.
+    // Optional override for the "Nearby places" card: [{ name, lat, lng, note?, type?, icon? }].
+    // Empty = use the app's own LOCS list.
     places: [],
     // Link included when the user taps "Share app".
     shareUrl: 'https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/'
@@ -579,14 +580,35 @@
     return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
   }
   function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1) + ' km'; }
+  // Places come from KC_NATIVE_CONFIG.places if given, otherwise from the app's own LOCS list
+  // (ghats, hospitals, police, parking, temples...), so no coordinates are duplicated or invented here.
+  function appPlaces() {
+    var src = [];
+    try { if (typeof LOCS !== 'undefined' && Array.isArray(LOCS)) src = LOCS; } catch (e) { /* none */ }
+    var en = lang() === 'en';
+    return src.map(function (x) {
+      return {
+        name: (en ? (x.e || x.n) : (x.n || x.e)) || '',
+        lat: x.la, lng: x.lo, note: x.a || '', type: x.t || '', icon: x.ic || ''
+      };
+    });
+  }
   function validPlaces() {
-    var src = Array.isArray(CFG.places) ? CFG.places : [];
+    var src = Array.isArray(CFG.places) && CFG.places.length ? CFG.places : appPlaces();
     return src.filter(function (p) {
       return p && typeof p.name === 'string' && p.name &&
         typeof p.lat === 'number' && isFinite(p.lat) && Math.abs(p.lat) <= 90 &&
         typeof p.lng === 'number' && isFinite(p.lng) && Math.abs(p.lng) <= 180;
     });
   }
+  var NEAR_FILTERS = [
+    { k: '',         mr: 'सर्व',      en: 'All' },
+    { k: 'ghat',     mr: 'घाट',       en: 'Ghats' },
+    { k: 'hospital', mr: 'रुग्णालय',  en: 'Hospitals' },
+    { k: 'police',   mr: 'पोलीस',     en: 'Police' },
+    { k: 'parking',  mr: 'पार्किंग',  en: 'Parking' },
+    { k: 'temple',   mr: 'मंदिर',     en: 'Temples' }
+  ];
   function showNearby() {
     var places = validPlaces();
     if (!places.length || !navigator.geolocation) { say(t('near_none')); return; }
@@ -601,20 +623,50 @@
       if (!holder || !holder.isConnected) return;               // sheet already closed
       var me = pos && pos.coords;
       if (!me) { holder.textContent = t('near_none'); return; }
-      var ranked = places.map(function (p) {
+      var all = places.map(function (p) {
         return { p: p, d: distM(me.latitude, me.longitude, p.lat, p.lng) };
-      }).sort(function (a, b) { return a.d - b.d; }).slice(0, 8);
-      holder.textContent = '';
+      }).sort(function (a, b) { return a.d - b.d; });
+
+      var present = {};
+      all.forEach(function (r) { if (r.p.type) present[r.p.type] = true; });
+      var filters = NEAR_FILTERS.filter(function (f) { return f.k === '' || present[f.k]; });
+      var active = '';
+      var chips = el('div', 'kcn-chips');
       var ul = el('ul', 'kcn-list');
-      ranked.forEach(function (r) {
-        var li = el('li', 'kcn-item');
-        var tx = el('span', 'kcn-tx');
-        var b = el('b'); b.textContent = r.p.name; tx.appendChild(b);
-        if (typeof r.p.note === 'string' && r.p.note) { var sm = el('small'); sm.textContent = r.p.note; tx.appendChild(sm); }
-        var dist = el('span', 'kcn-dist'); dist.textContent = fmtDist(r.d);
-        li.appendChild(tx); li.appendChild(dist); ul.appendChild(li);
-      });
+
+      function draw() {
+        ul.textContent = '';
+        var rows = all.filter(function (r) { return !active || r.p.type === active; }).slice(0, 8);
+        if (!rows.length) { var e0 = el('li', 'kcn-empty'); e0.textContent = t('near_none'); ul.appendChild(e0); return; }
+        rows.forEach(function (r) {
+          var li = el('li', 'kcn-item');
+          if (r.p.icon) { var ic = el('span', 'kcn-i'); ic.setAttribute('aria-hidden', 'true'); ic.textContent = r.p.icon; li.appendChild(ic); }
+          var tx = el('span', 'kcn-tx');
+          var b = el('b'); b.textContent = r.p.name; tx.appendChild(b);
+          if (typeof r.p.note === 'string' && r.p.note) { var sm = el('small'); sm.textContent = r.p.note; tx.appendChild(sm); }
+          var dist = el('span', 'kcn-dist'); dist.textContent = fmtDist(r.d);
+          li.appendChild(tx); li.appendChild(dist); ul.appendChild(li);
+        });
+      }
+      if (filters.length > 1) {
+        filters.forEach(function (f) {
+          var c = el('button', 'kcn-chip'); c.type = 'button';
+          c.textContent = lang() === 'en' ? f.en : f.mr;
+          c.setAttribute('aria-pressed', f.k === active ? 'true' : 'false');
+          c.addEventListener('click', function () {
+            active = f.k;
+            Array.prototype.forEach.call(chips.children, function (x, i) {
+              x.setAttribute('aria-pressed', filters[i].k === active ? 'true' : 'false');
+            });
+            draw();
+          });
+          chips.appendChild(c);
+        });
+      }
+      holder.textContent = '';
+      if (filters.length > 1) holder.appendChild(chips);
       holder.appendChild(ul);
+      draw();
     }, function () {
       if (!holder || !holder.isConnected) return;
       holder.textContent = '';
