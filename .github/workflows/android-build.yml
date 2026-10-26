@@ -23,15 +23,15 @@ concurrency:
 
 jobs:
   build:
-    name: Build Android App v1.4 (SDK 36) for Indus Appstore
+    name: Build Android App v1.4.1 (SDK 36) for Indus Appstore
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     env:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
-      APP_VERSION: "1.4"
-      APP_VERSION_CODE: "12"   # Pudhchya update la ha number wadhva (13, 14...). Aadhicha APK = 10
+      APP_VERSION: "1.4.1"
+      APP_VERSION_CODE: "13"   # Pudhchya update la wadhva (14, 15...). Aadhiche: 10, 12
 
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
@@ -132,6 +132,64 @@ jobs:
           if (bad) process.exit(1);
           console.log('Dependencies OK');
           NODE
+
+      # ------------------------------------------------
+      # 6b. NEW: Indus guard - native plugins ani "remote website" check
+      #     Plugin nasel tar kc-native.js chi feature lapte ani app
+      #     parat "website wrapper" disto (Indus rejection cha mukhya karan).
+      # ------------------------------------------------
+      - name: Verify native plugins and no remote website (Indus guard)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node - <<'NODE'
+          const p = require('./package.json');
+          const has = (n) => (p.dependencies && p.dependencies[n]) || (p.devDependencies && p.devDependencies[n]);
+
+          const core = [
+            '@capacitor/geolocation',
+            '@capacitor/camera',
+            '@capacitor/share',
+            '@capacitor/app',
+            '@capacitor/network',
+            '@capacitor/local-notifications',
+            '@capacitor/splash-screen'
+          ];
+          const optional = [
+            '@capacitor/haptics',
+            '@capacitor/status-bar',
+            '@capacitor/keyboard',
+            '@capacitor/push-notifications'
+          ];
+
+          let bad = false;
+          for (const n of core) {
+            if (has(n)) console.log('plugin OK      : ' + n);
+            else {
+              console.error('::error::Native plugin missing: ' + n + ' (nasel tar Indus la app website wrapper vatel). Run: npm i ' + n);
+              bad = true;
+            }
+          }
+          for (const n of optional) {
+            if (has(n)) console.log('plugin OK      : ' + n);
+            else console.log('::warning::Optional plugin not installed: ' + n);
+          }
+          if (bad) process.exit(1);
+          NODE
+
+          # server.url (remote website) vaparla tar app website load karto - Indus reject karto.
+          for f in capacitor.config.ts capacitor.config.js; do
+            if [ -f "$f" ] && grep -nE '^[[:space:]]*url[[:space:]]*:' "$f"; then
+              echo "::error::$f madhe server.url aahe. Kadha: app www/ madhun local load zali pahije."
+              exit 1
+            fi
+          done
+          if [ -f capacitor.config.json ] && grep -n '"url"' capacitor.config.json; then
+            echo "::error::capacitor.config.json madhe server.url aahe. Kadha."
+            exit 1
+          fi
+          echo "Indus guard passed."
 
       # ------------------------------------------------
       # 7. Ensure npm lock file
@@ -236,6 +294,11 @@ jobs:
           fi
           [ -s www/vendor/leaflet/leaflet.js ] || { echo "::error::Local Leaflet missing"; exit 1; }
 
+          # index.html ne remote website var redirect karu naye
+          if grep -qi 'http-equiv="refresh"' www/index.html; then
+            echo "::error::www/index.html madhe meta refresh redirect aahe"; exit 1
+          fi
+
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const html = fs.readFileSync('www/index.html', 'utf8');
@@ -273,18 +336,19 @@ jobs:
           npx cap sync android
 
       # ------------------------------------------------
-      # 13b. AndroidManifest permissions (Indus reviewer fix)
-      #      android/ gitignored aahe, mhanun build madhech patch karto.
-      #      - Location permission add (nahitar Nearby/SOS GPS chalnar nahi)
-      #      - Push band aahe (pushConfigured:false) mhanun boot/wake/notification kadhto
-      #      Push chalu karayche tar ya 3 'remove' oli kadha.
+      # 13b. AndroidManifest permissions
+      #      - Location permission add (Nearby / SOS GPS sathi)
+      #      - FIX: Reminders (Local Notifications) sathi POST_NOTIFICATIONS lagto.
+      #        Junya version madhe to kadhla hota, mhanun Android 13+ var reminders
+      #        dakhvlya jaat navhatya. Ata notification plugin asel tar to kadhat nahi.
+      #      - Notification plugin nasel tarach 3 unused permissions kadhto.
       # ------------------------------------------------
       - name: Patch AndroidManifest permissions
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import sys
+          import json, os, re, sys
           from pathlib import Path
 
           p = Path("android/app/src/main/AndroidManifest.xml")
@@ -293,8 +357,26 @@ jobs:
               sys.exit(1)
           t = p.read_text(encoding="utf-8")
 
+          pkg = json.loads(Path("package.json").read_text(encoding="utf-8"))
+          deps = {}
+          deps.update(pkg.get("dependencies", {}))
+          deps.update(pkg.get("devDependencies", {}))
+          notif = any(n in deps for n in ("@capacitor/local-notifications",
+                                          "@capacitor/push-notifications"))
+
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write("NOTIF_PLUGINS=%d\n" % (1 if notif else 0))
+
           if "xmlns:tools" not in t:
               t = t.replace("<manifest ", '<manifest xmlns:tools="http://schemas.android.com/tools" ', 1)
+
+          notif_perms = ("RECEIVE_BOOT_COMPLETED", "WAKE_LOCK", "POST_NOTIFICATIONS")
+
+          if notif:
+              # android/ commit kelela asel tar junya 'remove' oli kadha
+              t = re.sub(
+                  r'\s*<uses-permission android:name="android\.permission\.(?:RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS)" tools:node="remove" />',
+                  '', t)
 
           lines = []
           for perm in ("ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"):
@@ -306,14 +388,20 @@ jobs:
               if 'android:name="%s"' % feat not in t:
                   lines.append('    <uses-feature android:name="%s" android:required="false" />' % feat)
 
-          for perm in ("RECEIVE_BOOT_COMPLETED", "WAKE_LOCK", "POST_NOTIFICATIONS"):
-              name = "android.permission." + perm
-              if ('android:name="%s" tools:node="remove"' % name) not in t:
-                  lines.append('    <uses-permission android:name="%s" tools:node="remove" />' % name)
+          if notif:
+              name = "android.permission.POST_NOTIFICATIONS"
+              if 'android:name="%s"' % name not in t:
+                  lines.append('    <uses-permission android:name="%s" />' % name)
+          else:
+              for perm in notif_perms:
+                  name = "android.permission." + perm
+                  if ('android:name="%s" tools:node="remove"' % name) not in t:
+                      lines.append('    <uses-permission android:name="%s" tools:node="remove" />' % name)
 
           if lines:
               t = t.replace("</manifest>", "\n".join(lines) + "\n</manifest>", 1)
           p.write_text(t, encoding="utf-8")
+          print("Notification plugins installed:", notif)
           print("Manifest patched:")
           print(t)
           PY
@@ -447,14 +535,18 @@ jobs:
           AAPT2="$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS/aapt2"
           [ -x "$AAPT2" ] || { echo "::error::aapt2 not found"; exit 1; }
           B="$("$AAPT2" dump badging android/app/build/outputs/apk/debug/app-debug.apk)"
-          echo "$B" | grep -E "^package:|^sdkVersion|^targetSdkVersion|uses-permission"
-          echo "$B" | grep -q "versionCode='${APP_VERSION_CODE}'" || { echo "::error::versionCode != ${APP_VERSION_CODE}"; exit 1; }
-          echo "$B" | grep -q "versionName='${APP_VERSION}'"     || { echo "::error::versionName != ${APP_VERSION}"; exit 1; }
-          echo "$B" | grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" || { echo "::error::targetSdk != ${ANDROID_TARGET_SDK}"; exit 1; }
-          echo "$B" | grep -q "android.permission.ACCESS_FINE_LOCATION"  || { echo "::error::ACCESS_FINE_LOCATION missing"; exit 1; }
-          echo "$B" | grep -q "android.permission.ACCESS_COARSE_LOCATION" || { echo "::error::ACCESS_COARSE_LOCATION missing"; exit 1; }
-          if echo "$B" | grep -qE "RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS"; then
-            echo "::error::Unused permission still present"; exit 1
+          grep -E "^package:|^sdkVersion|^targetSdkVersion|uses-permission" <<< "$B"
+          grep -q "versionCode='${APP_VERSION_CODE}'" <<< "$B" || { echo "::error::versionCode != ${APP_VERSION_CODE}"; exit 1; }
+          grep -q "versionName='${APP_VERSION}'" <<< "$B"     || { echo "::error::versionName != ${APP_VERSION}"; exit 1; }
+          grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" <<< "$B" || { echo "::error::targetSdk != ${ANDROID_TARGET_SDK}"; exit 1; }
+          grep -q "android.permission.ACCESS_FINE_LOCATION" <<< "$B"   || { echo "::error::ACCESS_FINE_LOCATION missing"; exit 1; }
+          grep -q "android.permission.ACCESS_COARSE_LOCATION" <<< "$B" || { echo "::error::ACCESS_COARSE_LOCATION missing"; exit 1; }
+          if [ "${NOTIF_PLUGINS:-0}" = "1" ]; then
+            grep -q "android.permission.POST_NOTIFICATIONS" <<< "$B" || { echo "::error::POST_NOTIFICATIONS missing (reminders chalnar nahit)"; exit 1; }
+          else
+            if grep -qE "RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS" <<< "$B"; then
+              echo "::error::Unused permission still present"; exit 1
+            fi
           fi
           echo "Debug APK checks passed."
 
@@ -586,14 +678,18 @@ jobs:
 
           AAPT2="$BT/aapt2"
           B="$("$AAPT2" dump badging "$APK")"
-          echo "$B" | grep -E "^package:|^sdkVersion|^targetSdkVersion|uses-permission"
-          echo "$B" | grep -q "versionCode='${APP_VERSION_CODE}'" || { echo "::error::versionCode != ${APP_VERSION_CODE}"; exit 1; }
-          echo "$B" | grep -q "versionName='${APP_VERSION}'"     || { echo "::error::versionName != ${APP_VERSION}"; exit 1; }
-          echo "$B" | grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" || { echo "::error::targetSdk != ${ANDROID_TARGET_SDK}"; exit 1; }
-          echo "$B" | grep -q "android.permission.ACCESS_FINE_LOCATION"  || { echo "::error::ACCESS_FINE_LOCATION missing"; exit 1; }
-          echo "$B" | grep -q "android.permission.ACCESS_COARSE_LOCATION" || { echo "::error::ACCESS_COARSE_LOCATION missing"; exit 1; }
-          if echo "$B" | grep -qE "RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS"; then
-            echo "::error::Unused permission still present"; exit 1
+          grep -E "^package:|^sdkVersion|^targetSdkVersion|uses-permission" <<< "$B"
+          grep -q "versionCode='${APP_VERSION_CODE}'" <<< "$B" || { echo "::error::versionCode != ${APP_VERSION_CODE}"; exit 1; }
+          grep -q "versionName='${APP_VERSION}'" <<< "$B"     || { echo "::error::versionName != ${APP_VERSION}"; exit 1; }
+          grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" <<< "$B" || { echo "::error::targetSdk != ${ANDROID_TARGET_SDK}"; exit 1; }
+          grep -q "android.permission.ACCESS_FINE_LOCATION" <<< "$B"   || { echo "::error::ACCESS_FINE_LOCATION missing"; exit 1; }
+          grep -q "android.permission.ACCESS_COARSE_LOCATION" <<< "$B" || { echo "::error::ACCESS_COARSE_LOCATION missing"; exit 1; }
+          if [ "${NOTIF_PLUGINS:-0}" = "1" ]; then
+            grep -q "android.permission.POST_NOTIFICATIONS" <<< "$B" || { echo "::error::POST_NOTIFICATIONS missing (reminders chalnar nahit)"; exit 1; }
+          else
+            if grep -qE "RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS" <<< "$B"; then
+              echo "::error::Unused permission still present"; exit 1
+            fi
           fi
 
           "$BT/apksigner" verify --verbose --print-certs "$APK"
