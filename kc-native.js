@@ -1,38 +1,49 @@
 /*
- * KumbhConnect Native Android bridge — release candidate
+ * KumbhConnect Native Android bridge — release candidate (v2)
  * File: kc-native.js
  * Additive integration for Capacitor WebView. Push remains opt-in/off by default.
  * Requires matching Capacitor plugins to be installed and synced in Android.
- * This file alone does not certify Play Store policy or build readiness.
+ * This file alone does not certify Play Store / Indus Appstore policy or build readiness.
  */
 /* ================================================================
  * KumbhConnect — kc-native.js
  * Additive Capacitor bridge. Loaded AFTER the main inline scripts.
  *
- * What it does (native Android app only; the website/PWA is unchanged):
- *   - Location: replaces navigator.geolocation.getCurrentPosition with the
- *     Capacitor Geolocation plugin, after a plain-language explanation.
- *   - Camera:   "Take photo / choose from gallery" for the complaint form.
- *   - Share:    share the SOS / location text (Share plugin).
- *   - Haptics:  light feedback when the SOS sheet opens.
- *   - Push:     permission + registration + notification-tap navigation.
- *               Hidden until KC_NATIVE_CONFIG.pushConfigured === true.
+ * Native Android app only; the website/PWA is unchanged.
+ *   - Location:  Capacitor Geolocation behind navigator.geolocation, after an explanation.
+ *   - Camera:    "Take photo / choose from gallery" for the complaint form.
+ *   - Share:     share SOS text and share the app (Share plugin).
+ *   - Haptics:   feedback when SOS is opened.
+ *   - Push:      permission + registration + tap navigation (hidden until pushConfigured:true).
+ *   NEW in v2
+ *   - Offline banner (Network plugin; falls back to online/offline events).
+ *   - Personal reminders (Local Notifications): user-chosen name + date/time, fully on-device.
+ *   - Nearby places (needs KC_NATIVE_CONFIG.places; sorted by distance from one GPS fix).
+ *   - Share the app.
+ *   - Android Back: closes the top dialog first, then returns to Home, then double-press to exit.
+ *   - Fixes: StatusBar style and Keyboard resize mode now use string values (the plugin
+ *     enums are not available without a bundler, so v1 silently skipped them).
  *
- * It never uploads anything, never tracks continuously, and never calls
- * anyone. Plugins are looked up with Capacitor.isPluginAvailable() so a
- * missing plugin degrades to the existing web behaviour instead of throwing.
+ * It never uploads anything, never tracks continuously, and never calls anyone.
+ * Plugins are looked up with Capacitor.isPluginAvailable() so a missing plugin
+ * degrades to the existing web behaviour instead of throwing.
  * ================================================================ */
 (function () {
   'use strict';
 
   // ---- Owner-editable configuration -------------------------------------
-  // Set pushConfigured:true ONLY after google-services.json is in
-  // android/app/ and an FCM sender exists (see ANDROID-NATIVE-SETUP.md).
+  // Set before this script loads, e.g.:
+  //   <script>window.KC_NATIVE_CONFIG = { pushConfigured: true, places: [ {name:'...', lat:0, lng:0, note:'...'} ] };</script>
+  // pushConfigured:true ONLY after google-services.json is in android/app/ and FCM is set up.
   var CFG = Object.assign({
     pushConfigured: false,
-    // Optional: function(token){...} that sends the FCM token to a backend
-    // YOU have configured. Left null: the token is not stored or sent.
-    onPushToken: null
+    // Optional: function(token){...} that sends the FCM token to a backend YOU configured.
+    // Left null: the token is not stored or sent.
+    onPushToken: null,
+    // Optional list for the "Nearby places" card: [{ name, lat, lng, note? }]. Empty = card hidden.
+    places: [],
+    // Link included when the user taps "Share app".
+    shareUrl: 'https://kumbhmelaconnect-maker.github.io/Kumbhconnect-/'
   }, window.KC_NATIVE_CONFIG || {});
 
   var MAX_PHOTO_BYTES = 5 * 1024 * 1024;               // same limit as the existing form
@@ -41,6 +52,7 @@
   var nativeWired = false;
   var lastBackAt = 0;
   var BACK_EXIT_WINDOW_MS = 1800;
+  var activeClose = null;                               // closes the top-most dialog/sheet (used by Back)
 
   // ---- Environment ------------------------------------------------------
   function cap() { return window.Capacitor || null; }
@@ -58,6 +70,11 @@
       if (typeof c.registerPlugin === 'function') return c.registerPlugin(name);
     } catch (e) { /* fall through */ }
     return null;
+  }
+  function el(tag, cls) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    return n;
   }
 
   // ---- Text (Marathi default, English; other languages use English) ----
@@ -90,7 +107,25 @@
       h_sos: 'आपत्कालीन मदत (SOS)', h_sos_s: 'स्थान, 112 कॉल आणि शेअर',
       h_rep: 'फोटोसह तक्रार', h_rep_s: 'कॅमेरा किंवा गॅलरी',
       h_title: 'अ‍ॅप सुविधा',
-      sos_hint: 'SOS मधून आपोआप कॉल किंवा संदेश जात नाही; प्रत्येक पायरी तुम्ही निवडता.'
+      sos_hint: 'SOS मधून आपोआप कॉल किंवा संदेश जात नाही; प्रत्येक पायरी तुम्ही निवडता.',
+      back_exit: 'अ‍ॅप बंद करण्यासाठी पुन्हा Back दाबा.',
+      // v2
+      off: 'इंटरनेट नाही — काही सुविधा मर्यादित आहेत',
+      rem_card: 'आठवण सेट करा', rem_card_s: 'निवडलेल्या वेळी फोनवर सूचना',
+      rem_t: 'आठवण (Reminder)',
+      rem_b: 'तुम्ही निवडलेल्या वेळी आठवण दाखवण्यासाठी सूचना परवानगी लागते. आठवणी फक्त या फोनवर राहतात; काहीही सर्व्हरवर पाठवले जात नाही.',
+      rem_name: 'आठवणीचे नाव', rem_when: 'दिनांक व वेळ', rem_save: 'आठवण जतन करा',
+      rem_list: 'सेट केलेल्या आठवणी', rem_none: 'अजून आठवण नाही', rem_del: 'रद्द करा',
+      rem_ok: 'आठवण सेट झाली.', rem_past: 'भविष्यातील दिनांक व वेळ निवडा.', rem_noname: 'आठवणीला नाव द्या.',
+      rem_denied: 'सूचना परवानगी बंद आहे. फोनच्या Settings मध्ये चालू करा.',
+      rem_unavail: 'आठवण सुविधा या डिव्हाइसवर उपलब्ध नाही.',
+      rem_fail: 'आठवण सेट करता आली नाही. पुन्हा प्रयत्न करा.',
+      rem_body: 'KumbhConnect आठवण',
+      app_card: 'अ‍ॅप शेअर करा', app_card_s: 'मित्र-कुटुंबाला पाठवा',
+      app_msg: 'KumbhConnect – नाशिक कुंभमेळा मार्गदर्शक',
+      near_card: 'जवळची ठिकाणे', near_card_s: 'तुमच्या स्थानापासून अंतरानुसार',
+      near_t: 'जवळची ठिकाणे', near_none: 'जवळची ठिकाणे दाखवता आली नाहीत.',
+      near_wait: 'स्थान शोधत आहे…'
     },
     en: {
       cont: 'Continue', notnow: 'Not now', close: 'Close',
@@ -120,12 +155,46 @@
       h_sos: 'Emergency help (SOS)', h_sos_s: 'Location, call 112, share',
       h_rep: 'Complaint with photo', h_rep_s: 'Camera or gallery',
       h_title: 'App tools',
-      sos_hint: 'SOS never calls or sends a message by itself; you choose each step.'
+      sos_hint: 'SOS never calls or sends a message by itself; you choose each step.',
+      back_exit: 'Press Back again to exit the app.',
+      // v2
+      off: 'You are offline — some features are limited',
+      rem_card: 'Set a reminder', rem_card_s: 'Phone alert at a time you choose',
+      rem_t: 'Reminder',
+      rem_b: 'Notification permission is needed to show your reminder at the time you choose. Reminders stay on this phone; nothing is sent to a server.',
+      rem_name: 'Reminder name', rem_when: 'Date and time', rem_save: 'Save reminder',
+      rem_list: 'Your reminders', rem_none: 'No reminders yet', rem_del: 'Cancel',
+      rem_ok: 'Reminder set.', rem_past: 'Choose a future date and time.', rem_noname: 'Give the reminder a name.',
+      rem_denied: 'Notification permission is off. Enable it in phone Settings.',
+      rem_unavail: 'Reminders are not available on this device.',
+      rem_fail: 'Could not set the reminder. Please try again.',
+      rem_body: 'KumbhConnect reminder',
+      app_card: 'Share the app', app_card_s: 'Send to friends and family',
+      app_msg: 'KumbhConnect – Nashik Kumbh Mela Guide',
+      near_card: 'Nearby places', near_card_s: 'Sorted by distance from you',
+      near_t: 'Nearby places', near_none: 'Could not show nearby places.',
+      near_wait: 'Finding your location…'
     }
   };
   function lang() { try { return typeof _lang !== 'undefined' ? _lang : 'mr'; } catch (e) { return 'mr'; } }
   function t(k) { var d = TX[lang() === 'mr' ? 'mr' : 'en']; return d[k] !== undefined ? d[k] : TX.en[k] || ''; }
-  function say(msg) { try { if (typeof toast === 'function') toast(msg); } catch (e) { /* no-op */ } }
+
+  // Uses the app's own toast() when present, otherwise a small native-styled one.
+  var toastEl = null, toastTimer = null;
+  function say(msg) {
+    try { if (typeof toast === 'function') { toast(msg); return; } } catch (e) { /* use fallback */ }
+    if (!toastEl) {
+      toastEl = el('div', 'kcn-toast');
+      toastEl.setAttribute('role', 'status');
+      toastEl.setAttribute('aria-live', 'polite');
+      toastEl.hidden = true;
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2800);
+  }
 
   // ---- Accessible explanation dialog -------------------------------------
   var dlgOpen = null;
@@ -145,7 +214,7 @@
       ok.textContent = t(okKey || 'cont'); no.textContent = t('notnow');
       function done(v) {
         document.removeEventListener('keydown', onKey, true);
-        wrap.remove(); dlgOpen = null;
+        wrap.remove(); dlgOpen = null; activeClose = null;
         try { if (prev && prev.focus) prev.focus(); } catch (e) { /* no-op */ }
         resolve(v);
       }
@@ -154,10 +223,45 @@
       no.addEventListener('click', function () { done(false); });
       wrap.addEventListener('click', function (e) { if (e.target === wrap) done(false); });
       document.addEventListener('keydown', onKey, true);
+      activeClose = function () { done(false); };
       document.body.appendChild(wrap);
       ok.focus();
     });
     return dlgOpen;
+  }
+
+  // Generic sheet (title + custom body + Close). buildBody(close) must return a DOM node.
+  function openSheet(titleText, buildBody) {
+    if (activeClose) return null;
+    var prev = document.activeElement;
+    var wrap = el('div', 'kcn-ov');
+    var dlg = el('div', 'kcn-dlg');
+    dlg.setAttribute('role', 'dialog');
+    dlg.setAttribute('aria-modal', 'true');
+    dlg.setAttribute('aria-label', titleText);
+    var h = el('h3'); h.textContent = titleText; dlg.appendChild(h);
+    var closed = false;
+    function close() {
+      if (closed) return;
+      closed = true;
+      document.removeEventListener('keydown', onKey, true);
+      wrap.remove(); activeClose = null;
+      try { if (prev && prev.focus) prev.focus(); } catch (e) { /* no-op */ }
+    }
+    function onKey(e) { if (e.key === 'Escape') { e.preventDefault(); close(); } }
+    dlg.appendChild(buildBody(close));
+    var row = el('div', 'kcn-row');
+    row.style.marginTop = '12px';
+    var cb = el('button'); cb.type = 'button'; cb.textContent = t('close');
+    cb.addEventListener('click', close);
+    row.appendChild(cb); dlg.appendChild(row);
+    wrap.appendChild(dlg);
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) close(); });
+    document.addEventListener('keydown', onKey, true);
+    activeClose = close;
+    document.body.appendChild(wrap);
+    cb.focus();
+    return close;
   }
 
   // ---- Haptics -----------------------------------------------------------
@@ -316,6 +420,11 @@
     if (st) st.textContent = r === 'ok' ? t('share_done') : r === 'cancelled' ? '' : t('share_fail');
   }
   function canShare() { return !!(plugin('Share') || navigator.share); }
+  async function shareApp() {
+    var url = typeof CFG.shareUrl === 'string' && /^https:\/\//i.test(CFG.shareUrl) ? CFG.shareUrl : '';
+    var r = await shareText(t('app_msg') + (url ? '\n' + url : ''), 'KumbhConnect');
+    if (r === 'error' || r === 'unsupported') say(t('share_fail'));
+  }
 
   // ---- Push --------------------------------------------------------------
   var pushWired = false;
@@ -351,6 +460,168 @@
     } catch (e) { say(t('push_err')); }
   }
 
+  // ---- Offline banner ----------------------------------------------------
+  var offBar = null, netWired = false;
+  function showOffline(off) {
+    if (!offBar) {
+      offBar = el('div', 'kcn-offline');
+      offBar.setAttribute('role', 'status');
+      offBar.setAttribute('aria-live', 'polite');
+      offBar.hidden = true;
+      document.body.appendChild(offBar);
+    }
+    offBar.textContent = t('off');
+    offBar.hidden = !off;
+  }
+  function setupNetwork() {
+    if (!isNative() || netWired) return;
+    netWired = true;
+    var N = plugin('Network');
+    if (N) {
+      try {
+        N.getStatus().then(function (s) { showOffline(!(s && s.connected)); }).catch(function () {});
+        N.addListener('networkStatusChange', function (s) { showOffline(!(s && s.connected)); });
+        return;
+      } catch (e) { /* use browser events below */ }
+    }
+    window.addEventListener('online', function () { showOffline(false); });
+    window.addEventListener('offline', function () { showOffline(true); });
+    showOffline(!navigator.onLine);
+  }
+
+  // ---- Personal reminders (Local Notifications, on-device only) ----------
+  function localIso(d) {
+    function p(n) { return n < 10 ? '0' + n : '' + n; }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function styleInput(n) {
+    n.style.cssText = 'width:100%;box-sizing:border-box;min-height:48px;padding:10px 12px;margin:0 0 10px;' +
+      'border:1.5px solid #e0c9a8;border-radius:10px;background:#fff;color:#2b1a0c;font:inherit;font-size:16px';
+  }
+  async function openReminders() {
+    var L = plugin('LocalNotifications');
+    if (!L) { say(t('rem_unavail')); return; }
+    var s;
+    try { s = await L.checkPermissions(); } catch (e) { say(t('rem_unavail')); return; }
+    if (s && s.display === 'denied') { say(t('rem_denied')); return; }
+    if (!s || s.display !== 'granted') {
+      var go = await ask('rem_t', 'rem_b');
+      if (!go) return;
+      try { s = await L.requestPermissions(); } catch (e) { say(t('rem_unavail')); return; }
+      if (!s || s.display !== 'granted') { say(t('rem_denied')); return; }
+    }
+    openSheet(t('rem_t'), function () {
+      var box = el('div');
+      var name = el('input'); name.type = 'text'; name.maxLength = 60;
+      name.placeholder = t('rem_name'); name.setAttribute('aria-label', t('rem_name')); styleInput(name);
+      var when = el('input'); when.type = 'datetime-local';
+      when.min = localIso(new Date(Date.now() + 60000));
+      when.setAttribute('aria-label', t('rem_when')); styleInput(when);
+      var save = el('button', 'kcn-btn'); save.type = 'button'; save.textContent = t('rem_save');
+      var head = el('div', 'kcn-h'); head.textContent = t('rem_list'); head.style.margin = '14px 0 8px';
+      var list = el('ul', 'kcn-list');
+
+      async function refresh() {
+        list.textContent = '';
+        var items = [];
+        try { var p = await L.getPending(); items = (p && p.notifications) || []; } catch (e) { /* show empty */ }
+        if (!items.length) {
+          var e0 = el('li', 'kcn-empty'); e0.textContent = t('rem_none'); list.appendChild(e0); return;
+        }
+        items.forEach(function (n) {
+          var li = el('li', 'kcn-item');
+          var tx = el('span', 'kcn-tx');
+          var b = el('b'); b.textContent = n.title || '';
+          var sm = el('small');
+          try { sm.textContent = n.schedule && n.schedule.at ? new Date(n.schedule.at).toLocaleString() : ''; } catch (e) { sm.textContent = ''; }
+          tx.appendChild(b); tx.appendChild(sm);
+          var del = el('button', 'kcn-btn kcn-ghost'); del.type = 'button'; del.textContent = t('rem_del');
+          del.style.width = 'auto'; del.style.minWidth = '88px';
+          del.addEventListener('click', async function () {
+            try { await L.cancel({ notifications: [{ id: n.id }] }); } catch (e) { /* refresh anyway */ }
+            refresh();
+          });
+          li.appendChild(tx); li.appendChild(del); list.appendChild(li);
+        });
+      }
+
+      save.addEventListener('click', async function () {
+        var title = name.value.trim();
+        if (!title) { say(t('rem_noname')); name.focus(); return; }
+        var at = when.value ? new Date(when.value) : null;
+        if (!at || isNaN(at.getTime()) || at.getTime() <= Date.now() + 15000) { say(t('rem_past')); when.focus(); return; }
+        try {
+          await L.schedule({
+            notifications: [{
+              id: Math.floor(Date.now() / 1000) % 2000000000,
+              title: title, body: t('rem_body'),
+              schedule: { at: at, allowWhileIdle: true }
+            }]
+          });
+          name.value = ''; when.value = '';
+          say(t('rem_ok')); refresh();
+        } catch (e) { say(t('rem_fail')); }
+      });
+
+      box.appendChild(name); box.appendChild(when); box.appendChild(save);
+      box.appendChild(head); box.appendChild(list);
+      refresh();
+      return box;
+    });
+  }
+
+  // ---- Nearby places (config-driven, one GPS fix, nothing sent anywhere) --
+  function distM(aLat, aLng, bLat, bLng) {
+    var R = 6371000, r = Math.PI / 180;
+    var dLat = (bLat - aLat) * r, dLng = (bLng - aLng) * r;
+    var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(aLat * r) * Math.cos(bLat * r) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+  function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1) + ' km'; }
+  function validPlaces() {
+    var src = Array.isArray(CFG.places) ? CFG.places : [];
+    return src.filter(function (p) {
+      return p && typeof p.name === 'string' && p.name &&
+        typeof p.lat === 'number' && isFinite(p.lat) && Math.abs(p.lat) <= 90 &&
+        typeof p.lng === 'number' && isFinite(p.lng) && Math.abs(p.lng) <= 180;
+    });
+  }
+  function showNearby() {
+    var places = validPlaces();
+    if (!places.length || !navigator.geolocation) { say(t('near_none')); return; }
+    var holder = null;
+    var close = openSheet(t('near_t'), function () {
+      holder = el('div');
+      var w = el('div', 'kcn-empty'); w.textContent = t('near_wait'); holder.appendChild(w);
+      return holder;
+    });
+    if (!close) return;
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      if (!holder || !holder.isConnected) return;               // sheet already closed
+      var me = pos && pos.coords;
+      if (!me) { holder.textContent = t('near_none'); return; }
+      var ranked = places.map(function (p) {
+        return { p: p, d: distM(me.latitude, me.longitude, p.lat, p.lng) };
+      }).sort(function (a, b) { return a.d - b.d; }).slice(0, 8);
+      holder.textContent = '';
+      var ul = el('ul', 'kcn-list');
+      ranked.forEach(function (r) {
+        var li = el('li', 'kcn-item');
+        var tx = el('span', 'kcn-tx');
+        var b = el('b'); b.textContent = r.p.name; tx.appendChild(b);
+        if (typeof r.p.note === 'string' && r.p.note) { var sm = el('small'); sm.textContent = r.p.note; tx.appendChild(sm); }
+        var dist = el('span', 'kcn-dist'); dist.textContent = fmtDist(r.d);
+        li.appendChild(tx); li.appendChild(dist); ul.appendChild(li);
+      });
+      holder.appendChild(ul);
+    }, function () {
+      if (!holder || !holder.isConnected) return;
+      holder.textContent = '';
+      var m = el('div', 'kcn-empty'); m.textContent = t('loc_denied'); holder.appendChild(m);
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  }
+
   // ---- Home tools card ---------------------------------------------------
   function openMyLocation() {
     if (typeof nav === 'function') nav('map');
@@ -359,8 +630,8 @@
   function openComplaintPhoto() {
     if (typeof nav === 'function') nav('sos');
     setTimeout(function () {
-      var el = document.getElementById('kcn-photo') || document.getElementById('griev');
-      if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' });
+      var elx = document.getElementById('kcn-photo') || document.getElementById('griev');
+      if (elx && elx.scrollIntoView) elx.scrollIntoView({ block: 'center' });
     }, 300);
   }
   function renderHome() {
@@ -377,7 +648,14 @@
       { id: 'sos', cls: 'kcn-sos', ico: '\uD83C\uDD98', a: t('h_sos'), b: t('h_sos_s'), fn: function () { if (typeof nav === 'function') nav('sos'); } },
       { id: 'rep', cls: '', ico: '\uD83D\uDCF7', a: t('h_rep'), b: t('h_rep_s'), fn: openComplaintPhoto }
     ];
+    if (isNative() && validPlaces().length && navigator.geolocation) {
+      items.push({ id: 'near', cls: '', ico: '\uD83E\uDDED', a: t('near_card'), b: t('near_card_s'), fn: showNearby });
+    }
+    if (isNative() && plugin('LocalNotifications')) {
+      items.push({ id: 'rem', cls: '', ico: '\u23F0', a: t('rem_card'), b: t('rem_card_s'), fn: openReminders });
+    }
     if (pushAvailable()) items.push({ id: 'push', cls: '', ico: '\uD83D\uDD14', a: t('push_btn'), b: t('push_t'), fn: enablePush });
+    if (canShare()) items.push({ id: 'app', cls: '', ico: '\uD83D\uDCE4', a: t('app_card'), b: t('app_card_s'), fn: shareApp });
     host.textContent = '';
     var h = document.createElement('div'); h.className = 'kcn-h'; h.textContent = t('h_title'); host.appendChild(h);
     items.forEach(function (it) {
@@ -403,8 +681,9 @@
     if (!S) return;
     try {
       if (typeof S.setBackgroundColor === 'function') S.setBackgroundColor({ color: '#C8410A' });
-      // Light text/icons on the KumbhConnect saffron status bar.
-      if (S.Style && typeof S.setStyle === 'function') S.setStyle({ style: S.Style.Light });
+      // FIX: the plugin's Style enum is not exposed without a bundler, so use the string value.
+      // 'DARK' = light (white) icons for a dark/saffron background.
+      if (typeof S.setStyle === 'function') S.setStyle({ style: 'DARK' });
       if (typeof S.show === 'function') S.show();
     } catch (e) { /* optional native styling */ }
   }
@@ -419,11 +698,11 @@
 
   function visiblePage() {
     for (var i = 0; i < NAV_PAGES.length; i++) {
-      var el = document.getElementById('pg-' + NAV_PAGES[i]);
-      if (!el) continue;
+      var pg = document.getElementById('pg-' + NAV_PAGES[i]);
+      if (!pg) continue;
       var cs;
-      try { cs = window.getComputedStyle(el); } catch (e) { cs = null; }
-      if (cs && cs.display !== 'none' && cs.visibility !== 'hidden' && el.getClientRects().length) {
+      try { cs = window.getComputedStyle(pg); } catch (e) { cs = null; }
+      if (cs && cs.display !== 'none' && cs.visibility !== 'hidden' && pg.getClientRects().length) {
         return NAV_PAGES[i];
       }
     }
@@ -431,22 +710,21 @@
   }
 
   function handleAndroidBack() {
-    // Let open dialogs receive Escape first rather than navigating underneath them.
-    if (dlgOpen) {
-      try { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); } catch (e) { /* old WebView */ }
-      return;
-    }
+    // 1) Close the top dialog/sheet first.
+    if (activeClose) { try { activeClose(); } catch (e) { /* no-op */ } return; }
+    // 2) Any other page goes back to Home.
     var page = visiblePage();
     if (page !== 'home' && typeof window.nav === 'function') {
       try { window.nav('home'); lastBackAt = 0; return; } catch (e) { /* continue */ }
     }
+    // 3) On Home: press twice to exit.
     var now = Date.now();
     if (now - lastBackAt < BACK_EXIT_WINDOW_MS) {
       var A = plugin('App');
       try { if (A && typeof A.exitApp === 'function') { A.exitApp(); return; } } catch (e) { /* fallback below */ }
     }
     lastBackAt = now;
-    say(lang() === 'mr' ? 'अ‍ॅप बंद करण्यासाठी पुन्हा Back दाबा.' : 'Press Back again to exit the app.');
+    say(t('back_exit'));
   }
 
   function setupNativeAppEvents() {
@@ -470,7 +748,8 @@
     // Keep the viewport usable when the Android soft keyboard opens.
     var K = plugin('Keyboard');
     if (K) {
-      try { if (typeof K.setResizeMode === 'function' && K.Resize && K.Resize.Native) K.setResizeMode({ mode: K.Resize.Native }); } catch (e) { /* optional */ }
+      // FIX: Keyboard.Resize enum is not available without a bundler; 'native' is the string value.
+      try { if (typeof K.setResizeMode === 'function') K.setResizeMode({ mode: 'native' }); } catch (e) { /* optional */ }
       try {
         if (typeof K.addListener === 'function') {
           K.addListener('keyboardDidShow', function () { document.documentElement.classList.add('kc-keyboard-open'); });
@@ -494,7 +773,11 @@
   function patchSetLang() {
     if (typeof window.setLang !== 'function' || window.setLang.__kcn) return;
     var orig = window.setLang;
-    var w = function () { var r = orig.apply(this, arguments); try { renderHome(); refreshPhotoUi(); } catch (e) { /* no-op */ } return r; };
+    var w = function () {
+      var r = orig.apply(this, arguments);
+      try { renderHome(); refreshPhotoUi(); if (offBar && !offBar.hidden) offBar.textContent = t('off'); } catch (e) { /* no-op */ }
+      return r;
+    };
     w.__kcn = true; window.setLang = w;
   }
   function init() {
@@ -505,14 +788,17 @@
     patchSetLang();
     setupStatusBar();
     setupNativeAppEvents();
+    setupNetwork();
     wireHaptics();
     hideNativeSplash();
   }
 
   window.KCNative = {
     isNative: isNative, t: t, haptic: haptic, canShare: canShare, shareSos: shareSos,
-    shareText: shareText, mayAutoLocate: mayAutoLocate, pickPhoto: pickPhoto, removePhoto: removePhoto,
+    shareText: shareText, shareApp: shareApp, mayAutoLocate: mayAutoLocate,
+    pickPhoto: pickPhoto, removePhoto: removePhoto,
     enablePush: enablePush, refreshPhotoUi: refreshPhotoUi,
+    openReminders: openReminders, showNearby: showNearby,
     setupStatusBar: setupStatusBar, setupNativeAppEvents: setupNativeAppEvents,
     handleAndroidBack: handleAndroidBack
   };
