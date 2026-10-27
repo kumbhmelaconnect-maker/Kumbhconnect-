@@ -30,8 +30,8 @@ jobs:
     env:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
-      APP_VERSION: "1.4.1"
-      APP_VERSION_CODE: "13"   # Pudhchya update la wadhva (14, 15...). Aadhiche: 10, 12
+      APP_VERSION: "1.4.2"
+      APP_VERSION_CODE: "14"   # Pudhchya update la wadhva (14, 15...). Aadhiche: 10, 12
 
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
