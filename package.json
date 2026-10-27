@@ -1,6 +1,6 @@
 {
   "name": "kumbhconnect-android",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "description": "Capacitor Android build scaffold for KumbhConnect",
   "scripts": {
