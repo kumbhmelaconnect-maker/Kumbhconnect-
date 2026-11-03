@@ -151,3 +151,17 @@ html.kc-native button:focus-visible,html.kc-native a:focus-visible,html.kc-nativ
 .kcn-chip:focus-visible{outline:3px solid #1A237E;outline-offset:2px}
 .kcn-item .kcn-i{flex:none;font-size:1.3rem;line-height:1}
 html.kc-native #ibar,html.kc-native #updatebar{display:none !important}
+
+/* ---------- AND-01: Google Sign-In is not supported inside the Android app ----------
+   Hidden in native mode only (html.kc-native). The website/PWA keeps the buttons.
+   .auth-or is the "or" divider that precedes each Google button (4 places in index.html). */
+html.kc-native .btn-google,
+html.kc-native .auth-or{display:none !important}
+
+/* ---------- offline banner: second line explaining what still works ---------- */
+.kcn-offline{flex-direction:column;gap:2px;text-align:center}
+.kcn-offline small{display:block;font-size:.72rem;font-weight:500;line-height:1.35;opacity:.92}
+html.kc-offline .kcn-needs-net{opacity:.55}
+
+/* ---------- analytics sheet ---------- */
+.kcn-note{margin:8px 0 0;font-size:.76rem;line-height:1.5;color:var(--t2,#5a4630)}
