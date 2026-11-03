@@ -63,9 +63,15 @@ jobs:
       # 5. Android SDK
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # Handle licence acceptance explicitly in the next step.
+          # This avoids an interactive prompt inside the action.
+          accept-android-sdk-licenses: false
+          log-accepted-android-sdk-licenses: false
+          packages: ''
 
-      # 6. Install SDK 36
-      - name: Install Android SDK 36
+      # 6. Accept SDK licences and install SDK 36
+      - name: Accept Android SDK licences and install SDK 36
         shell: bash
         run: |
           set -euo pipefail
@@ -78,11 +84,32 @@ jobs:
 
           echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
 
+          SDKMANAGER="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMANAGER" ] || [ ! -x "$SDKMANAGER" ]; then
+            echo "::error::sdkmanager was not found on PATH."
+            exit 1
+          fi
+
+          echo "Using sdkmanager: $SDKMANAGER"
+
+          # Accept the licences non-interactively and preserve sdkmanager's
+          # exit code. The 'yes' process may receive SIGPIPE after sdkmanager
+          # has consumed the required answers, so do not use pipefail here.
+          LICENSE_LOG="$RUNNER_TEMP/android-sdk-licenses.log"
           set +o pipefail
-          yes | sdkmanager --licenses >/dev/null || true
+          yes | "$SDKMANAGER" --sdk_root="$SDK" --licenses >"$LICENSE_LOG" 2>&1
+          LICENSE_STATUS=${PIPESTATUS[1]}
           set -o pipefail
 
-          sdkmanager \
+          if [ "$LICENSE_STATUS" -ne 0 ]; then
+            echo "::error::Android SDK licence acceptance failed."
+            tail -n 80 "$LICENSE_LOG" || true
+            exit "$LICENSE_STATUS"
+          fi
+
+          echo "Android SDK licences accepted."
+
+          "$SDKMANAGER" --sdk_root="$SDK" \
             "platform-tools" \
             "platforms;android-${ANDROID_COMPILE_SDK}" \
             "build-tools;${ANDROID_BUILD_TOOLS}"
@@ -95,6 +122,7 @@ jobs:
             echo "::error::Android build tools missing."
             exit 1
           }
+
           echo "Android SDK installation verified."
 
       # 7. Verify project files and dependencies
