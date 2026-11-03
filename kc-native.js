@@ -24,6 +24,10 @@
  *   - Fixes: StatusBar style and Keyboard resize mode now use string values (the plugin
  *     enums are not available without a bundler, so v1 silently skipped them).
  *
+ *   Phase 2: Google Sign-In hidden in native mode (CSS + this file), analytics opt-out card,
+ *   offline banner explains what still works, complaint photo is handed to the Android share
+ *   sheet via Capacitor Filesystem + Share (a data: URL <a download> does not save in a WebView).
+ *
  * It never uploads anything, never tracks continuously, and never calls anyone.
  * Plugins are looked up with Capacitor.isPluginAvailable() so a missing plugin
  * degrades to the existing web behaviour instead of throwing.
@@ -126,7 +130,37 @@
       app_msg: 'KumbhConnect – नाशिक कुंभमेळा मार्गदर्शक',
       near_card: 'जवळची ठिकाणे', near_card_s: 'तुमच्या स्थानापासून अंतरानुसार',
       near_t: 'जवळची ठिकाणे', near_none: 'जवळची ठिकाणे दाखवता आली नाहीत.',
-      near_wait: 'स्थान शोधत आहे…'
+      near_wait: 'स्थान शोधत आहे…',
+      // phase 2
+      off_hint: 'ऑफलाइन चालते: SOS व आपत्कालीन क्रमांक, ॲपमधील ठिकाणांची यादी, आठवणी. इंटरनेट लागते: नकाशा, लॉगिन, तक्रार पाठवणे, AI चॅट, रिव्ह्यू व ऑनलाइन डेटा.',
+      on_back: 'इंटरनेट परत आले.',
+      an_card: 'वापर आकडेवारी', an_card_s: 'चालू/बंद करा, स्थानिक नोंदी हटवा',
+      an_t: 'वापर आकडेवारी (Analytics)',
+      an_b: 'अ‍ॅप वापराची अनामिक नोंद (Device ID, वापरलेले पेज/सुविधा, वेळ) KumbhConnect ने ठरवलेल्या Google Apps Script सेवेला पाठवली जाते. तुम्ही ती बंद करू शकता; बंद केल्यावर नवीन नोंदी पाठवल्या जात नाहीत.',
+      an_sw: 'अनामिक वापर आकडेवारी पाठवा',
+      an_clear: 'या फोनवरील स्थानिक नोंदी हटवा',
+      an_clear_n: 'यामुळे फक्त या फोनवर साठवलेल्या नोंदी हटतात. आधी सर्व्हरला पाठवलेल्या नोंदी अ‍ॅपमधून हटवता येत नाहीत; त्याबाबत kumbhmelaconnect@gmail.com वर संपर्क करा.',
+      an_off_ok: 'आकडेवारी बंद केली.', an_on_ok: 'आकडेवारी चालू केली.', an_cleared: 'स्थानिक नोंदी हटवल्या.',
+      photo_share: 'फोटो शेअर करा (WhatsApp इ.)',
+      photo_share_fail: 'फोटो शेअर करता आला नाही. पुन्हा प्रयत्न करा.',
+      photo_native_body: 'WhatsApp मध्ये संदेशाचा मसुदा उघडला आहे — तो अजून पाठवलेला नाही. WhatsApp संदेशासोबत फोटो आपोआप जोडता येत नाही. फोटो पाठवण्यासाठी खालील बटण दाबा, शेअर यादीतून WhatsApp व योग्य चॅट निवडा आणि पाठवा.',
+      photo_native_none: 'WhatsApp मध्ये संदेशाचा मसुदा उघडला आहे — तो अजून पाठवलेला नाही. हे अ‍ॅप फोटो WhatsApp ला देऊ शकले नाही, त्यामुळे फोटो आपोआप जोडला गेलेला नाही.'
+    },
+    hi: {
+      // Only the phase-2 strings; every other key falls back to English (existing behaviour).
+      off_hint: 'ऑफ़लाइन चलता है: SOS व आपातकालीन नंबर, ऐप में दी गई जगहों की सूची, रिमाइंडर। इंटरनेट चाहिए: नक्शा, लॉग-इन, शिकायत भेजना, AI चैट, रिव्यू व ऑनलाइन डेटा।',
+      on_back: 'इंटरनेट वापस आ गया।',
+      an_card: 'उपयोग आँकड़े', an_card_s: 'चालू/बंद करें, स्थानीय रिकॉर्ड हटाएँ',
+      an_t: 'उपयोग आँकड़े (Analytics)',
+      an_b: 'ऐप के उपयोग का अनाम रिकॉर्ड (Device ID, उपयोग किया गया पेज/फ़ीचर, समय) KumbhConnect द्वारा तय की गई Google Apps Script सेवा को भेजा जाता है। आप इसे बंद कर सकते हैं; बंद करने के बाद नए रिकॉर्ड नहीं भेजे जाते।',
+      an_sw: 'अनाम उपयोग आँकड़े भेजें',
+      an_clear: 'इस फ़ोन के स्थानीय रिकॉर्ड हटाएँ',
+      an_clear_n: 'इससे केवल इस फ़ोन में सहेजे गए रिकॉर्ड हटते हैं। पहले सर्वर को भेजे गए रिकॉर्ड ऐप से नहीं हटाए जा सकते; इसके लिए kumbhmelaconnect@gmail.com पर संपर्क करें।',
+      an_off_ok: 'आँकड़े बंद किए गए।', an_on_ok: 'आँकड़े चालू किए गए।', an_cleared: 'स्थानीय रिकॉर्ड हटाए गए।',
+      photo_share: 'फ़ोटो शेयर करें (WhatsApp आदि)',
+      photo_share_fail: 'फ़ोटो शेयर नहीं हो सका। कृपया फिर प्रयास करें।',
+      photo_native_body: 'WhatsApp में संदेश का ड्राफ़्ट खुल गया है — वह अभी भेजा नहीं गया है। WhatsApp संदेश के साथ फ़ोटो अपने-आप नहीं जुड़ सकती। फ़ोटो भेजने के लिए नीचे का बटन दबाएँ, शेयर सूची से WhatsApp व सही चैट चुनें और भेजें।',
+      photo_native_none: 'WhatsApp में संदेश का ड्राफ़्ट खुल गया है — वह अभी भेजा नहीं गया है। यह ऐप फ़ोटो WhatsApp को नहीं दे सका, इसलिए फ़ोटो अपने-आप नहीं जुड़ी है।'
     },
     en: {
       cont: 'Continue', notnow: 'Not now', close: 'Close',
@@ -174,11 +208,28 @@
       app_msg: 'KumbhConnect – Nashik Kumbh Mela Guide',
       near_card: 'Nearby places', near_card_s: 'Sorted by distance from you',
       near_t: 'Nearby places', near_none: 'Could not show nearby places.',
-      near_wait: 'Finding your location…'
+      near_wait: 'Finding your location…',
+      // phase 2
+      off_hint: 'Works offline: SOS and emergency numbers, the in-app places list, reminders. Needs internet: map, sign-in, sending complaints, AI chat, reviews and online data.',
+      on_back: 'Back online.',
+      an_card: 'Usage statistics', an_card_s: 'Turn on/off, delete local records',
+      an_t: 'Usage statistics (Analytics)',
+      an_b: 'An anonymous record of app use (device ID, page/feature used, time) is sent to a Google Apps Script service set up by KumbhConnect. You can turn this off; after that no new records are sent.',
+      an_sw: 'Send anonymous usage statistics',
+      an_clear: 'Delete local records on this phone',
+      an_clear_n: 'This only deletes records stored on this phone. Records already sent to the server cannot be deleted from the app; contact kumbhmelaconnect@gmail.com about those.',
+      an_off_ok: 'Statistics turned off.', an_on_ok: 'Statistics turned on.', an_cleared: 'Local records deleted.',
+      photo_share: 'Share photo (WhatsApp etc.)',
+      photo_share_fail: 'Could not share the photo. Please try again.',
+      photo_native_body: 'A message draft has opened in WhatsApp — it has not been sent yet. WhatsApp cannot attach the photo to that draft automatically. To send the photo, tap the button below, choose WhatsApp and the right chat from the share list, then send.',
+      photo_native_none: 'A message draft has opened in WhatsApp — it has not been sent yet. This app could not hand the photo to WhatsApp, so the photo was not attached.'
     }
   };
   function lang() { try { return typeof _lang !== 'undefined' ? _lang : 'mr'; } catch (e) { return 'mr'; } }
-  function t(k) { var d = TX[lang() === 'mr' ? 'mr' : 'en']; return d[k] !== undefined ? d[k] : TX.en[k] || ''; }
+  function t(k) {
+    var l = lang(), d = TX[l === 'mr' ? 'mr' : l === 'hi' ? 'hi' : 'en'];
+    return d[k] !== undefined ? d[k] : TX.en[k] || '';
+  }
 
   // Uses the app's own toast() when present, otherwise a small native-styled one.
   var toastEl = null, toastTimer = null;
@@ -471,8 +522,14 @@
       offBar.hidden = true;
       document.body.appendChild(offBar);
     }
-    offBar.textContent = t('off');
+    var wasOff = document.documentElement.classList.contains('kc-offline');
+    offBar.textContent = '';
+    var l1 = document.createElement('span'); l1.textContent = t('off');
+    var l2 = document.createElement('small'); l2.textContent = t('off_hint');
+    offBar.appendChild(l1); offBar.appendChild(l2);
     offBar.hidden = !off;
+    document.documentElement.classList.toggle('kc-offline', !!off);
+    if (wasOff && !off) say(t('on_back'));          // connectivity recovered
   }
   function setupNetwork() {
     if (!isNative() || netWired) return;
@@ -569,6 +626,60 @@
       refresh();
       return box;
     });
+  }
+
+  // ---- Analytics preference (PRV-04) -------------------------------------
+  // kcTrack() in index.html honours localStorage 'kc_analytics_optout' === '1'.
+  // Opt-out stops new events (queue + network). Deleting the local queue never touches the server.
+  var AN_KEY = 'kc_analytics_optout';
+  function analyticsOff() { try { return localStorage.getItem(AN_KEY) === '1'; } catch (e) { return false; } }
+  function setAnalyticsOff(v) {
+    try {
+      if (v) localStorage.setItem(AN_KEY, '1'); else localStorage.removeItem(AN_KEY);
+      if (v) { localStorage.removeItem('kc_event_q'); localStorage.removeItem('kc_last_report'); }
+    } catch (e) { /* storage unavailable */ }
+  }
+  function openAnalytics() {
+    openSheet(t('an_t'), function () {
+      var box = el('div');
+      var p = el('p', 'kcn-note'); p.textContent = t('an_b'); p.style.marginTop = '0';
+      var row = el('label', 'kcn-sw');
+      var lbl = el('span'); lbl.textContent = t('an_sw');
+      var cb = el('input'); cb.type = 'checkbox'; cb.checked = !analyticsOff();
+      cb.setAttribute('aria-label', t('an_sw'));
+      cb.addEventListener('change', function () { setAnalyticsOff(!cb.checked); say(cb.checked ? t('an_on_ok') : t('an_off_ok')); });
+      row.appendChild(lbl); row.appendChild(cb);
+      var clr = el('button', 'kcn-btn kcn-ghost'); clr.type = 'button'; clr.textContent = t('an_clear');
+      clr.addEventListener('click', function () {
+        try { localStorage.removeItem('kc_event_q'); localStorage.removeItem('kc_last_report'); } catch (e) { /* no-op */ }
+        say(t('an_cleared'));
+      });
+      var n = el('p', 'kcn-note'); n.textContent = t('an_clear_n');
+      box.appendChild(p); box.appendChild(row); box.appendChild(clr); box.appendChild(n);
+      return box;
+    });
+  }
+
+  // ---- Complaint photo -> Android share sheet (AND-04) ---------------------
+  // A data: URL <a download> does not save a file inside the Capacitor WebView, so the photo is
+  // written to the app cache with @capacitor/filesystem and handed to the share sheet. The user
+  // picks the app/chat; nothing is sent automatically and success is never claimed.
+  function canSharePhotoFile() { return isNative() && !!plugin('Filesystem') && !!plugin('Share'); }
+  var PHOTO_EXT = { jpeg: 'jpg', png: 'png', webp: 'webp' };
+  async function sharePhotoFile(dataUrl, baseName) {
+    var F = plugin('Filesystem'), S = plugin('Share');
+    if (!F || !S || typeof dataUrl !== 'string' || !PHOTO_TYPES.test(dataUrl)) return 'unsupported';
+    try {
+      var m = /^data:image\/(jpeg|png|webp);base64,/i.exec(dataUrl);
+      var ext = PHOTO_EXT[m[1].toLowerCase()];
+      var safe = String(baseName || 'KumbhConnect-Complaint').replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 60) + '.' + ext;
+      try { await F.rmdir({ path: 'kc-share', directory: 'CACHE', recursive: true }); } catch (e) { /* none yet */ }
+      var w = await F.writeFile({ path: 'kc-share/' + safe, data: dataUrl.slice(dataUrl.indexOf(',') + 1), directory: 'CACHE', recursive: true });
+      await S.share({ title: 'KumbhConnect', dialogTitle: 'KumbhConnect', files: [w.uri] });
+      return 'ok';                                   // share sheet was used; delivery is NOT known
+    } catch (e) {
+      return /cancel|abort/i.test(String((e && (e.message || e.name)) || '')) ? 'cancelled' : 'error';
+    }
   }
 
   // ---- Nearby places (config-driven, one GPS fix, nothing sent anywhere) --
@@ -708,6 +819,7 @@
     }
     if (pushAvailable()) items.push({ id: 'push', cls: '', ico: '\uD83D\uDD14', a: t('push_btn'), b: t('push_t'), fn: enablePush });
     if (canShare()) items.push({ id: 'app', cls: '', ico: '\uD83D\uDCE4', a: t('app_card'), b: t('app_card_s'), fn: shareApp });
+    if (isNative()) items.push({ id: 'an', cls: '', ico: '\uD83D\uDCCA', a: t('an_card'), b: t('an_card_s'), fn: openAnalytics });
     host.textContent = '';
     var h = document.createElement('div'); h.className = 'kcn-h'; h.textContent = t('h_title'); host.appendChild(h);
     items.forEach(function (it) {
@@ -827,7 +939,7 @@
     var orig = window.setLang;
     var w = function () {
       var r = orig.apply(this, arguments);
-      try { renderHome(); refreshPhotoUi(); if (offBar && !offBar.hidden) offBar.textContent = t('off'); } catch (e) { /* no-op */ }
+      try { renderHome(); refreshPhotoUi(); if (offBar && !offBar.hidden) showOffline(true); } catch (e) { /* no-op */ }
       return r;
     };
     w.__kcn = true; window.setLang = w;
@@ -852,7 +964,9 @@
     enablePush: enablePush, refreshPhotoUi: refreshPhotoUi,
     openReminders: openReminders, showNearby: showNearby,
     setupStatusBar: setupStatusBar, setupNativeAppEvents: setupNativeAppEvents,
-    handleAndroidBack: handleAndroidBack
+    handleAndroidBack: handleAndroidBack,
+    canSharePhotoFile: canSharePhotoFile, sharePhotoFile: sharePhotoFile,
+    openAnalytics: openAnalytics, analyticsOff: analyticsOff
   };
 
   // Capacitor injects window.Capacitor before page scripts on Android; init after DOM is ready.
