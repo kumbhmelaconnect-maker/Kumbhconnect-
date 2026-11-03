@@ -1,3 +1,4 @@
+
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -5,8 +6,8 @@ const config: CapacitorConfig = {
   appName: 'KumbhConnect',
   webDir: 'www',
 
-  // IMPORTANT: server.url vaparu nako. App www/ madhun local load zali pahije,
-  // nahitar Indus la "website converted into app" disto.
+  // App must load bundled local assets.
+  // Do not configure server.url.
   server: {
     androidScheme: 'https',
     cleartext: false
@@ -21,13 +22,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#FF6D00'
     },
 
-    // @capacitor/local-notifications (aarti / snan reminders)
     LocalNotifications: {
       iconColor: '#FF6D00'
     },
 
-    // @capacitor/push-notifications (Android sathi presentationOptions lagat nahi;
-    // FCM sathi android/app/google-services.json lagto)
     PushNotifications: {}
   },
 
