@@ -34,7 +34,7 @@ jobs:
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
       ANDROID_BUILD_TOOLS: "36.0.0"
-      ANDROID_GRADLE_PLUGIN_VERSION: "8.10.2"
+      ANDROID_GRADLE_PLUGIN_VERSION: "8.10.1"
 
     steps:
       # 1. Checkout
@@ -92,14 +92,18 @@ jobs:
 
           echo "Using sdkmanager: $SDKMANAGER"
 
-          # Accept the licences non-interactively and preserve sdkmanager's
-          # exit code. The 'yes' process may receive SIGPIPE after sdkmanager
-          # has consumed the required answers, so do not use pipefail here.
+          # Accept licences non-interactively. Capture sdkmanager's exit code
+          # without letting errexit terminate the step before diagnostics print.
+          # The 'yes' process may receive SIGPIPE after sdkmanager has read all
+          # required answers; sdkmanager's status is the one that matters.
           LICENSE_LOG="$RUNNER_TEMP/android-sdk-licenses.log"
+          set +e
           set +o pipefail
           yes | "$SDKMANAGER" --sdk_root="$SDK" --licenses >"$LICENSE_LOG" 2>&1
-          LICENSE_STATUS=${PIPESTATUS[1]}
+          PIPE_STATUS=("${PIPESTATUS[@]}")
           set -o pipefail
+          set -e
+          LICENSE_STATUS="${PIPE_STATUS[1]:-1}"
 
           if [ "$LICENSE_STATUS" -ne 0 ]; then
             echo "::error::Android SDK licence acceptance failed."
@@ -692,7 +696,7 @@ jobs:
           PY
 
       # 22. Verify Gradle, AGP and SDK configuration
-      - name: Verify Gradle and Android configuration
+      - name: Configure and verify Gradle and Android configuration
         shell: bash
         env:
           REQUIRED_AGP: ${{ env.ANDROID_GRADLE_PLUGIN_VERSION }}
@@ -721,16 +725,45 @@ jobs:
           wrapper_file = Path('android/gradle/wrapper/gradle-wrapper.properties')
           wrapper_text = wrapper_file.read_text(encoding='utf-8')
           wrapper_match = re.search(
-              r'gradle-(\d+\.\d+(?:\.\d+)?)-(?:bin|all)\.zip',
+              r'(?m)^distributionUrl=.*gradle-(\d+\.\d+(?:\.\d+)?)-(?:bin|all)\.zip\s*$',
               wrapper_text
           )
           if not wrapper_match:
-              print('::error::Could not detect Gradle wrapper version.')
+              print('::error::Could not detect Gradle wrapper distributionUrl.')
               sys.exit(1)
           gradle_version = wrapper_match.group(1)
+
+          # AGP 8.10 requires Gradle 8.11.1 or newer. If the generated
+          # Capacitor wrapper is older, upgrade its distribution URL and pin
+          # the official Gradle 8.11.1 SHA-256 checksum instead of failing later.
           if ver(gradle_version) < ver('8.11.1'):
-              print('::error::Gradle %s is below 8.11.1 required by AGP 8.10.' % gradle_version)
-              sys.exit(1)
+              gradle_version = '8.11.1'
+              gradle_url = (
+                  'distributionUrl=https\\://services.gradle.org/distributions/'
+                  'gradle-8.11.1-bin.zip'
+              )
+              gradle_sha256 = (
+                  'f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6'
+              )
+              wrapper_text, url_count = re.subn(
+                  r'(?m)^distributionUrl=.*$', gradle_url, wrapper_text
+              )
+              if url_count != 1:
+                  print('::error::Could not safely update Gradle distributionUrl.')
+                  sys.exit(1)
+              checksum_line = 'distributionSha256Sum=' + gradle_sha256
+              if re.search(r'(?m)^distributionSha256Sum=', wrapper_text):
+                  wrapper_text, checksum_count = re.subn(
+                      r'(?m)^distributionSha256Sum=.*$', checksum_line, wrapper_text
+                  )
+                  if checksum_count != 1:
+                      print('::error::Could not safely update Gradle distribution checksum.')
+                      sys.exit(1)
+              else:
+                  wrapper_text = wrapper_text.rstrip() + '\n' + checksum_line + '\n'
+              wrapper_file.write_text(wrapper_text, encoding='utf-8')
+              print('Upgraded Gradle wrapper to 8.11.1 with official SHA-256 pin.')
+
           print('Gradle wrapper:', gradle_version)
 
           android = Path('android')
@@ -786,6 +819,11 @@ jobs:
 
           cd android
           ./gradlew --no-daemon --version
+
+          # Resolve the Android plugin and configure the project before the
+          # actual assemble task. This catches repository/version problems
+          # in a dedicated preflight step with a clearer failure location.
+          ./gradlew --no-daemon --console=plain --stacktrace help
 
       # 23. Build Debug APK
       - name: Build Debug APK
