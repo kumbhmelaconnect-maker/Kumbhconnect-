@@ -1,4 +1,3 @@
-
 name: Build KumbhConnect Android
 
 on:
@@ -32,61 +31,46 @@ jobs:
       APP_NAME: KumbhConnect
       APP_VERSION: "1.5.1"
       APP_VERSION_CODE: "17"
-
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
       ANDROID_BUILD_TOOLS: "36.0.0"
+      ANDROID_GRADLE_PLUGIN_VERSION: "8.10.2"
 
     steps:
-      # ------------------------------------------------
       # 1. Checkout
-      # ------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ------------------------------------------------
       # 2. Node.js
-      # ------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      # ------------------------------------------------
       # 3. Python
-      # ------------------------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      # ------------------------------------------------
       # 4. Java 21
-      # ------------------------------------------------
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      # ------------------------------------------------
       # 5. Android SDK
-      # ------------------------------------------------
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: ''
 
-      # ------------------------------------------------
       # 6. Install SDK 36
-      # ------------------------------------------------
       - name: Install Android SDK 36
         shell: bash
         run: |
           set -euo pipefail
 
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
-
           if [ -z "$SDK" ] || [ ! -d "$SDK" ]; then
             echo "::error::Android SDK directory not found."
             exit 1
@@ -103,21 +87,17 @@ jobs:
             "platforms;android-${ANDROID_COMPILE_SDK}" \
             "build-tools;${ANDROID_BUILD_TOOLS}"
 
-          [ -d "$SDK/platforms/android-${ANDROID_COMPILE_SDK}" ] || {
+          test -d "$SDK/platforms/android-${ANDROID_COMPILE_SDK}" || {
             echo "::error::Android platform missing."
             exit 1
           }
-
-          [ -d "$SDK/build-tools/${ANDROID_BUILD_TOOLS}" ] || {
+          test -d "$SDK/build-tools/${ANDROID_BUILD_TOOLS}" || {
             echo "::error::Android build tools missing."
             exit 1
           }
-
           echo "Android SDK installation verified."
 
-      # ------------------------------------------------
       # 7. Verify project files and dependencies
-      # ------------------------------------------------
       - name: Verify project files and dependencies
         shell: bash
         run: |
@@ -133,11 +113,12 @@ jobs:
           need package.json
           need scripts/android/prepare-web.mjs
           need scripts/android/generate-icons.py
-
           need index.html
           need kc-native.js
           need kc-native.css
           need sw.js
+          need icon-512.png
+          need icon-maskable-512.png
 
           if [ ! -f capacitor.config.ts ] &&
              [ ! -f capacitor.config.json ] &&
@@ -149,67 +130,37 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const p = require('./package.json');
-
-          const has = n =>
-            Boolean(
-              (p.dependencies && p.dependencies[n]) ||
-              (p.devDependencies && p.devDependencies[n])
-            );
+          const has = n => Boolean(
+            (p.dependencies && p.dependencies[n]) ||
+            (p.devDependencies && p.devDependencies[n])
+          );
 
           const required = [
-            '@capacitor/core',
-            '@capacitor/cli',
-            '@capacitor/android',
-            '@capacitor/geolocation',
-            '@capacitor/camera',
-            '@capacitor/share',
-            '@capacitor/app',
-            '@capacitor/network',
-            '@capacitor/local-notifications',
-            '@capacitor/splash-screen',
-            '@capacitor/filesystem',
-            'leaflet'
+            '@capacitor/core', '@capacitor/cli', '@capacitor/android',
+            '@capacitor/geolocation', '@capacitor/camera',
+            '@capacitor/share', '@capacitor/app', '@capacitor/network',
+            '@capacitor/local-notifications', '@capacitor/splash-screen',
+            '@capacitor/filesystem', 'leaflet'
           ];
 
           let failed = false;
-
           for (const name of required) {
-            if (has(name)) {
-              console.log('OK:', name);
-            } else {
+            if (has(name)) console.log('OK:', name);
+            else {
               console.error('::error::Missing dependency:', name);
               failed = true;
             }
           }
 
-          if (
-            fs.existsSync('capacitor.config.ts') &&
-            !has('typescript')
-          ) {
-            console.error(
-              '::error::capacitor.config.ts requires typescript.'
-            );
+          if (fs.existsSync('capacitor.config.ts') && !has('typescript')) {
+            console.error('::error::capacitor.config.ts requires typescript.');
             failed = true;
           }
-
           if (failed) process.exit(1);
-
           console.log('All required dependencies verified.');
           NODE
 
-          [ -f icon-512.png ] || {
-            echo "::error::icon-512.png missing."
-            exit 1
-          }
-
-          [ -f icon-maskable-512.png ] || {
-            echo "::error::icon-maskable-512.png missing."
-            exit 1
-          }
-
-      # ------------------------------------------------
-      # 8. Verify native plugins and local configuration
-      # ------------------------------------------------
+      # 8. Verify native plugins and ensure local bundled app configuration
       - name: Verify native plugins and local configuration
         shell: bash
         run: |
@@ -217,208 +168,149 @@ jobs:
 
           node - <<'NODE'
           const p = require('./package.json');
-
-          const has = n =>
-            Boolean(
-              (p.dependencies && p.dependencies[n]) ||
-              (p.devDependencies && p.devDependencies[n])
-            );
-
+          const has = n => Boolean(
+            (p.dependencies && p.dependencies[n]) ||
+            (p.devDependencies && p.devDependencies[n])
+          );
           const required = [
-            '@capacitor/geolocation',
-            '@capacitor/camera',
-            '@capacitor/share',
-            '@capacitor/app',
-            '@capacitor/network',
-            '@capacitor/local-notifications',
-            '@capacitor/splash-screen',
+            '@capacitor/geolocation', '@capacitor/camera',
+            '@capacitor/share', '@capacitor/app', '@capacitor/network',
+            '@capacitor/local-notifications', '@capacitor/splash-screen',
             '@capacitor/filesystem'
           ];
-
           let failed = false;
-
           for (const name of required) {
-            if (has(name)) {
-              console.log('Native plugin OK:', name);
-            } else {
+            if (has(name)) console.log('Native plugin OK:', name);
+            else {
               console.error('::error::Missing native plugin:', name);
               failed = true;
             }
           }
-
-          const optional = [
-            '@capacitor/haptics',
-            '@capacitor/status-bar',
-            '@capacitor/keyboard',
-            '@capacitor/push-notifications'
-          ];
-
-          for (const name of optional) {
-            if (!has(name)) {
-              console.log('Optional plugin not installed:', name);
-            }
+          for (const name of [
+            '@capacitor/haptics', '@capacitor/status-bar',
+            '@capacitor/keyboard', '@capacitor/push-notifications'
+          ]) {
+            if (!has(name)) console.log('Optional plugin not installed:', name);
           }
-
           if (failed) process.exit(1);
           NODE
 
           for f in capacitor.config.ts capacitor.config.js; do
-            if [ -f "$f" ] &&
-               grep -nE '^[[:space:]]*url[[:space:]]*:' "$f"; then
+            if [ -f "$f" ] && grep -nE '^[[:space:]]*url[[:space:]]*:' "$f"; then
               echo "::error::Remote server.url detected in $f."
               exit 1
             fi
           done
-
           if [ -f capacitor.config.json ] &&
              grep -n '"url"[[:space:]]*:' capacitor.config.json; then
             echo "::error::Remote server.url detected."
             exit 1
           fi
-
           echo "Native plugin and local configuration checks passed."
 
-      # ------------------------------------------------
       # 9. Ensure npm lock file
-      # ------------------------------------------------
       - name: Ensure npm lock file exists
         shell: bash
         run: |
           set -euo pipefail
-
-          if [ ! -f package-lock.json ] &&
-             [ ! -f npm-shrinkwrap.json ]; then
+          if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
             echo "Generating npm lock file."
             npm install --package-lock-only --ignore-scripts
           fi
-
-          if [ ! -f package-lock.json ] &&
-             [ ! -f npm-shrinkwrap.json ]; then
+          if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
             echo "::error::npm lock file was not generated."
             exit 1
           fi
 
-      # ------------------------------------------------
       # 10. Install dependencies
-      # ------------------------------------------------
       - name: Install dependencies
         shell: bash
         run: |
           set -euo pipefail
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      # ------------------------------------------------
-      # 11. Verify source files
-      # ------------------------------------------------
+      # 11. Verify source files and scripts
       - name: Verify native source files
         shell: bash
         run: |
           set -euo pipefail
-
           for f in index.html kc-native.js kc-native.css sw.js; do
             [ -s "$f" ] || {
               echo "::error::Missing or empty: $f"
               exit 1
             }
           done
-
           node --check kc-native.js
           node --check scripts/android/prepare-web.mjs
-
+          python -m py_compile scripts/android/generate-icons.py
           echo "Native source files verified."
 
-      # ------------------------------------------------
-      # 12. Prepare web assets
-      # ------------------------------------------------
+      # 12. Prepare local web assets
       - name: Prepare web assets
         shell: bash
         run: |
           set -euo pipefail
           node scripts/android/prepare-web.mjs
 
-      # ------------------------------------------------
       # 13. Bundle Leaflet locally
-      # ------------------------------------------------
       - name: Bundle Leaflet locally
         shell: bash
         run: |
           set -euo pipefail
-
-          L=node_modules/leaflet/dist
-
-          [ -s "$L/leaflet.js" ] || {
+          L="node_modules/leaflet/dist"
+          test -s "$L/leaflet.js" || {
             echo "::error::leaflet.js missing."
             exit 1
           }
-
-          [ -s "$L/leaflet.css" ] || {
+          test -s "$L/leaflet.css" || {
             echo "::error::leaflet.css missing."
             exit 1
           }
-
-          [ -d "$L/images" ] || {
+          test -d "$L/images" || {
             echo "::error::Leaflet images missing."
             exit 1
           }
 
           mkdir -p www/vendor/leaflet
-
-          cp "$L/leaflet.js" www/vendor/leaflet/
-          cp "$L/leaflet.css" www/vendor/leaflet/
-
+          cp "$L/leaflet.js" www/vendor/leaflet/leaflet.js
+          cp "$L/leaflet.css" www/vendor/leaflet/leaflet.css
           rm -rf www/vendor/leaflet/images
-          cp -r "$L/images" www/vendor/leaflet/images
+          cp -R "$L/images" www/vendor/leaflet/images
 
           python - <<'PY'
           import sys
           from pathlib import Path
 
-          f = Path("www/index.html")
-          t = f.read_text(encoding="utf-8")
+          path = Path('www/index.html')
+          html = path.read_text(encoding='utf-8')
+          replacements = {
+              'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css':
+                  'vendor/leaflet/leaflet.css',
+              'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js':
+                  'vendor/leaflet/leaflet.js',
+          }
 
-          pairs = [
-              (
-                  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-                  "vendor/leaflet/leaflet.css"
-              ),
-              (
-                  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-                  "vendor/leaflet/leaflet.js"
-              )
-          ]
+          for remote, local in replacements.items():
+              if remote in html:
+                  html = html.replace(remote, local)
 
-          for old, new in pairs:
-              if old not in t:
-                  print("::error::Leaflet reference not found: " + old)
+          for local in replacements.values():
+              if local not in html:
+                  print('::error::Expected local Leaflet reference missing: ' + local)
                   sys.exit(1)
 
-              t = t.replace(old, new)
-
-          f.write_text(t, encoding="utf-8")
-          print("Leaflet bundled locally.")
+          path.write_text(html, encoding='utf-8')
+          print('Leaflet references are local.')
           PY
 
-      # ------------------------------------------------
       # 14. Verify prepared web assets
-      # ------------------------------------------------
       - name: Verify prepared web assets
         shell: bash
         run: |
           set -euo pipefail
-
           for f in \
-            www/index.html \
-            www/kc-native.js \
-            www/kc-native.css \
-            www/sw.js \
-            www/vendor/leaflet/leaflet.js \
-            www/vendor/leaflet/leaflet.css; do
-
+            www/index.html www/kc-native.js www/kc-native.css www/sw.js \
+            www/vendor/leaflet/leaflet.js www/vendor/leaflet/leaflet.css; do
             [ -s "$f" ] || {
               echo "::error::Missing or empty: $f"
               exit 1
@@ -427,70 +319,143 @@ jobs:
 
           node --check www/kc-native.js
 
-          if grep -q "unpkg.com/leaflet" www/index.html; then
+          if grep -q 'unpkg.com/leaflet' www/index.html; then
             echo "::error::Leaflet still loads from unpkg."
             exit 1
           fi
-
-          if grep -qi 'http-equiv="refresh"' www/index.html; then
-            echo "::error::Meta refresh redirect detected."
-            exit 1
-          fi
+          python - <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+          html = Path('www/index.html').read_text(encoding='utf-8')
+          if re.search(r"http-equiv\s*=\s*[\"']refresh[\"']", html, re.I):
+              print('::error::Meta refresh redirect detected.')
+              sys.exit(1)
+          PY
 
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
-
           const html = fs.readFileSync('www/index.html', 'utf8');
-
           for (const asset of ['kc-native.js', 'kc-native.css']) {
             if (!html.includes(asset)) {
               console.error('::error::Missing reference:', asset);
               process.exit(1);
             }
           }
-
           console.log('Native JS/CSS references verified.');
           NODE
 
-      # ------------------------------------------------
-      # 15. Add Android platform
-      # ------------------------------------------------
+      # 15. Add Android platform only when absent
       - name: Add Android platform
         shell: bash
         run: |
           set -euo pipefail
-
           if [ -d android ]; then
             echo "android/ already exists. Skipping cap add."
           else
             npx cap add android
           fi
 
-      # ------------------------------------------------
       # 16. Sync Capacitor
-      # ------------------------------------------------
       - name: Sync Capacitor
         shell: bash
         run: |
           set -euo pipefail
           npx cap sync android
 
-      # ------------------------------------------------
-      # 17. Generate launcher icons and splash
-      # ------------------------------------------------
+      # 17. Upgrade AGP for Android API 36
+      - name: Configure Android Gradle Plugin for API 36
+        shell: bash
+        env:
+          AGP_VERSION: ${{ env.ANDROID_GRADLE_PLUGIN_VERSION }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          target = os.environ['AGP_VERSION']
+          android = Path('android')
+          if not android.is_dir():
+              print('::error::android directory not found.')
+              sys.exit(1)
+
+          # Only update known Android Gradle Plugin declarations. Do not
+          # change Kotlin, Google Services, or unrelated plugin versions.
+          files = []
+          for pattern in ('*.gradle', '*.gradle.kts', '*.toml'):
+              files.extend(android.rglob(pattern))
+
+          patterns = [
+              re.compile(r'(com\.android\.tools\.build:gradle:)(\d+\.\d+\.\d+)'),
+              re.compile(r"""((?:id\s*\(\s*|id\s+)["']com\.android\.application["']\s*\)?\s*version\s*["'])(\d+\.\d+\.\d+)(["'])"""),
+              re.compile(r"""((?:id\s*\(\s*|id\s+)["']com\.android\.library["']\s*\)?\s*version\s*["'])(\d+\.\d+\.\d+)(["'])"""),
+              re.compile(r"""(?m)^(\s*agp\s*=\s*["'])(\d+\.\d+\.\d+)(["'])"""),
+              re.compile(r"""(?m)^(\s*com\.android\.application\s*=\s*["'])(\d+\.\d+\.\d+)(["'])"""),
+              re.compile(r"""(?m)^(\s*com\.android\.library\s*=\s*["'])(\d+\.\d+\.\d+)(["'])"""),
+          ]
+
+          changed = []
+          for path in sorted(set(files)):
+              if any(part in {'.gradle', 'build', 'outputs'} for part in path.parts):
+                  # Keep source build files; exclude generated/build directories.
+                  if 'build' in path.parts or 'outputs' in path.parts:
+                      continue
+              try:
+                  original = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              updated = original
+              for index, pattern in enumerate(patterns):
+                  if index == 0:
+                      updated = pattern.sub(lambda m: m.group(1) + target, updated)
+                  else:
+                      updated = pattern.sub(
+                          lambda m: m.group(1) + target + m.group(3), updated
+                      )
+              if updated != original:
+                  path.write_text(updated, encoding='utf-8')
+                  changed.append(str(path))
+
+          already_configured = []
+          if not changed:
+              for path in sorted(set(files)):
+                  if 'build' in path.parts or 'outputs' in path.parts:
+                      continue
+                  try:
+                      content = path.read_text(encoding='utf-8')
+                  except (UnicodeDecodeError, OSError):
+                      continue
+                  if any(
+                      (match := pattern.search(content)) and match.group(2) == target
+                      for pattern in patterns
+                  ):
+                      already_configured.append(str(path))
+
+          if not changed and not already_configured:
+              print('::error::No explicit AGP version declaration found. '
+                    'Inspect android/build.gradle, settings.gradle or '
+                    'gradle/libs.versions.toml before building.')
+              sys.exit(1)
+
+          print('Configured AGP version:', target)
+          for item in changed:
+              print('Updated:', item)
+          for item in already_configured:
+              print('Already configured:', item)
+          PY
+
+      # 18. Generate launcher icons and splash
       - name: Install Pillow and generate Android icons
         shell: bash
         run: |
           set -euo pipefail
-
-          python -m pip install \
-            --disable-pip-version-check \
-            "Pillow>=9.1,<13"
-
+          python -m pip install --disable-pip-version-check 'Pillow>=9.1,<13'
           python scripts/android/generate-icons.py
 
           R=android/app/src/main/res
-
           for f in \
             "$R/mipmap-xxxhdpi/ic_launcher.png" \
             "$R/mipmap-xxxhdpi/ic_launcher_round.png" \
@@ -498,23 +463,23 @@ jobs:
             "$R/mipmap-anydpi-v26/ic_launcher.xml" \
             "$R/mipmap-anydpi-v26/ic_launcher_round.xml" \
             "$R/values/ic_launcher_background.xml"; do
-
             [ -s "$f" ] || {
               echo "::error::Generated resource missing: $f"
               exit 1
             }
           done
 
+          find "$R" -path '*/drawable*/splash.png' -type f -size +0c -print -quit | grep -q . || {
+            echo "::error::Generated splash image missing."
+            exit 1
+          }
           echo "Launcher icons and splash generated."
 
-      # ------------------------------------------------
-      # 18. Patch AndroidManifest
-      # ------------------------------------------------
+      # 19. Patch AndroidManifest permissions
       - name: Patch AndroidManifest permissions
         shell: bash
         run: |
           set -euo pipefail
-
           python - <<'PY'
           import json
           import os
@@ -522,144 +487,93 @@ jobs:
           import sys
           from pathlib import Path
 
-          p = Path("android/app/src/main/AndroidManifest.xml")
-
-          if not p.is_file():
-              print("::error::AndroidManifest.xml not found.")
+          manifest = Path('android/app/src/main/AndroidManifest.xml')
+          if not manifest.is_file():
+              print('::error::AndroidManifest.xml not found.')
               sys.exit(1)
 
-          t = p.read_text(encoding="utf-8")
-
-          pkg = json.loads(
-              Path("package.json").read_text(encoding="utf-8")
-          )
-
+          text = manifest.read_text(encoding='utf-8')
+          package = json.loads(Path('package.json').read_text(encoding='utf-8'))
           deps = {}
-          deps.update(pkg.get("dependencies", {}))
-          deps.update(pkg.get("devDependencies", {}))
+          deps.update(package.get('dependencies', {}))
+          deps.update(package.get('devDependencies', {}))
 
-          notif = any(
-              n in deps for n in (
-                  "@capacitor/local-notifications",
-                  "@capacitor/push-notifications"
-              )
-          )
+          notification_plugins = any(name in deps for name in (
+              '@capacitor/local-notifications',
+              '@capacitor/push-notifications'
+          ))
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
+              env.write('NOTIF_PLUGINS=%d\n' % int(notification_plugins))
 
-          with open(os.environ["GITHUB_ENV"], "a") as f:
-              f.write("NOTIF_PLUGINS=%d\n" % (1 if notif else 0))
-
-          if "xmlns:tools=" not in t:
-              t = t.replace(
-                  "<manifest ",
+          if 'xmlns:tools=' not in text:
+              text = text.replace(
+                  '<manifest ',
                   '<manifest xmlns:tools="http://schemas.android.com/tools" ',
                   1
               )
 
-          # Remove stale notification permission removal directives
-          # when notification plugins are installed.
-          if notif:
-              t = re.sub(
+          # Remove explicit tools:node="remove" overrides for notification
+          # permissions when a notification plugin is part of this build.
+          if notification_plugins:
+              text = re.sub(
                   r'(?m)^[ \t]*<uses-permission\b'
                   r'(?=[^>]*android:name="android\.permission\.'
                   r'(?:RECEIVE_BOOT_COMPLETED|WAKE_LOCK|POST_NOTIFICATIONS)")'
                   r'(?=[^>]*tools:node="remove")[^>]*/>[ \t]*\n?',
-                  '',
-                  t
+                  '', text
               )
 
-          lines = []
-
-          for perm in (
-              "ACCESS_COARSE_LOCATION",
-              "ACCESS_FINE_LOCATION"
-          ):
-              name = "android.permission." + perm
-
+          additions = []
+          for permission in ('ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION'):
+              name = 'android.permission.' + permission
               if not re.search(
                   r'<uses-permission\b[^>]*android:name="' +
-                  re.escape(name) + r'"',
-                  t
+                  re.escape(name) + r'"', text
               ):
-                  lines.append(
+                  additions.append(
                       '    <uses-permission android:name="%s" />' % name
                   )
 
-          for feature in (
-              "android.hardware.location.gps",
-              "android.hardware.camera"
-          ):
+          for feature in ('android.hardware.location.gps', 'android.hardware.camera'):
               if not re.search(
                   r'<uses-feature\b[^>]*android:name="' +
-                  re.escape(feature) + r'"',
-                  t
+                  re.escape(feature) + r'"', text
               ):
-                  lines.append(
-                      '    <uses-feature android:name="%s" '
-                      'android:required="false" />' % feature
+                  additions.append(
+                      '    <uses-feature android:name="%s" android:required="false" />'
+                      % feature
                   )
 
-          if notif:
-              name = "android.permission.POST_NOTIFICATIONS"
-
+          if notification_plugins:
+              name = 'android.permission.POST_NOTIFICATIONS'
               if not re.search(
                   r'<uses-permission\b[^>]*android:name="' +
-                  re.escape(name) + r'"',
-                  t
+                  re.escape(name) + r'"', text
               ):
-                  lines.append(
+                  additions.append(
                       '    <uses-permission android:name="%s" />' % name
                   )
-          else:
-              for perm in (
-                  "RECEIVE_BOOT_COMPLETED",
-                  "WAKE_LOCK",
-                  "POST_NOTIFICATIONS"
-              ):
-                  name = "android.permission." + perm
 
-                  if not re.search(
-                      r'<uses-permission\b'
-                      r'(?=[^>]*android:name="' + re.escape(name) + r'")'
-                      r'(?=[^>]*tools:node="remove")',
-                      t
-                  ):
-                      lines.append(
-                          '    <uses-permission android:name="%s" '
-                          'tools:node="remove" />' % name
-                      )
+          if additions:
+              text = text.replace('</manifest>', '\n'.join(additions) + '\n</manifest>', 1)
 
-          if lines:
-              t = t.replace(
-                  "</manifest>",
-                  "\n".join(lines) + "\n</manifest>",
-                  1
-              )
-
-          p.write_text(t, encoding="utf-8")
-
-          print("Notification plugins installed:", notif)
-          print("Manifest permissions patched.")
+          manifest.write_text(text, encoding='utf-8')
+          print('Notification plugins installed:', notification_plugins)
+          print('Manifest permissions patched.')
           PY
 
-      # ------------------------------------------------
-      # 19. Validate AndroidManifest XML
-      # ------------------------------------------------
+      # 20. Validate AndroidManifest XML
       - name: Validate AndroidManifest XML
         shell: bash
         run: |
           set -euo pipefail
-
           python - <<'PY'
           import xml.etree.ElementTree as ET
-
-          ET.parse("android/app/src/main/AndroidManifest.xml")
-
-          print("AndroidManifest.xml is valid.")
+          ET.parse('android/app/src/main/AndroidManifest.xml')
+          print('AndroidManifest.xml is valid.')
           PY
 
-      # ------------------------------------------------
-      # 20. Configure SDK and app version
-      # ------------------------------------------------
+      # 21. Configure SDK and app version
       - name: Configure Android SDK and app version
         shell: bash
         env:
@@ -669,7 +583,6 @@ jobs:
           TARGET_SDK: ${{ env.ANDROID_TARGET_SDK }}
         run: |
           set -euo pipefail
-
           python - <<'PY'
           import os
           import re
@@ -677,364 +590,235 @@ jobs:
           from pathlib import Path
 
           def fail(message):
-              print("::error::" + message)
+              print('::error::' + message)
               sys.exit(1)
 
-          version_code = int(os.environ["VERSION_CODE"])
-          version_name = os.environ["VERSION_NAME"]
-          compile_sdk = os.environ["COMPILE_SDK"]
-          target_sdk = os.environ["TARGET_SDK"]
+          version_code = int(os.environ['VERSION_CODE'])
+          version_name = os.environ['VERSION_NAME']
+          compile_sdk = os.environ['COMPILE_SDK']
+          target_sdk = os.environ['TARGET_SDK']
 
           if version_code < 1:
-              fail("VERSION_CODE must be positive.")
+              fail('VERSION_CODE must be positive.')
+          if not re.fullmatch(r'\d+\.\d+\.\d+', version_name):
+              fail('Invalid semantic version name.')
 
-          if not re.fullmatch(r"\d+\.\d+\.\d+", version_name):
-              fail("Invalid semantic version name.")
-
-          app = next(
-              (
-                  p for p in (
-                      Path("android/app/build.gradle"),
-                      Path("android/app/build.gradle.kts")
-                  )
-                  if p.is_file()
-              ),
-              None
-          )
-
+          app = next((p for p in (
+              Path('android/app/build.gradle'),
+              Path('android/app/build.gradle.kts')
+          ) if p.is_file()), None)
           if app is None:
-              fail("Android app Gradle file not found.")
+              fail('Android app Gradle file not found.')
 
-          # Update SDK values in the standard Capacitor variables file.
-          variables = Path("android/variables.gradle")
-          sdk_done = False
-
+          variables = Path('android/variables.gradle')
+          sdk_configured = False
           if variables.is_file():
-              t = variables.read_text(encoding="utf-8")
-
-              t, n1 = re.subn(
+              content = variables.read_text(encoding='utf-8')
+              updated, n_compile = re.subn(
                   r'(?m)^(\s*compileSdkVersion\s*=\s*)\d+',
-                  lambda m: m.group(1) + compile_sdk,
-                  t
+                  lambda m: m.group(1) + compile_sdk, content
               )
-
-              t, n2 = re.subn(
+              updated, n_target = re.subn(
                   r'(?m)^(\s*targetSdkVersion\s*=\s*)\d+',
-                  lambda m: m.group(1) + target_sdk,
-                  t
+                  lambda m: m.group(1) + target_sdk, updated
               )
+              if n_compile == 1 and n_target == 1:
+                  variables.write_text(updated, encoding='utf-8')
+                  sdk_configured = True
+                  print('SDK values updated in variables.gradle.')
+              elif n_compile or n_target:
+                  fail('Only one SDK variable was found in variables.gradle.')
 
-              if n1 == 1 and n2 == 1:
-                  variables.write_text(t, encoding="utf-8")
-                  sdk_done = True
-                  print("SDK values updated in variables.gradle.")
-
-              elif n1 or n2:
-                  fail(
-                      "Only one SDK variable was found in variables.gradle. "
-                      "Review its structure before building."
-                  )
-
-          # If variables.gradle does not define both values,
-          # try literal SDK values in the app Gradle file.
-          if not sdk_done:
-              t = app.read_text(encoding="utf-8")
-
-              t, n1 = re.subn(
+          if not sdk_configured:
+              content = app.read_text(encoding='utf-8')
+              updated, n_compile = re.subn(
                   r'(?m)^(\s*compileSdk(?:Version)?\s*=?\s*)\d+',
-                  lambda m: m.group(1) + compile_sdk,
-                  t
+                  lambda m: m.group(1) + compile_sdk, content
               )
-
-              t, n2 = re.subn(
+              updated, n_target = re.subn(
                   r'(?m)^(\s*targetSdk(?:Version)?\s*=?\s*)\d+',
-                  lambda m: m.group(1) + target_sdk,
-                  t
+                  lambda m: m.group(1) + target_sdk, updated
               )
+              if n_compile != 1 or n_target != 1:
+                  fail('Could not safely configure compileSdk and targetSdk. '
+                       'Review variables.gradle and app Gradle configuration.')
+              app.write_text(updated, encoding='utf-8')
+              print('SDK values updated in app Gradle file.')
 
-              if n1 != 1 or n2 != 1:
-                  fail(
-                      "Could not safely configure compileSdk and targetSdk. "
-                      "Check variables.gradle and app Gradle configuration."
-                  )
-
-              app.write_text(t, encoding="utf-8")
-              print("SDK values updated in app Gradle file.")
-
-          # Configure app version.
-          t = app.read_text(encoding="utf-8")
-
-          t, n1 = re.subn(
+          content = app.read_text(encoding='utf-8')
+          content, n_code = re.subn(
               r'(?m)^(\s*versionCode\s*(?:=\s*)?)\d+',
-              lambda m: m.group(1) + str(version_code),
-              t
+              lambda m: m.group(1) + str(version_code), content
           )
-
-          t, n2 = re.subn(
+          content, n_name = re.subn(
               r'''(?m)^(\s*versionName\s*(?:=\s*)*)(["']).*?\2''',
-              lambda m: m.group(1) + '"' + version_name + '"',
-              t
+              lambda m: m.group(1) + '"' + version_name + '"', content
           )
+          if n_code != 1 or n_name != 1:
+              fail('Could not safely update versionCode/versionName in app Gradle file.')
+          app.write_text(content, encoding='utf-8')
 
-          if n1 != 1 or n2 != 1:
-              fail(
-                  "Could not safely update versionCode/versionName. "
-                  "Check app/build.gradle."
-              )
-
-          app.write_text(t, encoding="utf-8")
-
-          # Ensure Gradle warning suppression is present.
-          gp = Path("android/gradle.properties")
-
-          if gp.is_file():
-              gtxt = gp.read_text(encoding="utf-8")
-          else:
-              gtxt = ""
-
-          key = "android.suppressUnsupportedCompileSdk"
-
-          if not re.search(
-              r'(?m)^\s*' + re.escape(key) + r'\s*=',
-              gtxt
-          ):
-              with gp.open("a", encoding="utf-8") as f:
-                  f.write(
-                      "\n" + key + "=" + compile_sdk + "\n"
-                  )
-
-          print(
-              "Configured version: %s (%s), compileSdk=%s, targetSdk=%s"
-              % (
-                  version_name,
-                  version_code,
-                  compile_sdk,
-                  target_sdk
-              )
-          )
+          print('Configured app version %s (%s), compileSdk=%s, targetSdk=%s.' % (
+              version_name, version_code, compile_sdk, target_sdk
+          ))
           PY
 
-      # ------------------------------------------------
-      # 21. Verify Gradle and Android configuration
-      # ------------------------------------------------
+      # 22. Verify Gradle, AGP and SDK configuration
       - name: Verify Gradle and Android configuration
         shell: bash
+        env:
+          REQUIRED_AGP: ${{ env.ANDROID_GRADLE_PLUGIN_VERSION }}
         run: |
           set -euo pipefail
-
-          [ -f android/gradlew ] || {
+          test -f android/gradlew || {
             echo "::error::android/gradlew missing."
             exit 1
           }
-
-          [ -f android/gradle/wrapper/gradle-wrapper.properties ] || {
+          test -f android/gradle/wrapper/gradle-wrapper.properties || {
             echo "::error::Gradle wrapper properties missing."
             exit 1
           }
-
           chmod +x android/gradlew
 
           python - <<'PY'
+          import os
           import re
           import sys
           from pathlib import Path
 
-          def version_tuple(value):
-              return tuple(int(x) for x in value.split("."))
+          def ver(value):
+              parts = [int(x) for x in value.split('.')]
+              return tuple((parts + [0, 0, 0])[:3])
 
-          # Gradle wrapper compatibility.
-          wrapper = Path(
-              "android/gradle/wrapper/gradle-wrapper.properties"
-          ).read_text(encoding="utf-8")
-
-          match = re.search(
-              r"gradle-(\d+\.\d+(?:\.\d+)?)-(?:bin|all)\.zip",
-              wrapper
+          wrapper_file = Path('android/gradle/wrapper/gradle-wrapper.properties')
+          wrapper_text = wrapper_file.read_text(encoding='utf-8')
+          wrapper_match = re.search(
+              r'gradle-(\d+\.\d+(?:\.\d+)?)-(?:bin|all)\.zip',
+              wrapper_text
           )
-
-          if not match:
-              print("::error::Could not detect Gradle wrapper version.")
+          if not wrapper_match:
+              print('::error::Could not detect Gradle wrapper version.')
               sys.exit(1)
-
-          gradle_version = match.group(1)
-
-          if version_tuple(gradle_version) < (8, 11, 1):
-              print(
-                  "::error::Gradle %s is too old for the configured SDK 36 build."
-                  % gradle_version
-              )
+          gradle_version = wrapper_match.group(1)
+          if ver(gradle_version) < ver('8.11.1'):
+              print('::error::Gradle %s is below 8.11.1 required by AGP 8.10.' % gradle_version)
               sys.exit(1)
+          print('Gradle wrapper:', gradle_version)
 
-          print("Gradle wrapper:", gradle_version)
-
-          # Inspect common AGP declarations.
-          candidates = [
-              Path("android/build.gradle"),
-              Path("android/build.gradle.kts"),
-              Path("android/settings.gradle"),
-              Path("android/settings.gradle.kts"),
-              Path("android/gradle/libs.versions.toml")
-          ]
-
-          agp_versions = []
-
-          patterns = [
-              r"com\.android\.tools\.build:gradle:(\d+\.\d+(?:\.\d+)?)",
-              r"""id\s*\(?\s*["']com\.android\.application["']\s*\)?\s*version\s*["'](\d+\.\d+(?:\.\d+)?)["']""",
-              r"""agp\s*=\s*["'](\d+\.\d+(?:\.\d+)?)["']""",
-              r"""com\.android\.application\s*=\s*["'](\d+\.\d+(?:\.\d+)?)["']"""
-          ]
-
-          for path in candidates:
-              if not path.is_file():
+          android = Path('android')
+          candidates = []
+          for pattern in ('*.gradle', '*.gradle.kts', '*.toml'):
+              candidates.extend(android.rglob(pattern))
+          detected = []
+          patterns = (
+              r'com\.android\.tools\.build:gradle:(\d+\.\d+\.\d+)',
+              r'''id\s*\(?\s*["']com\.android\.(?:application|library)["']\s*\)?\s*version\s*["'](\d+\.\d+\.\d+)["']''',
+              r'''(?m)^\s*agp\s*=\s*["'](\d+\.\d+\.\d+)["']''',
+              r'''(?m)^\s*com\.android\.(?:application|library)\s*=\s*["'](\d+\.\d+\.\d+)["']'''
+          )
+          for path in sorted(set(candidates)):
+              if 'build' in path.parts or 'outputs' in path.parts:
                   continue
-
-              content = path.read_text(encoding="utf-8")
-
+              try:
+                  content = path.read_text(encoding='utf-8')
+              except (OSError, UnicodeDecodeError):
+                  continue
               for pattern in patterns:
-                  agp_versions.extend(
-                      re.findall(pattern, content)
-                  )
+                  detected.extend(re.findall(pattern, content))
 
-          if agp_versions:
-              detected = max(
-                  agp_versions,
-                  key=version_tuple
-              )
+          if not detected:
+              print('::error::AGP version could not be detected after upgrade.')
+              sys.exit(1)
+          unique = sorted(set(detected), key=ver)
+          print('Detected AGP version declarations:', ', '.join(unique))
+          required = os.environ['REQUIRED_AGP']
+          if any(ver(item) != ver(required) for item in unique):
+              print('::error::AGP declarations do not all match required version %s.' % required)
+              sys.exit(1)
+          if ver(required) < ver('8.10.0'):
+              print('::error::AGP %s does not support API 36.' % required)
+              sys.exit(1)
 
-              print("Detected Android Gradle Plugin:", detected)
-
-              if version_tuple(detected) < (8, 9, 1):
-                  print(
-                      "::error::AGP %s is below the minimum expected "
-                      "for API 36. Review the Android Gradle Plugin version."
-                      % detected
-                  )
-                  sys.exit(1)
-          else:
-              print(
-                  "::warning::AGP version was not detected in common "
-                  "Gradle files. Verify plugin aliases/version catalogs."
-              )
-
-          # Verify SDK declarations after configuration.
-          variables = Path("android/variables.gradle")
-          app = Path("android/app/build.gradle")
-          app_kts = Path("android/app/build.gradle.kts")
-
-          sdk_files = [
-              p for p in (variables, app, app_kts)
-              if p.is_file()
+          source_files = [
+              p for p in (
+                  Path('android/variables.gradle'),
+                  Path('android/app/build.gradle'),
+                  Path('android/app/build.gradle.kts')
+              ) if p.is_file()
           ]
-
-          combined = "\n".join(
-              p.read_text(encoding="utf-8")
-              for p in sdk_files
-          )
-
-          if not re.search(
-              r"compileSdkVersion\s*=\s*36|compileSdk(?:Version)?\s*=?\s*36",
-              combined
-          ):
-              print("::error::compileSdk 36 declaration not verified.")
+          combined = '\n'.join(p.read_text(encoding='utf-8') for p in source_files)
+          if not re.search(r'compileSdkVersion\s*=\s*36|compileSdk(?:Version)?\s*=?\s*36', combined):
+              print('::error::compileSdk 36 declaration not verified.')
               sys.exit(1)
-
-          if not re.search(
-              r"targetSdkVersion\s*=\s*36|targetSdk(?:Version)?\s*=?\s*36",
-              combined
-          ):
-              print("::error::targetSdk 36 declaration not verified.")
+          if not re.search(r'targetSdkVersion\s*=\s*36|targetSdk(?:Version)?\s*=?\s*36', combined):
+              print('::error::targetSdk 36 declaration not verified.')
               sys.exit(1)
-
-          print("Gradle and SDK configuration checks passed.")
+          print('AGP, Gradle and SDK configuration checks passed.')
           PY
 
           cd android
           ./gradlew --no-daemon --version
 
-      # ------------------------------------------------
-      # 22. Build Debug APK
-      # ------------------------------------------------
+      # 23. Build Debug APK
       - name: Build Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         shell: bash
         run: |
           set -euo pipefail
-
           cd android
-
-          ./gradlew \
-            --no-daemon \
-            --console=plain \
-            --stacktrace \
-            assembleDebug
-
-          [ -s app/build/outputs/apk/debug/app-debug.apk ] || {
+          ./gradlew --no-daemon --console=plain --stacktrace assembleDebug
+          test -s app/build/outputs/apk/debug/app-debug.apk || {
             echo "::error::Debug APK not produced."
             exit 1
           }
 
-      # ------------------------------------------------
-      # 23. Verify Debug APK
-      # ------------------------------------------------
+      # 24. Verify Debug APK
       - name: Verify Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         shell: bash
         run: |
           set -euo pipefail
-
-          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          APK='android/app/build/outputs/apk/debug/app-debug.apk'
           AAPT2="$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS/aapt2"
-
-          [ -x "$AAPT2" ] || {
+          test -x "$AAPT2" || {
             echo "::error::aapt2 not found."
             exit 1
           }
+          BADGING="$("$AAPT2" dump badging "$APK")"
 
-          B="$("$AAPT2" dump badging "$APK")"
-
-          grep -q "name='${APP_ID}'" <<< "$B" || {
+          grep -Fq "name='${APP_ID}'" <<< "$BADGING" || {
             echo "::error::Debug APK package ID mismatch."
             exit 1
           }
-
-          grep -q "versionCode='${APP_VERSION_CODE}'" <<< "$B" || {
+          grep -Fq "versionCode='${APP_VERSION_CODE}'" <<< "$BADGING" || {
             echo "::error::Debug versionCode mismatch."
             exit 1
           }
-
-          grep -q "versionName='${APP_VERSION}'" <<< "$B" || {
+          grep -Fq "versionName='${APP_VERSION}'" <<< "$BADGING" || {
             echo "::error::Debug versionName mismatch."
             exit 1
           }
-
-          grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" <<< "$B" || {
+          grep -Fq "targetSdkVersion:'${ANDROID_TARGET_SDK}'" <<< "$BADGING" || {
             echo "::error::Debug target SDK mismatch."
             exit 1
           }
-
-          grep -q "android.permission.ACCESS_FINE_LOCATION" <<< "$B" || {
+          grep -Fq 'android.permission.ACCESS_FINE_LOCATION' <<< "$BADGING" || {
             echo "::error::Debug ACCESS_FINE_LOCATION missing."
             exit 1
           }
-
-          grep -q "android.permission.ACCESS_COARSE_LOCATION" <<< "$B" || {
+          grep -Fq 'android.permission.ACCESS_COARSE_LOCATION' <<< "$BADGING" || {
             echo "::error::Debug ACCESS_COARSE_LOCATION missing."
             exit 1
           }
-
-          if [ "${NOTIF_PLUGINS:-0}" = "1" ]; then
-            grep -q "android.permission.POST_NOTIFICATIONS" <<< "$B" || {
+          if [ "${NOTIF_PLUGINS:-0}" = '1' ]; then
+            grep -Fq 'android.permission.POST_NOTIFICATIONS' <<< "$BADGING" || {
               echo "::error::Debug POST_NOTIFICATIONS missing."
               exit 1
             }
           fi
+          echo 'Debug APK verification passed.'
 
-          echo "Debug APK verification passed."
-
-      # ------------------------------------------------
-      # 24. Upload Debug APK
-      # ------------------------------------------------
+      # 25. Upload Debug APK
       - name: Upload Debug APK
         if: ${{ inputs.build_type == 'debug' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -1044,9 +828,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # ------------------------------------------------
-      # 25. Decode release keystore
-      # ------------------------------------------------
+      # 26. Decode and validate the existing release keystore
       - name: Decode release keystore
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -1057,33 +839,16 @@ jobs:
           KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-
-          [ -n "$KEYSTORE_BASE64" ] || {
-            echo "::error::TWA_KEYSTORE_BASE64 missing."
-            exit 1
-          }
-
-          [ -n "$KEYSTORE_PASSWORD" ] || {
-            echo "::error::TWA_KEYSTORE_PASSWORD missing."
-            exit 1
-          }
-
-          [ -n "$KEY_ALIAS" ] || {
-            echo "::error::TWA_KEY_ALIAS missing."
-            exit 1
-          }
-
-          [ -n "$KEY_PASSWORD" ] || {
-            echo "::error::TWA_KEY_PASSWORD missing."
-            exit 1
-          }
+          for name in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is missing."
+              exit 1
+            fi
+          done
 
           KEYSTORE_PATH="$RUNNER_TEMP/kumbhconnect-release.keystore"
-
-          printf '%s' "$KEYSTORE_BASE64" |
-            base64 --decode > "$KEYSTORE_PATH"
-
-          [ -s "$KEYSTORE_PATH" ] || {
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+          test -s "$KEYSTORE_PATH" || {
             echo "::error::Decoded keystore is empty."
             exit 1
           }
@@ -1094,36 +859,23 @@ jobs:
             -alias "$KEY_ALIAS" >/dev/null
 
           echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          echo 'Existing release keystore validated.'
 
-          echo "Existing release keystore validated."
-
-      # ------------------------------------------------
-      # 26. Build Release APK and AAB
-      # ------------------------------------------------
+      # 27. Build Release APK and AAB
       - name: Build release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
         run: |
           set -euo pipefail
-
           cd android
-
-          ./gradlew \
-            --no-daemon \
-            --console=plain \
-            --stacktrace \
-            assembleRelease \
-            bundleRelease
-
-          [ -s app/build/outputs/bundle/release/app-release.aab ] || {
+          ./gradlew --no-daemon --console=plain --stacktrace assembleRelease bundleRelease
+          test -s app/build/outputs/bundle/release/app-release.aab || {
             echo "::error::Release AAB not produced."
             exit 1
           }
 
-      # ------------------------------------------------
-      # 27. Align and sign release artifacts
-      # ------------------------------------------------
-      - name: Sign release APK and AAB
+      # 28. Align/sign APK and sign AAB only when needed
+      - name: Sign release APK and AAB with existing keystore
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
         env:
@@ -1132,76 +884,94 @@ jobs:
           KEY_PASSWORD: ${{ secrets.TWA_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-
           BT="$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS"
+          APK_DIR='android/app/build/outputs/apk/release'
+          AAB_IN='android/app/build/outputs/bundle/release/app-release.aab'
+          APK_IN="$APK_DIR/app-release-unsigned.apk"
+          if [ ! -s "$APK_IN" ]; then APK_IN="$APK_DIR/app-release.apk"; fi
 
-          [ -x "$BT/apksigner" ] || {
+          test -x "$BT/apksigner" || {
             echo "::error::apksigner not found."
             exit 1
           }
-
-          [ -x "$BT/zipalign" ] || {
+          test -x "$BT/zipalign" || {
             echo "::error::zipalign not found."
             exit 1
           }
-
-          [ -s "$ANDROID_KEYSTORE_PATH" ] || {
+          test -s "$ANDROID_KEYSTORE_PATH" || {
             echo "::error::Release keystore missing."
             exit 1
           }
-
-          APK_DIR="android/app/build/outputs/apk/release"
-          AAB_IN="android/app/build/outputs/bundle/release/app-release.aab"
-
-          APK_IN="$APK_DIR/app-release-unsigned.apk"
-
-          if [ ! -s "$APK_IN" ]; then
-            APK_IN="$APK_DIR/app-release.apk"
-          fi
-
-          [ -s "$APK_IN" ] || {
+          test -s "$APK_IN" || {
             echo "::error::Release APK not found."
             ls -la "$APK_DIR" || true
             exit 1
           }
-
-          [ -s "$AAB_IN" ] || {
+          test -s "$AAB_IN" || {
             echo "::error::Release AAB not found."
             exit 1
           }
 
-          BASE="KumbhConnect-${APP_VERSION}-${APP_VERSION_CODE}"
-
           mkdir -p dist
+          BASE="KumbhConnect-${APP_VERSION}-${APP_VERSION_CODE}"
+          OUT_APK="dist/${BASE}-release.apk"
+          OUT_AAB="dist/${BASE}-release.aab"
 
-          "$BT/zipalign" -p -f 4 \
-            "$APK_IN" \
-            "$RUNNER_TEMP/aligned.apk"
-
-          "$BT/apksigner" sign \
-            --ks "$ANDROID_KEYSTORE_PATH" \
-            --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass env:KEYSTORE_PASSWORD \
-            --key-pass env:KEY_PASSWORD \
-            --out "dist/${BASE}-release.apk" \
-            "$RUNNER_TEMP/aligned.apk"
-
-          cp "$AAB_IN" "dist/${BASE}-release.aab"
-
-          jarsigner \
+          KEY_CERT="$(keytool -list -v \
             -keystore "$ANDROID_KEYSTORE_PATH" \
             -storepass:env KEYSTORE_PASSWORD \
-            -keypass:env KEY_PASSWORD \
-            -sigalg SHA256withRSA \
-            -digestalg SHA-256 \
-            "dist/${BASE}-release.aab" \
-            "$KEY_ALIAS"
+            -alias "$KEY_ALIAS" | \
+            awk -F': ' '/SHA256:/ { gsub(/:/, "", $2); print tolower($2); exit }')"
+          test -n "$KEY_CERT" || {
+            echo "::error::Could not read configured keystore SHA-256 fingerprint."
+            exit 1
+          }
 
-          echo "Release artifacts signed."
+          # If Gradle already signed the APK, accept it only when it uses
+          # the exact configured certificate. Otherwise sign the unsigned APK.
+          if "$BT/apksigner" verify --print-certs "$APK_IN" >/dev/null 2>&1; then
+            INPUT_APK_CERT="$("$BT/apksigner" verify --print-certs "$APK_IN" | \
+              awk -F': ' '/Signer #1 certificate SHA-256 digest:/ { gsub(/:/, "", $2); print tolower($2); exit }')"
+            if [ "$INPUT_APK_CERT" != "$KEY_CERT" ]; then
+              echo "::error::Gradle-signed APK uses a different certificate. Refusing to replace signing identity."
+              exit 1
+            fi
+            "$BT/zipalign" -c -p 4 "$APK_IN"
+            cp "$APK_IN" "$OUT_APK"
+          else
+            "$BT/zipalign" -p -f 4 "$APK_IN" "$RUNNER_TEMP/kumbhconnect-aligned.apk"
+            "$BT/apksigner" sign \
+              --ks "$ANDROID_KEYSTORE_PATH" \
+              --ks-key-alias "$KEY_ALIAS" \
+              --ks-pass env:KEYSTORE_PASSWORD \
+              --key-pass env:KEY_PASSWORD \
+              --out "$OUT_APK" \
+              "$RUNNER_TEMP/kumbhconnect-aligned.apk"
+          fi
 
-      # ------------------------------------------------
-      # 28. Verify Release APK, AAB and certificates
-      # ------------------------------------------------
+          # Do not append a second signer to an already-signed AAB.
+          if AAB_CERT_OUTPUT="$(keytool -printcert -jarfile "$AAB_IN" 2>/dev/null)"; then
+            INPUT_AAB_CERT="$(printf '%s\n' "$AAB_CERT_OUTPUT" | \
+              awk -F': ' '/SHA256:/ { gsub(/:/, "", $2); print tolower($2); exit }')"
+            if [ -z "$INPUT_AAB_CERT" ] || [ "$INPUT_AAB_CERT" != "$KEY_CERT" ]; then
+              echo "::error::Gradle-signed AAB uses a different or unreadable certificate. Refusing to alter signing identity."
+              exit 1
+            fi
+            cp "$AAB_IN" "$OUT_AAB"
+          else
+            cp "$AAB_IN" "$OUT_AAB"
+            jarsigner \
+              -keystore "$ANDROID_KEYSTORE_PATH" \
+              -storepass:env KEYSTORE_PASSWORD \
+              -keypass:env KEY_PASSWORD \
+              -sigalg SHA256withRSA \
+              -digestalg SHA-256 \
+              "$OUT_AAB" "$KEY_ALIAS"
+          fi
+
+          echo 'Release artifacts signed or verified with the existing keystore.'
+
+      # 29. Verify Release APK, AAB and certificate continuity
       - name: Verify release artifacts and signatures
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         shell: bash
@@ -1210,150 +980,89 @@ jobs:
           KEY_ALIAS: ${{ vars.TWA_KEY_ALIAS || secrets.TWA_KEY_ALIAS }}
         run: |
           set -euo pipefail
-
           BT="$ANDROID_SDK_ROOT/build-tools/$ANDROID_BUILD_TOOLS"
+          APK="dist/KumbhConnect-${APP_VERSION}-${APP_VERSION_CODE}-release.apk"
+          AAB="dist/KumbhConnect-${APP_VERSION}-${APP_VERSION_CODE}-release.aab"
 
-          APK="$(find dist -maxdepth 1 -name '*-release.apk' -print -quit)"
-          AAB="$(find dist -maxdepth 1 -name '*-release.aab' -print -quit)"
-
-          [ -s "$APK" ] || {
+          test -s "$APK" || {
             echo "::error::Signed APK missing."
             exit 1
           }
-
-          [ -s "$AAB" ] || {
+          test -s "$AAB" || {
             echo "::error::Signed AAB missing."
             exit 1
           }
-
           unzip -tq "$APK"
           unzip -tq "$AAB"
 
-          # APK metadata.
-          B="$("$BT/aapt2" dump badging "$APK")"
-
-          grep -q "name='${APP_ID}'" <<< "$B" || {
+          BADGING="$("$BT/aapt2" dump badging "$APK")"
+          grep -Fq "name='${APP_ID}'" <<< "$BADGING" || {
             echo "::error::Release package ID mismatch."
             exit 1
           }
-
-          grep -q "versionCode='${APP_VERSION_CODE}'" <<< "$B" || {
+          grep -Fq "versionCode='${APP_VERSION_CODE}'" <<< "$BADGING" || {
             echo "::error::Release versionCode mismatch."
             exit 1
           }
-
-          grep -q "versionName='${APP_VERSION}'" <<< "$B" || {
+          grep -Fq "versionName='${APP_VERSION}'" <<< "$BADGING" || {
             echo "::error::Release versionName mismatch."
             exit 1
           }
-
-          grep -q "targetSdkVersion:'${ANDROID_TARGET_SDK}'" <<< "$B" || {
+          grep -Fq "targetSdkVersion:'${ANDROID_TARGET_SDK}'" <<< "$BADGING" || {
             echo "::error::Release target SDK mismatch."
             exit 1
           }
-
-          # Release permissions.
-          grep -q "android.permission.ACCESS_FINE_LOCATION" <<< "$B" || {
+          grep -Fq 'android.permission.ACCESS_FINE_LOCATION' <<< "$BADGING" || {
             echo "::error::Release ACCESS_FINE_LOCATION missing."
             exit 1
           }
-
-          grep -q "android.permission.ACCESS_COARSE_LOCATION" <<< "$B" || {
+          grep -Fq 'android.permission.ACCESS_COARSE_LOCATION' <<< "$BADGING" || {
             echo "::error::Release ACCESS_COARSE_LOCATION missing."
             exit 1
           }
-
-          if [ "${NOTIF_PLUGINS:-0}" = "1" ]; then
-            grep -q "android.permission.POST_NOTIFICATIONS" <<< "$B" || {
+          if [ "${NOTIF_PLUGINS:-0}" = '1' ]; then
+            grep -Fq 'android.permission.POST_NOTIFICATIONS' <<< "$BADGING" || {
               echo "::error::Release POST_NOTIFICATIONS missing."
               exit 1
             }
           fi
 
-          # Verify APK signature.
-          APK_SIGN_OUTPUT="$(
-            "$BT/apksigner" verify --verbose --print-certs "$APK"
-          )"
-
+          APK_SIGN_OUTPUT="$("$BT/apksigner" verify --verbose --print-certs "$APK")"
           printf '%s\n' "$APK_SIGN_OUTPUT"
-
-          # Verify AAB signature.
           jarsigner -verify -verbose:summary "$AAB"
-
           AAB_CERT_OUTPUT="$(keytool -printcert -jarfile "$AAB")"
 
-          # Compare APK/AAB signer certificates with the existing keystore.
-          KEY_CERT="$(
-            keytool -list -v \
-              -keystore "$ANDROID_KEYSTORE_PATH" \
-              -storepass:env KEYSTORE_PASSWORD \
-              -alias "$KEY_ALIAS" |
-            awk -F': ' '/SHA256:/ {
-              gsub(/:/, "", $2);
-              print tolower($2);
-              exit
-            }'
-          )"
+          KEY_CERT="$(keytool -list -v \
+            -keystore "$ANDROID_KEYSTORE_PATH" \
+            -storepass:env KEYSTORE_PASSWORD \
+            -alias "$KEY_ALIAS" | \
+            awk -F': ' '/SHA256:/ { gsub(/:/, "", $2); print tolower($2); exit }')"
+          APK_CERT="$(printf '%s\n' "$APK_SIGN_OUTPUT" | \
+            awk -F': ' '/Signer #1 certificate SHA-256 digest:/ { gsub(/:/, "", $2); print tolower($2); exit }')"
+          AAB_CERT="$(printf '%s\n' "$AAB_CERT_OUTPUT" | \
+            awk -F': ' '/SHA256:/ { gsub(/:/, "", $2); print tolower($2); exit }')"
 
-          APK_CERT="$(
-            printf '%s\n' "$APK_SIGN_OUTPUT" |
-            awk -F': ' '/Signer #1 certificate SHA-256 digest:/ {
-              gsub(/:/, "", $2);
-              print tolower($2);
-              exit
-            }'
-          )"
-
-          AAB_CERT="$(
-            printf '%s\n' "$AAB_CERT_OUTPUT" |
-            awk -F': ' '/SHA256:/ {
-              gsub(/:/, "", $2);
-              print tolower($2);
-              exit
-            }'
-          )"
-
-          [ -n "$KEY_CERT" ] || {
-            echo "::error::Could not read keystore certificate fingerprint."
-            exit 1
-          }
-
-          [ -n "$APK_CERT" ] || {
-            echo "::error::Could not read APK certificate fingerprint."
-            exit 1
-          }
-
-          [ -n "$AAB_CERT" ] || {
-            echo "::error::Could not read AAB certificate fingerprint."
-            exit 1
-          }
-
+          for name in KEY_CERT APK_CERT AAB_CERT; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Could not read $name fingerprint."
+              exit 1
+            fi
+          done
           if [ "$APK_CERT" != "$KEY_CERT" ]; then
             echo "::error::APK certificate does not match configured keystore."
             exit 1
           fi
-
           if [ "$AAB_CERT" != "$KEY_CERT" ]; then
             echo "::error::AAB certificate does not match configured keystore."
             exit 1
           fi
 
-          echo "APK and AAB signing certificate matches the configured keystore."
+          echo 'APK and AAB signing certificate matches the existing keystore.'
+          echo "Signing certificate SHA-256: $KEY_CERT"
+          sha256sum "$APK" "$AAB"
+          echo 'Release artifact verification completed.'
 
-          echo "=== Signing certificate SHA-256 ==="
-          echo "$KEY_CERT"
-
-          for f in "$APK" "$AAB"; do
-            echo "=== $f ==="
-            ls -lh "$f"
-            sha256sum "$f"
-          done
-
-          echo "Release artifact verification completed."
-
-      # ------------------------------------------------
-      # 29. Upload signed release files
-      # ------------------------------------------------
+      # 30. Upload signed release artifacts
       - name: Upload signed Release APK and AAB
         if: ${{ inputs.build_type == 'release' || inputs.build_type == 'both' }}
         uses: actions/upload-artifact@v4
@@ -1365,9 +1074,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # ------------------------------------------------
-      # 30. Cleanup temporary keystore
-      # ------------------------------------------------
+      # 31. Cleanup temporary keystore
       - name: Cleanup signing keystore
         if: ${{ always() && (inputs.build_type == 'release' || inputs.build_type == 'both') }}
         shell: bash
@@ -1375,5 +1082,5 @@ jobs:
           if [ -n "${ANDROID_KEYSTORE_PATH:-}" ] &&
              [ -f "$ANDROID_KEYSTORE_PATH" ]; then
             rm -f "$ANDROID_KEYSTORE_PATH"
-            echo "Temporary keystore removed."
+            echo 'Temporary keystore removed.'
           fi
