@@ -30,8 +30,8 @@ jobs:
     env:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
-      APP_VERSION: "1.5.2"
-      APP_VERSION_CODE: "18"
+      APP_VERSION: "1.5.3"
+      APP_VERSION_CODE: "19"
 
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
