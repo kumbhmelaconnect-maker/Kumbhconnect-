@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Privacy Policy — KumbhConnect</title>
+<link rel="icon" type="image/png" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --sf:#C8410A;--gd:#C9920A;--gd2:#F0B429;
+  --cr:#FFFAF4;--cd:#FFF6ED;--cs:#FFF3E6;
+  --br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;
+  --fn:'Mukta','Khand',sans-serif;--r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
+
+/* TOP BAR */
+.topbar{background:linear-gradient(135deg,#C8410A,#7B1616);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(200,65,10,.3)}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 12px;border-radius:20px;font-size:.75rem;cursor:pointer;font-family:var(--fn);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.back-btn:hover{background:rgba(255,255,255,.25)}
+.topbar-title{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#fff}
+.topbar-sub{font-size:.6rem;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#FFF3E6 0%,#FFFAF4 100%);padding:28px 20px 24px;text-align:center;border-bottom:2px solid var(--br)}
+.hero-icon{font-size:3rem;margin-bottom:10px}
+.hero-title{font-family:'Khand',sans-serif;font-size:1.8rem;font-weight:700;color:var(--sf);line-height:1.2;margin-bottom:6px}
+.hero-sub{font-size:.8rem;color:var(--t3);margin-bottom:10px}
+.hero-badge{display:inline-block;background:linear-gradient(90deg,#C8410A,#F0B429);color:#fff;font-size:.65rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase}
+
+/* DATE BADGE */
+.date-bar{background:var(--cd);border-bottom:1px solid var(--br);padding:9px 20px;display:flex;gap:16px;flex-wrap:wrap}
+.date-item{font-size:.7rem;color:var(--t3)}<br/>
+.date-item span{font-weight:700;color:var(--t2)}
+
+/* CONTENT */
+.content{max-width:680px;margin:0 auto;padding:20px 18px 48px}
+
+.section{margin-bottom:28px;background:#fff;border-radius:var(--r);border:1px solid var(--br);overflow:hidden;box-shadow:0 2px 8px rgba(200,65,10,.05)}
+.sec-hdr{background:linear-gradient(135deg,var(--cs),#fff);padding:13px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:10px}
+.sec-icon{font-size:1.3rem}
+.sec-title{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--sf)}
+.sec-body{padding:14px 16px}
+.sec-body p{font-size:.82rem;color:var(--t2);margin-bottom:10px}
+.sec-body ul{padding-left:18px;margin-bottom:10px}
+.sec-body ul li{font-size:.82rem;color:var(--t2);margin-bottom:6px}
+.sec-body h4{font-family:'Khand',sans-serif;font-size:.88rem;font-weight:700;color:var(--t1);margin-bottom:6px;margin-top:12px}
+
+/* HIGHLIGHT BOX */
+.highlight{background:linear-gradient(135deg,#FEF9EC,#FFF3E6);border:1.5px solid var(--gd2);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.highlight p{margin:0;font-size:.8rem;color:#78350F}
+
+/* CONTACT BOX */
+.contact-box{background:linear-gradient(135deg,#C8410A,#7B1616);border-radius:var(--r);padding:20px;text-align:center;margin-top:24px}
+.contact-box h3{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#F0B429;margin-bottom:8px}
+.contact-box p{font-size:.78rem;color:rgba(255,255,255,.85);margin-bottom:12px}
+.contact-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.clink-btn{padding:8px 18px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:var(--fn);cursor:pointer;text-decoration:none;border:none}
+.clink-wa{background:#25D366;color:#fff}
+.clink-mail{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)!important}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px 18px;border-top:1px solid var(--br);font-size:.68rem;color:var(--t3)}
+.footer strong{color:var(--sf)}
+
+/* LANGUAGE TABS */
+.lang-tabs{display:flex;gap:6px;padding:12px 18px;background:var(--cs);border-bottom:1px solid var(--br)}
+.ltab{padding:5px 14px;border-radius:16px;border:1.5px solid var(--br);background:#fff;color:var(--t2);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.ltab.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+.lang-block{display:none}.lang-block.on{display:block}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="back-btn">← मागे</a>
+  <div>
+    <div class="topbar-title">Privacy Policy</div>
+    <div class="topbar-sub">KumbhConnect · गोपनीयता धोरण</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-icon">🔐</div>
+  <div class="hero-title">गोपनीयता धोरण</div>
+  <div class="hero-sub">Privacy Policy — KumbhConnect Platform</div>
+  <div class="hero-badge">✅ User First · Your Data, Your Control</div>
+</div>
+
+<!-- DATE BAR -->
+<div class="date-bar">
+  <div class="date-item">📅 लागू तारीख: <span>जून १, २०२६</span></div>
+  <div class="date-item">🔄 शेवटचे अपडेट: <span>नोव्हेंबर ९, २०२६</span></div>
+  <div class="date-item">📍 Platform: <span>KumbhConnect Android App &amp; Website</span></div>
+</div>
+
+<!-- LANGUAGE TABS -->
+<div class="lang-tabs">
+  <button class="ltab on" onclick="setLang('mr',this)">मराठी</button>
+  <button class="ltab" onclick="setLang('hi',this)">हिंदी</button>
+  <button class="ltab" onclick="setLang('en',this)">English</button>
+</div>
+
+<div class="content">
+
+<!-- ===== MARATHI ===== -->
+<div id="lang-mr" class="lang-block on">
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📋</span><div class="sec-title">आम्ही कोणती माहिती गोळा करतो?</div></div>
+    <div class="sec-body">
+      <h4>स्वयंचलित माहिती (Anonymous)</h4>
+      <ul>
+        <li>Device ID (anonymous — नाव किंवा ओळख नाही)</li>
+        <li>App उघडण्याची वेळ व तारीख</li>
+        <li>कोणते Page/Feature वापरले</li>
+        <li>Search केलेले शब्द (location name फक्त)</li>
+      </ul>
+      <h4>तुम्ही स्वेच्छेने दिलेली माहिती</h4>
+      <ul>
+        <li>खातं Registration: नाव, Email, मोबाईल नंबर (ऐच्छिक)</li>
+        <li>तक्रार/Grievance: नाव, मोबाईल, तक्रार विषय</li>
+        <li>Business/Volunteer/Guide Listing तयार केल्यास: व्यवसायाची माहिती, फोटो, संपर्क तपशील</li>
+        <li>Service Request केल्यास: नाव, मोबाईल, हवी असलेली सेवा व तपशील</li>
+        <li>GPS Location — फक्त तुमच्या परवानगीनंतर</li>
+        <li>फोटो — Media Center व Volunteer ID Card साठी, ऐच्छिक (Volunteer कार्डसाठी बंधनकारक)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔑</span><div class="sec-title">खातं व Login</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect वापरण्यासाठी आता <strong>Registration/Login बंधनकारक</strong> आहे (Email+Password किंवा Google Sign-In).</p>
+      <ul>
+        <li>Login साठी Firebase Authentication (Google Cloud) वापरतो — पासवर्ड आमच्याकडे साध्या स्वरूपात कधीच साठवला जात नाही</li>
+        <li>Android अ‍ॅपमध्ये Login फक्त Email+Password ने होतो; Google Sign-In फक्त वेबसाइट/PWA वर उपलब्ध आहे</li>
+        <li>"माझं खातं" पेजवरून तुम्ही खातं डिलीट करू शकता. तेव्हा हे हटवले जाते: तुमचं Login खातं, तुमचा Profile, तुम्ही तयार केलेले Listings, तुमच्या सूचना (Notifications) आणि अजून "प्रलंबित" असलेल्या जाहिरात विनंत्या. हे हटवले जात नाही: Volunteer नोंदणी, Service Requests, Reviews आणि प्रलंबित नसलेल्या जाहिरात विनंत्या — कारण त्या इतर वापरकर्त्यांच्या/प्रदात्यांच्या व्यवहाराचे, मॉडरेशनचे व कामकाजाचे नोंद-रेकॉर्ड आहेत. Media Center चे फोटो आणि Cloudinary वर अपलोड केलेले फोटो (Listing/Volunteer ID Card सह) या प्रक्रियेत हटवले जात नाहीत. या न हटवल्या जाणाऱ्या नोंदींबाबत हटवण्याची विनंती kumbhmelaconnect@gmail.com वर करा.</li>
+        <li>सुरक्षेसाठी Firebase खाते हटवण्यापूर्वी अलीकडील Login मागतो; आवश्यक असल्यास पुन्हा Login करून प्रयत्न करा</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📍</span><div class="sec-title">GPS / Location माहिती</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect <strong>तुमच्या परवानगीशिवाय</strong> GPS access करत नाही.</p>
+      <ul>
+        <li>Location access करण्यापूर्वी स्पष्ट Consent popup दाखवले जाते</li>
+        <li>Location तुम्ही स्वतः एखादं location-based feature वापरता तेव्हाच access केली जाते — उदा. SOS/Grievance पाठवताना, किंवा listing/business जोडताना/एडिट करताना "📍 माझे स्थान वापरा" हा पर्याय निवडल्यास</li>
+        <li>Listing साठी वापरलेलं location त्या listing चा भाग म्हणून saved होतं, फक्त तुम्ही listing submit केल्यास</li>
+        <li>तुमचे Live Location कधीही स्वयंचलितपणे share होत नाही</li>
+        <li>GPS नाकारल्यास Manual location entry उपलब्ध आहे</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">💬</span><div class="sec-title">WhatsApp शेअरिंग</div></div>
+    <div class="sec-body">
+      <p>WhatsApp वर माहिती फक्त <strong>तुमच्या action नंतरच</strong> पाठवली जाते — कधीही automatically नाही.</p>
+      <ul>
+        <li>तक्रार पाठवण्यापूर्वी Consent popup दाखवतो</li>
+        <li>"तुमची माहिती जवळच्या मदतीसाठी पाठवली जाईल" — हे नेहमी दाखवतो</li>
+        <li>SOS मध्ये Location WhatsApp वर जाते — फक्त तुमच्या संमतीनंतर</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚫</span><div class="sec-title">आम्ही काय करत नाही</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>❌ तुमचा डेटा कधीही विकत नाही किंवा जाहिरातदारांना देत नाही</li>
+        <li>❌ Advertisements साठी डेटा वापरत नाही</li>
+        <li>❌ तुमचे नाव किंवा मोबाईल नंबर analytics मध्ये स्टोअर करत नाही</li>
+        <li>❌ Cookies track करत नाही</li>
+        <li>ℹ️ Login, Media Center फोटो अपलोड व Listing/Card साठी Firebase व Cloudinary या विश्वासू तांत्रिक सेवा वापरतो (खाली सविस्तर) — हे data broker किंवा जाहिरात कंपन्या नाहीत</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🗑️</span><div class="sec-title">खाते/डेटा डिलीशन</div></div>
+    <div class="sec-body"><p>अ‍ॅपमधील "माझं खातं" पेजवरून किंवा वेब-पेजवरून तुम्ही खातं व डेटा डिलीट करू शकता: <a href="delete-account.html"><b>delete-account.html</b></a>. कोणता डेटा हटतो, कोणता ठेवला जातो व किती काळ — तिथे सविस्तर आहे (विनंतीवर ३० दिवसांत).</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚩</span><div class="sec-title">मजकूर तक्रार व मॉडरेशन</div></div>
+    <div class="sec-body"><p>Media Center फोटो, Reviews व Kumbh AI चे उत्तर यावर "⚑ कळवा" बटण आहे. तक्रारी आमच्या टीमकडे जातात; फोटो व Listings Admin Approval नंतरच सार्वजनिक होतात; नियम मोडणारा मजकूर काढला जातो व वारंवार उल्लंघन करणाऱ्यांचे खाते बंद केले जाऊ शकते.</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📣</span><div class="sec-title">प्रायोजित मजकूर व पेमेंट</div></div>
+    <div class="sec-body"><p>प्रायोजित जाहिराती "प्रायोजित" असे स्पष्ट लेबल लावून दाखवल्या जातात. अ‍ॅपमध्ये In-app purchase किंवा पेमेंट प्रक्रिया नाही; जाहिरातीचे शुल्क (असल्यास) KumbhConnect टीमशी थेट ठरते. जाहिरातीसाठी तुमचा वैयक्तिक डेटा जाहिरातदारांना दिला जात नाही.</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">💾</span><div class="sec-title">डेटा कुठे साठवला जातो?</div></div>
+    <div class="sec-body">
+      <ul>
+        <li><strong>LocalStorage:</strong> तुमच्याच device वर — anonymous analytics events (रांग), भाषा निवड व आकडेवारी पसंती</li>
+        <li><strong>आठवणी (Reminders):</strong> फक्त तुमच्या फोनवर (Android स्थानिक सूचना); सर्व्हरला पाठवल्या जात नाहीत</li>
+        <li><strong>Google Sheets (Apps Script):</strong> Anonymous event counts — कोणतीही वैयक्तिक ओळख नाही</li>
+        <li><strong>Firebase (Google Cloud, अमेरिका/भारत सर्व्हर):</strong> तुमचं खातं, Login, Media Center फोटो, Business/Volunteer/Guide Listings, Service Requests, Reviews</li>
+        <li><strong>Cloudinary (तृतीय पक्ष इमेज होस्टिंग सेवा):</strong> Media Center व Volunteer ID Card साठी अपलोड केलेले फोटो साठवण्यासाठी वापरतो</li>
+        <li>तक्रारी/SOS: WhatsApp द्वारे थेट Police/Guide कडे — आम्ही वेगळे स्टोअर करत नाही</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📸</span><div class="sec-title">Media Center — फोटो अपलोड</div></div>
+    <div class="sec-body">
+      <p>Media Center मध्ये तुम्ही स्वेच्छेने फोटो अपलोड करू शकता.</p>
+      <ul>
+        <li>अपलोड करताना तुम्ही दिलेलं नाव, शहर, caption आणि location हे फोटोसोबत दिसतं</li>
+        <li>प्रत्येक फोटो Admin Approval नंतरच सार्वजनिक गॅलरीत दिसतो</li>
+        <li>फोटो Firebase (Google Cloud) व Cloudinary या सेवांवर साठवले जातात — या दोन्ही आमच्या विश्वासू तांत्रिक सेवा पुरवठादार आहेत, जाहिरातदार किंवा data broker नाहीत</li>
+        <li>Staff Login (Admin/Department/Press) साठी फक्त Email + Password वापरला जातो, Firebase Authentication द्वारे सुरक्षित</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏪</span><div class="sec-title">Business/Volunteer/Guide Listing व Reviews</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>Listing तयार केल्यास ती Admin Approval नंतरच सार्वजनिक दिसते</li>
+        <li>तुम्ही सेवा घेतल्यानंतर दिलेली Review सार्वजनिक दिसते (विश्वासार्हतेसाठी)</li>
+        <li>Review फक्त खरंच पूर्ण झालेल्या सेवेसाठीच देता येते — खोट्या reviews रोखण्यासाठी हे तांत्रिकरित्या सुनिश्चित केलं आहे</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔒</span><div class="sec-title">Offline & PWA सुरक्षा</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect एक Progressive Web App (PWA) आहे. Offline mode मध्ये:</p>
+      <ul>
+        <li>Emergency numbers व verified locations cache मध्ये सुरक्षित</li>
+        <li>Network नसताना local data वापरतो</li>
+        <li>Service Worker द्वारे secure caching</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📱</span><div class="sec-title">Android अ‍ॅप परवानग्या</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect Android अ‍ॅप फक्त खालील परवानग्या मागतो, आणि त्याही तुम्ही संबंधित सुविधा वापरता तेव्हाच:</p>
+      <ul>
+        <li><strong>स्थान (Location):</strong> नकाशावर तुमचे स्थान, जवळची ठिकाणे आणि SOS संदेशातील GPS दाखवण्यासाठी. स्थान सतत ट्रॅक केले जात नाही आणि तुमच्या निवडीशिवाय कुठेही पाठवले जात नाही.</li>
+        <li><strong>कॅमेरा / फोटो:</strong> तक्रारीसोबत फोटो जोडण्यासाठी. निवडलेला फोटो तुम्ही तक्रार पाठवेपर्यंत फक्त तुमच्या फोनवर राहतो.</li>
+        <li><strong>सूचना (Notifications):</strong> आठवण (Reminder) सुविधा ऐच्छिक आहे. तुम्ही आठवण सेट करता तेव्हा गरज असल्यास अ‍ॅप सूचना परवानगी मागते. आठवणीची माहिती (नाव व वेळ) फक्त तुमच्या फोनवर राहते आणि KumbhConnect च्या सर्व्हरला पाठवली जात नाही. ही फोनवरील स्थानिक (local) आठवण आहे — रिमोट पुश सूचना नव्हे. पुश सूचना सध्या बंद आहेत; त्या वेगळे सेटअप केल्याशिवाय चालू होत नाहीत. आठवण रद्द केल्यास ती फोनवरून काढली जाते, आणि परवानगी फोनच्या Settings मधून कधीही बंद करता येते.</li>
+        <li>कोणतीही परवानगी नाकारली तरी अ‍ॅपचा बाकीचा भाग वापरता येतो. परवानगी फोनच्या Settings मधून कधीही बदलता येते.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🤖</span><div class="sec-title">AI चॅट (Kumbh AI)</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>तुम्ही AI चॅटमध्ये लिहिलेला संदेश (कमाल ५०० अक्षरे) KumbhConnect साठी तयार केलेल्या Google Apps Script सेवेला (script.google.com) पाठवला जातो. सोबत अनामिक Device ID जातो; तुम्ही लॉगिन असल्यास तुमचे Firebase लॉगिन ओळख-टोकन पडताळणीसाठी जाते.</li>
+        <li>उत्तरात वेब-शोध निकालांच्या लिंक (स्रोत) दिसू शकतात. उत्तर देण्यासाठी ही सेवा इतर सेवांचा वापर करू शकते.</li>
+        <li>तिथे संदेश साठवले जातात का, किती काळ ठेवले जातात, किंवा इतर तृतीय-पक्ष सेवांना पाठवले जातात का — हे अ‍ॅपच्या कोडवरून सिद्ध करता येत नाही. म्हणून आम्ही असे वचन देत नाही की संदेश साठवले जात नाहीत किंवा कोणालाही पाठवले जात नाहीत.</li>
+        <li><strong>कृपया AI चॅटमध्ये पासवर्ड, बँक/UPI/कार्ड तपशील, आधार किंवा इतर संवेदनशील वैयक्तिक माहिती लिहू नका.</strong> आपत्कालीन स्थितीत SOS/112 वापरा; AI चॅट आपत्कालीन सेवा नाही.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🌐</span><div class="sec-title">तृतीय-पक्ष सेवा</div></div>
+    <div class="sec-body">
+      <p>अ‍ॅप/वेबसाइट वापरताना खालील बाह्य सेवांशी संपर्क होतो (तुमचा IP पत्ता त्या सेवांना दिसतो):</p>
+      <ul>
+        <li><strong>Firebase (Google):</strong> Login, Firestore डेटाबेस; Firebase SDK www.gstatic.com वरून लोड होते</li>
+        <li><strong>Google Apps Script (script.google.com):</strong> अनामिक वापर आकडेवारी व AI चॅट</li>
+        <li><strong>Cloudinary:</strong> तुम्ही अपलोड केलेले फोटो साठवणे व दाखवणे</li>
+        <li><strong>OpenStreetMap:</strong> नकाशा टाइल्स (tile.openstreetmap.org) व ठिकाण शोध (Nominatim) — तुम्ही शोधात लिहिलेला मजकूर त्यांना पाठवला जातो</li>
+        <li><strong>Supabase:</strong> सार्वजनिक Listings चा डेटा वाचण्यासाठी</li>
+        <li><strong>Google Fonts (fonts.googleapis.com / fonts.gstatic.com):</strong> फॉन्ट</li>
+        <li><strong>ImgBB (i.ibb.co):</strong> वेबसाइटवर काही चित्रे/लोगो या इमेज होस्टवरून दाखवली जातात; Android अ‍ॅपमध्ये ती अ‍ॅपसोबतच येतात</li>
+        <li><strong>cdnjs (Cloudflare):</strong> Volunteer ID Card पानावरील स्क्रिप्ट लायब्ररी (html2canvas, qrcode)</li>
+        <li><strong>unpkg.com:</strong> फक्त वेबसाइटवर नकाशा लायब्ररी (Leaflet); Android अ‍ॅपमध्ये ती अ‍ॅपसोबतच येते</li>
+        <li>तुम्ही निवडल्यास Google Maps, WhatsApp किंवा इतर साइट्स अ‍ॅपबाहेर उघडतात; त्यांची स्वतःची गोपनीयता धोरणे लागू होतात</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📊</span><div class="sec-title">वापर आकडेवारी (Analytics) — नियंत्रण</div></div>
+    <div class="sec-body">
+      <p>अ‍ॅप/वेबसाइट अनामिक वापराची नोंद (Device ID, पेज/सुविधा, वेळ) KumbhConnect च्या Google Apps Script सेवेला पाठवते. तुम्ही ती बंद करू शकता; बंद केल्यावर नवीन नोंदी या फोनवर रांगेत साठवल्या जात नाहीत किंवा पाठवल्या जात नाहीत. तुमची निवड पुढील वेळी अ‍ॅप उघडल्यावरही लागू राहते (ही निवड या ब्राउझर/अ‍ॅपच्या स्थानिक साठवणीत राहते).</p>
+      <div class="kc-an-ctl">
+        <label style="display:flex;align-items:center;gap:10px;min-height:44px;font-size:.9rem"><input type="checkbox" class="kc-an-toggle" style="width:22px;height:22px"/> <span>अनामिक वापर आकडेवारी पाठवा</span></label>
+        <button type="button" class="kc-an-clear" style="min-height:44px;padding:8px 14px;margin:6px 0;border:1.5px solid var(--sf);border-radius:10px;background:transparent;color:var(--sf);font:inherit;font-weight:700">या फोनवरील स्थानिक नोंदी हटवा</button>
+        <p class="kc-an-status" role="status" aria-live="polite" style="font-size:.8rem;margin:4px 0"></p>
+      </div>
+      <p>"स्थानिक नोंदी हटवा" फक्त या फोनवर साठवलेली रांग हटवते. आधी सर्व्हरला पाठवलेल्या नोंदी अ‍ॅपमधून हटवता येत नाहीत; सर्व्हर-बाजूच्या हटवण्याची सुविधा सध्या उपलब्ध नाही. त्याबाबत kumbhmelaconnect@gmail.com वर संपर्क करा.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">👤</span><div class="sec-title">तुमचे हक्क</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>✅ कधीही Location access नाकारण्याचा हक्क</li>
+        <li>✅ अनामिक वापर आकडेवारी बंद करण्याचा (opt-out) आणि या फोनवरील स्थानिक नोंदी हटवण्याचा पर्याय (Android अ‍ॅपमधील "वापर आकडेवारी" कार्ड किंवा या पानावरील नियंत्रण)</li>
+        <li>✅ WhatsApp/Call न वापरण्याचा पूर्ण हक्क</li>
+        <li>✅ "माझं खातं" पेजवरून खातं डिलीट करण्याचा हक्क (काय हटते व काय ठेवले जाते ते वर "खातं व Login" मध्ये सांगितले आहे)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📧</span><div class="sec-title">संपर्क</div></div>
+    <div class="sec-body">
+      <p>गोपनीयतेबाबत काही प्रश्न असल्यास संपर्क करा:</p>
+      <ul>
+        <li>📧 Email: kumbhmelaconnect@gmail.com</li>
+        <li>🌐 Platform: KumbhConnect Android App &amp; Website</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end lang-mr -->
+
+<!-- ===== ENGLISH ===== -->
+<div id="lang-en" class="lang-block">
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📋</span><div class="sec-title">What Information Do We Collect?</div></div>
+    <div class="sec-body">
+      <h4>Automatic (Anonymous)</h4>
+      <ul>
+        <li>Anonymous Device ID (no name or identity)</li>
+        <li>App open time and date</li>
+        <li>Which pages/features were used</li>
+        <li>Search keywords (location names only)</li>
+      </ul>
+      <h4>Voluntarily Provided</h4>
+      <ul>
+        <li>Account Registration: Name, Email, mobile number (optional)</li>
+        <li>Grievance/Complaint: Name, mobile number, complaint details</li>
+        <li>If you create a Business/Volunteer/Guide Listing: business details, photos, contact info</li>
+        <li>If you send a Service Request: name, mobile, requested service and details</li>
+        <li>GPS Location — only after your explicit permission</li>
+        <li>Photos — for Media Center and Volunteer ID Card, optional (required for the Volunteer card)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔑</span><div class="sec-title">Account & Login</div></div>
+    <div class="sec-body">
+      <p>Registration/Login is now <strong>required</strong> to use KumbhConnect (Email+Password or Google Sign-In).</p>
+      <ul>
+        <li>Login uses Firebase Authentication (Google Cloud) — your password is never stored by us in plain form</li>
+        <li>In the Android app, sign-in is by Email+Password only; Google Sign-In is available on the website/PWA only</li>
+        <li>You can delete your account from the "My Account" page. This deletes: your login account, your profile, listings you created, your notifications, and advertising requests that are still "pending". It does not delete: Volunteer registrations, Service Requests, Reviews, and advertising requests that are no longer pending — these are retained as records of transactions between users/providers, moderation and operations. Media Center photos and photos uploaded to Cloudinary (including Listing/Volunteer ID Card photos) are not deleted by this process. To ask about retained records, email kumbhmelaconnect@gmail.com.</li>
+        <li>For security, Firebase requires a recent sign-in before an account can be deleted; if asked, sign in again and retry</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📍</span><div class="sec-title">GPS / Location Data</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect <strong>never accesses GPS without your permission.</strong></p>
+      <ul>
+        <li>A clear consent popup is shown before any location access</li>
+        <li>Location is accessed only when you explicitly use a location-based feature — for example when sending SOS/Grievance, or when you choose "📍 Use My Location" while adding/editing a listing/business</li>
+        <li>Location used for a listing is stored as part of that listing only if you submit it</li>
+        <li>Your live location is never shared automatically</li>
+        <li>Manual location entry is available if GPS is denied</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">💬</span><div class="sec-title">WhatsApp Sharing</div></div>
+    <div class="sec-body">
+      <p>Information is sent via WhatsApp only <strong>after your action</strong> — never automatically.</p>
+      <ul>
+        <li>A consent popup is shown before sending a complaint</li>
+        <li>We always show: "Your information will be sent for nearby assistance"</li>
+        <li>SOS location goes via WhatsApp only after your consent</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚫</span><div class="sec-title">What We Never Do</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>❌ We never sell your data or give it to advertisers</li>
+        <li>❌ We never use data for advertisements</li>
+        <li>❌ We never store your name or phone number in analytics</li>
+        <li>❌ We never track cookies</li>
+        <li>ℹ️ Login, Media Center photo uploads, and Listing/Card creation use Firebase and Cloudinary (trusted technical service providers, not data brokers or ad networks) — see below</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🗑️</span><div class="sec-title">Account &amp; Data Deletion</div></div>
+    <div class="sec-body"><p>You can delete your account and data from the "My Account" page in the app, or via the web page: <a href="delete-account.html"><b>delete-account.html</b></a>. It explains what is deleted, what may be kept and for how long (requests are handled within 30 days).</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚩</span><div class="sec-title">Reporting &amp; Moderation</div></div>
+    <div class="sec-body"><p>Media Center photos, reviews and Kumbh AI replies have a "⚑ Report" button. Reports go to our team; photos and listings become public only after admin approval; content that breaks the rules is removed and repeat offenders' accounts can be closed.</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📣</span><div class="sec-title">Sponsored Content &amp; Payments</div></div>
+    <div class="sec-body"><p>Sponsored ads are clearly labelled "Sponsored". The app has no in-app purchases or payment processing; any advertising fee is arranged directly with the KumbhConnect team. We do not give your personal data to advertisers.</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">💾</span><div class="sec-title">Where Is Data Stored?</div></div>
+    <div class="sec-body">
+      <ul>
+        <li><strong>LocalStorage:</strong> On your own device — anonymous analytics events (queue), language choice and the statistics preference</li>
+        <li><strong>Reminders:</strong> only on your phone (Android local notifications); not sent to a server</li>
+        <li><strong>Google Sheets (Apps Script):</strong> Anonymous event counts — no personal identity</li>
+        <li><strong>Firebase (Google Cloud servers):</strong> Your account, login, Media Center photos, Business/Volunteer/Guide Listings, Service Requests, Reviews</li>
+        <li><strong>Cloudinary (third-party image hosting):</strong> Stores photos uploaded via Media Center and the Volunteer ID Card</li>
+        <li>Grievances/SOS: Sent directly to Police/Guide via WhatsApp — we do not separately store these</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📸</span><div class="sec-title">Media Center — Photo Uploads</div></div>
+    <div class="sec-body">
+      <p>Media Center lets you voluntarily upload photos to share with other pilgrims.</p>
+      <ul>
+        <li>The name, city, caption, and location you provide are shown alongside your photo</li>
+        <li>Every photo requires Admin Approval before it appears in the public gallery</li>
+        <li>Photos are stored using Firebase (Google Cloud) and Cloudinary — both are trusted technical infrastructure providers, not advertisers or data brokers</li>
+        <li>Staff logins (Admin/Department/Press) use Email + Password, secured via Firebase Authentication</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏪</span><div class="sec-title">Business/Volunteer/Guide Listings & Reviews</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>A listing appears publicly only after Admin Approval</li>
+        <li>Reviews you leave after receiving a service are shown publicly (for trust and transparency)</li>
+        <li>Reviews can only be submitted for a genuinely completed service — this is technically enforced to prevent fake reviews</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔒</span><div class="sec-title">Offline & PWA Security</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect is a Progressive Web App (PWA). In offline mode:</p>
+      <ul>
+        <li>Emergency numbers and verified locations are safely cached</li>
+        <li>Local data is used when there is no network</li>
+        <li>Secure caching via Service Worker</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📱</span><div class="sec-title">Android App Permissions</div></div>
+    <div class="sec-body">
+      <p>The KumbhConnect Android app asks only for the permissions below, and only when you use the related feature:</p>
+      <ul>
+        <li><strong>Location:</strong> to show your position on the map, nearby places, and GPS in the SOS message. Location is not tracked continuously and is not sent anywhere without your choice.</li>
+        <li><strong>Camera / Photos:</strong> to attach a photo to a complaint. The photo you pick stays on your phone until you choose to submit the complaint.</li>
+        <li><strong>Notifications:</strong> Reminders are optional. When you set a reminder, the app asks for notification permission if it is needed. Reminder details (name and time) stay on your phone and are not sent to KumbhConnect servers. These are local, on-device reminders — they are not remote push notifications. Push notifications are currently disabled and will not start unless separately configured. You can cancel a reminder in the app and turn the permission off any time in phone Settings.</li>
+        <li>If you deny any permission, the rest of the app still works. You can change permissions anytime in your phone Settings.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🤖</span><div class="sec-title">AI Chat (Kumbh AI)</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>The message you type in AI Chat (up to 500 characters) is sent to a Google Apps Script service (script.google.com) set up for KumbhConnect, together with an anonymous device ID. If you are signed in, your Firebase sign-in identity token is also sent so the service can verify it.</li>
+        <li>Replies may show links to web search results (sources). The service may use other services to produce its answers.</li>
+        <li>Whether messages are stored there, for how long, or passed to other third-party services cannot be established from the app code. We therefore do not promise that messages are not stored or are not shared with anyone.</li>
+        <li><strong>Please do not enter passwords, bank/UPI/card details, Aadhaar or other sensitive personal information in AI Chat.</strong> In an emergency use SOS/112; AI Chat is not an emergency service.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🌐</span><div class="sec-title">Third-party Services</div></div>
+    <div class="sec-body">
+      <p>The app/website contacts the following external services (they can see your IP address):</p>
+      <ul>
+        <li><strong>Firebase (Google):</strong> sign-in and the Firestore database; the Firebase SDK is loaded from www.gstatic.com</li>
+        <li><strong>Google Apps Script (script.google.com):</strong> anonymous usage statistics and AI Chat</li>
+        <li><strong>Cloudinary:</strong> storing and serving photos you upload</li>
+        <li><strong>OpenStreetMap:</strong> map tiles (tile.openstreetmap.org) and place search (Nominatim) — the text you type in search is sent to them</li>
+        <li><strong>Supabase:</strong> reading public listings data</li>
+        <li><strong>Google Fonts (fonts.googleapis.com / fonts.gstatic.com):</strong> fonts</li>
+        <li><strong>ImgBB (i.ibb.co):</strong> on the website some pictures/logos are loaded from this image host; in the Android app they are bundled with the app</li>
+        <li><strong>cdnjs (Cloudflare):</strong> script libraries on the Volunteer ID Card page (html2canvas, qrcode)</li>
+        <li><strong>unpkg.com:</strong> map library (Leaflet) on the website only; the Android app ships it inside the app</li>
+        <li>If you choose, Google Maps, WhatsApp or other sites open outside the app; their own privacy policies apply</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📊</span><div class="sec-title">Usage Statistics (Analytics) — Control</div></div>
+    <div class="sec-body">
+      <p>The app/website sends an anonymous record of use (device ID, page/feature, time) to a Google Apps Script service set up by KumbhConnect. You can turn this off; after that, new records are neither queued on this phone nor sent. Your choice is kept the next time you open the app (it is stored in this browser/app's local storage).</p>
+      <div class="kc-an-ctl">
+        <label style="display:flex;align-items:center;gap:10px;min-height:44px;font-size:.9rem"><input type="checkbox" class="kc-an-toggle" style="width:22px;height:22px"/> <span>Send anonymous usage statistics</span></label>
+        <button type="button" class="kc-an-clear" style="min-height:44px;padding:8px 14px;margin:6px 0;border:1.5px solid var(--sf);border-radius:10px;background:transparent;color:var(--sf);font:inherit;font-weight:700">Delete local records on this phone</button>
+        <p class="kc-an-status" role="status" aria-live="polite" style="font-size:.8rem;margin:4px 0"></p>
+      </div>
+      <p>"Delete local records" only deletes the queue stored on this phone. Records already sent to the server cannot be deleted from the app; server-side deletion is not currently available. Contact kumbhmelaconnect@gmail.com about those.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">👤</span><div class="sec-title">Your Rights</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>✅ Right to decline location access anytime</li>
+        <li>✅ Option to turn off anonymous usage statistics (opt-out) and delete local records on this phone (the "Usage statistics" card in the Android app, or the control on this page)</li>
+        <li>✅ Full right to avoid WhatsApp/Call features</li>
+        <li>✅ Right to delete your account from the "My Account" page (what is deleted and what is retained is explained above under "Account & Login")</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📧</span><div class="sec-title">Contact Us</div></div>
+    <div class="sec-body">
+      <p>For any privacy concerns, contact us:</p>
+      <ul>
+        <li>📧 Email: kumbhmelaconnect@gmail.com</li>
+        <li>🌐 Platform: KumbhConnect Android App &amp; Website</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end lang-en -->
+
+<!-- ===== HINDI ===== -->
+<div id="lang-hi" class="lang-block">
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📋</span><div class="sec-title">हम कौन सी जानकारी एकत्र करते हैं?</div></div>
+    <div class="sec-body">
+      <h4>स्वचालित जानकारी (Anonymous)</h4>
+      <ul>
+        <li>Device ID (anonymous — नाम या पहचान नहीं)</li>
+        <li>App खोलने का समय व तारीख</li>
+        <li>कौन सा Page/Feature इस्तेमाल किया</li>
+        <li>खोजे गए शब्द (केवल location name)</li>
+      </ul>
+      <h4>आपके द्वारा स्वेच्छा से दी गई जानकारी</h4>
+      <ul>
+        <li>खाता Registration: नाम, Email, मोबाइल नंबर (वैकल्पिक)</li>
+        <li>शिकायत/Grievance: नाम, मोबाइल, शिकायत विवरण</li>
+        <li>Business/Volunteer/Guide Listing बनाने पर: व्यवसाय की जानकारी, फोटो, संपर्क विवरण</li>
+        <li>Service Request भेजने पर: नाम, मोबाइल, आवश्यक सेवा व विवरण</li>
+        <li>GPS Location — केवल आपकी अनुमति के बाद</li>
+        <li>फोटो — Media Center व Volunteer ID Card के लिए, वैकल्पिक (Volunteer कार्ड के लिए आवश्यक)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔑</span><div class="sec-title">खाता व Login</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect इस्तेमाल करने के लिए अब <strong>Registration/Login अनिवार्य</strong> है (Email+Password या Google Sign-In)।</p>
+      <ul>
+        <li>Login के लिए Firebase Authentication (Google Cloud) इस्तेमाल करते हैं — पासवर्ड हमारे पास कभी भी सादे रूप में संग्रहीत नहीं होता</li>
+        <li>Android ऐप में Login केवल Email+Password से होता है; Google Sign-In केवल वेबसाइट/PWA पर उपलब्ध है</li>
+        <li>आप "मेरा खाता" पेज से अपना खाता डिलीट कर सकते हैं। इससे ये हटाया जाता है: आपका Login खाता, आपका Profile, आपके बनाए Listings, आपकी सूचनाएँ (Notifications) और वे विज्ञापन अनुरोध जो अभी "लंबित" हैं। ये नहीं हटाया जाता: Volunteer पंजीकरण, Service Requests, Reviews और जो विज्ञापन अनुरोध लंबित नहीं हैं — क्योंकि ये अन्य उपयोगकर्ताओं/प्रदाताओं के लेन-देन, मॉडरेशन व संचालन के रिकॉर्ड हैं। Media Center के फोटो और Cloudinary पर अपलोड किए गए फोटो (Listing/Volunteer ID Card सहित) इस प्रक्रिया में हटाए नहीं जाते। जो रिकॉर्ड नहीं हटते, उनके लिए kumbhmelaconnect@gmail.com पर अनुरोध करें।</li>
+        <li>सुरक्षा के लिए Firebase खाता हटाने से पहले हाल का Login माँगता है; ज़रूरत हो तो फिर Login करके दोबारा प्रयास करें</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📍</span><div class="sec-title">GPS / Location जानकारी</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect <strong>आपकी अनुमति के बिना</strong> GPS एक्सेस नहीं करता।</p>
+      <ul>
+        <li>Location एक्सेस से पहले स्पष्ट Consent popup दिखाया जाता है</li>
+        <li>Location केवल तभी access की जाती है जब आप स्वयं कोई location-based feature इस्तेमाल करते हैं — जैसे SOS/Grievance भेजते समय, या listing/business जोड़ते/एडिट करते समय "📍 मेरा स्थान उपयोग करें" चुनने पर</li>
+        <li>listing के लिए इस्तेमाल किया गया location उस listing के हिस्से के रूप में तभी सेव होता है जब आप listing submit करते हैं</li>
+        <li>आपकी Live Location कभी स्वचालित रूप से शेयर नहीं होती</li>
+        <li>GPS अस्वीकार करने पर Manual location entry उपलब्ध है</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">💬</span><div class="sec-title">WhatsApp शेयरिंग</div></div>
+    <div class="sec-body">
+      <p>WhatsApp पर जानकारी केवल <strong>आपके action के बाद ही</strong> भेजी जाती है — कभी automatically नहीं।</p>
+      <ul>
+        <li>शिकायत भेजने से पहले Consent popup दिखाते हैं</li>
+        <li>"आपकी जानकारी नज़दीकी सहायता के लिए भेजी जाएगी" — यह हमेशा दिखाते हैं</li>
+        <li>SOS में Location WhatsApp पर जाती है — केवल आपकी सहमति के बाद</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚫</span><div class="sec-title">हम क्या नहीं करते</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>❌ आपका डेटा कभी नहीं बेचते या विज्ञापनदाताओं को नहीं देते</li>
+        <li>❌ Advertisements के लिए डेटा इस्तेमाल नहीं करते</li>
+        <li>❌ आपका नाम या मोबाइल नंबर analytics में संग्रहीत नहीं करते</li>
+        <li>❌ Cookies track नहीं करते</li>
+        <li>ℹ️ Login, Media Center फोटो अपलोड व Listing/Card के लिए Firebase व Cloudinary जैसी विश्वसनीय तकनीकी सेवाएं इस्तेमाल करते हैं (नीचे विस्तार से) — ये data broker या विज्ञापन कंपनियां नहीं हैं</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🗑️</span><div class="sec-title">खाता/डेटा डिलीशन</div></div>
+    <div class="sec-body"><p>आप ऐप के "मेरा खाता" पेज से या वेब-पेज से खाता और डेटा डिलीट कर सकते हैं: <a href="delete-account.html"><b>delete-account.html</b></a>। क्या हटता है, क्या रखा जाता है और कितने समय — वहाँ विस्तार से है (अनुरोध पर 30 दिनों में)।</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🚩</span><div class="sec-title">सामग्री रिपोर्ट व मॉडरेशन</div></div>
+    <div class="sec-body"><p>Media Center फोटो, Reviews और Kumbh AI के उत्तर पर "⚑ रिपोर्ट" बटन है। रिपोर्ट हमारी टीम को जाती हैं; फोटो व Listings Admin Approval के बाद ही सार्वजनिक होते हैं; नियम तोड़ने वाली सामग्री हटाई जाती है और बार-बार उल्लंघन करने वालों का खाता बंद किया जा सकता है।</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📣</span><div class="sec-title">प्रायोजित सामग्री व पेमेंट</div></div>
+    <div class="sec-body"><p>प्रायोजित विज्ञापन "प्रायोजित" लेबल के साथ दिखते हैं। ऐप में In-app purchase या पेमेंट प्रोसेसिंग नहीं है; विज्ञापन शुल्क (यदि हो) KumbhConnect टीम से सीधे तय होता है। आपका निजी डेटा विज्ञापनदाताओं को नहीं दिया जाता।</p></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">💾</span><div class="sec-title">डेटा कहां संग्रहीत होता है?</div></div>
+    <div class="sec-body">
+      <ul>
+        <li><strong>LocalStorage:</strong> आपके ही device पर — anonymous analytics events (कतार), भाषा चयन व आँकड़ों की पसंद</li>
+        <li><strong>रिमाइंडर:</strong> केवल आपके फ़ोन में (Android स्थानीय नोटिफिकेशन); सर्वर को नहीं भेजे जाते</li>
+        <li><strong>Google Sheets (Apps Script):</strong> Anonymous event counts — कोई व्यक्तिगत पहचान नहीं</li>
+        <li><strong>Firebase (Google Cloud, अमेरिका/भारत सर्वर):</strong> आपका खाता, Login, Media Center फोटो, Business/Volunteer/Guide Listings, Service Requests, Reviews</li>
+        <li><strong>Cloudinary (तृतीय पक्ष इमेज होस्टिंग सेवा):</strong> Media Center व Volunteer ID Card के लिए अपलोड की गई फोटो संग्रहीत करने के लिए इस्तेमाल करते हैं</li>
+        <li>शिकायतें/SOS: WhatsApp के ज़रिए सीधे Police/Guide को — हम अलग से संग्रहीत नहीं करते</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📸</span><div class="sec-title">Media Center — फोटो अपलोड</div></div>
+    <div class="sec-body">
+      <p>Media Center में आप स्वेच्छा से फोटो अपलोड कर सकते हैं।</p>
+      <ul>
+        <li>अपलोड करते समय आपके द्वारा दिया गया नाम, शहर, caption और location फोटो के साथ दिखता है</li>
+        <li>हर फोटो Admin Approval के बाद ही सार्वजनिक गैलरी में दिखती है</li>
+        <li>फोटो Firebase (Google Cloud) व Cloudinary पर संग्रहीत होती हैं — दोनों हमारे विश्वसनीय तकनीकी सेवा प्रदाता हैं, विज्ञापनदाता या data broker नहीं</li>
+        <li>Staff Login (Admin/Department/Press) के लिए केवल Email + Password इस्तेमाल होता है, Firebase Authentication से सुरक्षित</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🏪</span><div class="sec-title">Business/Volunteer/Guide Listing व Reviews</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>Listing बनाने पर वह Admin Approval के बाद ही सार्वजनिक दिखती है</li>
+        <li>सेवा प्राप्त करने के बाद दी गई Review सार्वजनिक दिखती है (विश्वसनीयता के लिए)</li>
+        <li>Review केवल वास्तव में पूर्ण हुई सेवा के लिए ही दी जा सकती है — फर्जी reviews रोकने के लिए यह तकनीकी रूप से सुनिश्चित किया गया है</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🔒</span><div class="sec-title">Offline & PWA सुरक्षा</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect एक Progressive Web App (PWA) है। Offline mode में:</p>
+      <ul>
+        <li>Emergency numbers व verified locations cache में सुरक्षित</li>
+        <li>Network न होने पर local data इस्तेमाल होता है</li>
+        <li>Service Worker द्वारा secure caching</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📱</span><div class="sec-title">Android ऐप अनुमतियाँ</div></div>
+    <div class="sec-body">
+      <p>KumbhConnect Android ऐप केवल नीचे दी गई अनुमतियाँ मांगता है, और वह भी तभी जब आप संबंधित सुविधा इस्तेमाल करते हैं:</p>
+      <ul>
+        <li><strong>लोकेशन (Location):</strong> नक्शे पर आपकी स्थिति, आसपास की जगहें और SOS संदेश में GPS दिखाने के लिए। लोकेशन लगातार ट्रैक नहीं की जाती और आपकी पसंद के बिना कहीं नहीं भेजी जाती।</li>
+        <li><strong>कैमरा / फोटो:</strong> शिकायत के साथ फोटो जोड़ने के लिए। चुनी गई फोटो आपके शिकायत भेजने तक केवल आपके फोन में रहती है।</li>
+        <li><strong>नोटिफिकेशन:</strong> रिमाइंडर सुविधा वैकल्पिक है। जब आप रिमाइंडर सेट करते हैं तो ज़रूरत होने पर ऐप नोटिफिकेशन की अनुमति मांगता है। रिमाइंडर की जानकारी (नाम व समय) केवल आपके फ़ोन में रहती है और KumbhConnect के सर्वर को नहीं भेजी जाती। ये फ़ोन पर स्थानीय (local) रिमाइंडर हैं — रिमोट पुश नोटिफिकेशन नहीं। पुश नोटिफिकेशन फ़िलहाल बंद हैं; अलग से सेटअप किए बिना चालू नहीं होंगे। आप रिमाइंडर रद्द कर सकते हैं और अनुमति फ़ोन की Settings से कभी भी बंद कर सकते हैं।</li>
+        <li>कोई अनुमति न देने पर भी ऐप का बाकी हिस्सा चलता है। अनुमतियाँ फोन की Settings से कभी भी बदली जा सकती हैं।</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🤖</span><div class="sec-title">AI चैट (Kumbh AI)</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>आप AI चैट में जो संदेश लिखते हैं (अधिकतम ५०० अक्षर) वह KumbhConnect के लिए बनाई गई Google Apps Script सेवा (script.google.com) को भेजा जाता है। साथ में अनाम Device ID जाता है; लॉग-इन होने पर आपका Firebase लॉग-इन पहचान-टोकन सत्यापन के लिए जाता है।</li>
+        <li>उत्तर में वेब-खोज परिणामों के लिंक (स्रोत) दिख सकते हैं। उत्तर देने के लिए यह सेवा अन्य सेवाओं का उपयोग कर सकती है।</li>
+        <li>वहाँ संदेश संग्रहीत होते हैं या नहीं, कितने समय रखे जाते हैं, या अन्य तृतीय-पक्ष सेवाओं को भेजे जाते हैं या नहीं — यह ऐप के कोड से सिद्ध नहीं किया जा सकता। इसलिए हम यह वादा नहीं करते कि संदेश संग्रहीत नहीं होते या किसी को नहीं भेजे जाते।</li>
+        <li><strong>कृपया AI चैट में पासवर्ड, बैंक/UPI/कार्ड विवरण, आधार या अन्य संवेदनशील व्यक्तिगत जानकारी न लिखें।</strong> आपात स्थिति में SOS/112 का उपयोग करें; AI चैट आपातकालीन सेवा नहीं है।</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">🌐</span><div class="sec-title">तृतीय-पक्ष सेवाएँ</div></div>
+    <div class="sec-body">
+      <p>ऐप/वेबसाइट इस्तेमाल करते समय नीचे दी गई बाहरी सेवाओं से संपर्क होता है (आपका IP पता उन्हें दिखता है):</p>
+      <ul>
+        <li><strong>Firebase (Google):</strong> Login, Firestore डेटाबेस; Firebase SDK www.gstatic.com से लोड होता है</li>
+        <li><strong>Google Apps Script (script.google.com):</strong> अनाम उपयोग आँकड़े व AI चैट</li>
+        <li><strong>Cloudinary:</strong> आपके अपलोड किए फोटो संग्रहीत करना व दिखाना</li>
+        <li><strong>OpenStreetMap:</strong> मानचित्र टाइल्स (tile.openstreetmap.org) व स्थान खोज (Nominatim) — खोज में आपका लिखा पाठ उन्हें भेजा जाता है</li>
+        <li><strong>Supabase:</strong> सार्वजनिक Listings का डेटा पढ़ने के लिए</li>
+        <li><strong>Google Fonts (fonts.googleapis.com / fonts.gstatic.com):</strong> फ़ॉन्ट</li>
+        <li><strong>ImgBB (i.ibb.co):</strong> वेबसाइट पर कुछ चित्र/लोगो इस इमेज होस्ट से दिखाए जाते हैं; Android ऐप में वे ऐप के साथ ही आते हैं</li>
+        <li><strong>cdnjs (Cloudflare):</strong> Volunteer ID Card पेज की स्क्रिप्ट लाइब्रेरी (html2canvas, qrcode)</li>
+        <li><strong>unpkg.com:</strong> केवल वेबसाइट पर मानचित्र लाइब्रेरी (Leaflet); Android ऐप में वह ऐप के साथ ही आती है</li>
+        <li>आपके चुनने पर Google Maps, WhatsApp या अन्य साइटें ऐप के बाहर खुलती हैं; उनकी अपनी गोपनीयता नीतियाँ लागू होती हैं</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📊</span><div class="sec-title">उपयोग आँकड़े (Analytics) — नियंत्रण</div></div>
+    <div class="sec-body">
+      <p>ऐप/वेबसाइट उपयोग का अनाम रिकॉर्ड (Device ID, पेज/फ़ीचर, समय) KumbhConnect की Google Apps Script सेवा को भेजती है। आप इसे बंद कर सकते हैं; बंद करने के बाद नए रिकॉर्ड इस फ़ोन में कतार में सहेजे या भेजे नहीं जाते। आपकी पसंद अगली बार ऐप खोलने पर भी लागू रहती है (यह पसंद इस ब्राउज़र/ऐप के स्थानीय स्टोरेज में रहती है)।</p>
+      <div class="kc-an-ctl">
+        <label style="display:flex;align-items:center;gap:10px;min-height:44px;font-size:.9rem"><input type="checkbox" class="kc-an-toggle" style="width:22px;height:22px"/> <span>अनाम उपयोग आँकड़े भेजें</span></label>
+        <button type="button" class="kc-an-clear" style="min-height:44px;padding:8px 14px;margin:6px 0;border:1.5px solid var(--sf);border-radius:10px;background:transparent;color:var(--sf);font:inherit;font-weight:700">इस फ़ोन के स्थानीय रिकॉर्ड हटाएँ</button>
+        <p class="kc-an-status" role="status" aria-live="polite" style="font-size:.8rem;margin:4px 0"></p>
+      </div>
+      <p>"स्थानीय रिकॉर्ड हटाएँ" केवल इस फ़ोन में सहेजी कतार हटाता है। पहले सर्वर को भेजे गए रिकॉर्ड ऐप से नहीं हटाए जा सकते; सर्वर-स्तर पर हटाने की सुविधा फ़िलहाल उपलब्ध नहीं है। इसके लिए kumbhmelaconnect@gmail.com पर संपर्क करें।</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">👤</span><div class="sec-title">आपके अधिकार</div></div>
+    <div class="sec-body">
+      <ul>
+        <li>✅ कभी भी Location access अस्वीकार करने का अधिकार</li>
+        <li>✅ अनाम उपयोग आँकड़े बंद करने (opt-out) और इस फ़ोन के स्थानीय रिकॉर्ड हटाने का विकल्प (Android ऐप का "उपयोग आँकड़े" कार्ड या इस पेज का नियंत्रण)</li>
+        <li>✅ WhatsApp/Call इस्तेमाल न करने का पूर्ण अधिकार</li>
+        <li>✅ "मेरा खाता" पेज से खाता डिलीट करने का अधिकार (क्या हटता है और क्या रखा जाता है, यह ऊपर "खाता व Login" में बताया गया है)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-icon">📧</span><div class="sec-title">संपर्क करें</div></div>
+    <div class="sec-body">
+      <p>गोपनीयता संबंधी किसी भी प्रश्न के लिए संपर्क करें:</p>
+      <ul>
+        <li>📧 Email: kumbhmelaconnect@gmail.com</li>
+        <li>🌐 Platform: KumbhConnect Android App &amp; Website</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end lang-hi -->
+
+<!-- CONTACT BOX -->
+<div class="contact-box">
+  <h3>📞 संपर्क करा / Contact Us</h3>
+  <p>गोपनीयतेबाबत कोणताही प्रश्न असल्यास संपर्क करा</p>
+  <div class="contact-links">
+    <a href="mailto:kumbhmelaconnect@gmail.com?subject=Privacy%20Query%20-%20KumbhConnect" class="clink-btn clink-mail">📧 Email</a>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>🕉️ <strong>KumbhConnect</strong> — नाशिक–त्र्यंबकेश्वर कुंभमेळा डिजिटल साथी</div>
+  <div style="margin-top:5px">Founder: Prasad Arvind Bhalekar &nbsp;·&nbsp; © 2026 KumbhConnect. All rights reserved.</div>
+  <div style="margin-top:5px"><a href="index.html" style="color:var(--sf);text-decoration:none">← परत जा / Go Back</a> &nbsp;·&nbsp; <a href="terms.html" style="color:var(--sf);text-decoration:none">Terms & Conditions</a></div>
+</div>
+
+<script>
+function setLang(lang, el) {
+  document.querySelectorAll('.lang-block').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.ltab').forEach(b => b.classList.remove('on'));
+  document.getElementById('lang-' + lang).classList.add('on');
+  if (el) el.classList.add('on');
+  localStorage.setItem('kc_lang', lang);
+  document.documentElement.lang = lang;
+}
+// Analytics preference (shared with index.html kcTrack via localStorage 'kc_analytics_optout').
+const KC_AN_MSG = {
+  mr: { on: 'आकडेवारी चालू आहे.', off: 'आकडेवारी बंद केली. नवीन नोंदी पाठवल्या जाणार नाहीत.', cleared: 'या फोनवरील स्थानिक नोंदी हटवल्या.', fail: 'तुमची निवड या ब्राउझरमध्ये साठवता आली नाही.' },
+  hi: { on: 'आँकड़े चालू हैं।', off: 'आँकड़े बंद किए गए। नए रिकॉर्ड नहीं भेजे जाएँगे।', cleared: 'इस फ़ोन के स्थानीय रिकॉर्ड हटाए गए।', fail: 'आपकी पसंद इस ब्राउज़र में सहेजी नहीं जा सकी।' },
+  en: { on: 'Statistics are on.', off: 'Statistics turned off. No new records will be sent.', cleared: 'Local records on this phone deleted.', fail: 'Could not save your choice in this browser.' }
+};
+function kcAnLang() { const l = localStorage.getItem('kc_lang'); return KC_AN_MSG[l] ? l : 'mr'; }
+function kcAnSay(key) { document.querySelectorAll('.kc-an-status').forEach(n => { n.textContent = KC_AN_MSG[kcAnLang()][key]; }); }
+function kcAnInit() {
+  let off = false;
+  try { off = localStorage.getItem('kc_analytics_optout') === '1'; } catch (e) { /* storage blocked */ }
+  document.querySelectorAll('.kc-an-toggle').forEach(cb => {
+    cb.checked = !off;
+    cb.addEventListener('change', () => {
+      try {
+        if (cb.checked) localStorage.removeItem('kc_analytics_optout');
+        else { localStorage.setItem('kc_analytics_optout', '1'); localStorage.removeItem('kc_event_q'); localStorage.removeItem('kc_last_report'); }
+        document.querySelectorAll('.kc-an-toggle').forEach(o => { o.checked = cb.checked; });
+        kcAnSay(cb.checked ? 'on' : 'off');
+      } catch (e) { cb.checked = !cb.checked; kcAnSay('fail'); }
+    });
+  });
+  document.querySelectorAll('.kc-an-clear').forEach(b => b.addEventListener('click', () => {
+    try { localStorage.removeItem('kc_event_q'); localStorage.removeItem('kc_last_report'); kcAnSay('cleared'); } catch (e) { kcAnSay('fail'); }
+  }));
+}
+document.addEventListener('DOMContentLoaded', kcAnInit);
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('kc_lang');
+  if (saved && document.getElementById('lang-' + saved)) {
+    const tabs = document.querySelectorAll('.ltab');
+    const idx = { mr: 0, hi: 1, en: 2 }[saved];
+    setLang(saved, idx !== undefined ? tabs[idx] : null);
+  }
+});
+</script>
+</body>
+</html>
