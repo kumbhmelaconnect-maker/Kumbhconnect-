@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"/>
+<meta name="theme-color" content="#C8410A"/>
+<title>Delete Account — KumbhConnect</title><link rel="icon" type="image/png" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --sf:#C8410A;--gd:#C9920A;--gd2:#F0B429;
+  --cr:#FFFAF4;--cd:#FFF6ED;--cs:#FFF3E6;
+  --br:#F0D5B8;--t1:#1A0800;--t2:#4A1E08;--t3:#9A6040;
+  --fn:'Mukta','Khand',sans-serif;--r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fn);background:var(--cr);color:var(--t1);line-height:1.7}
+
+/* TOP BAR */
+.topbar{background:linear-gradient(135deg,#C8410A,#7B1616);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(200,65,10,.3)}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 12px;border-radius:20px;font-size:.75rem;cursor:pointer;font-family:var(--fn);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.back-btn:hover{background:rgba(255,255,255,.25)}
+.topbar-title{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#fff}
+.topbar-sub{font-size:.6rem;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#FFF3E6 0%,#FFFAF4 100%);padding:28px 20px 24px;text-align:center;border-bottom:2px solid var(--br)}
+.hero-icon{font-size:3rem;margin-bottom:10px}
+.hero-title{font-family:'Khand',sans-serif;font-size:1.8rem;font-weight:700;color:var(--sf);line-height:1.2;margin-bottom:6px}
+.hero-sub{font-size:.8rem;color:var(--t3);margin-bottom:10px}
+.hero-badge{display:inline-block;background:linear-gradient(90deg,#C8410A,#F0B429);color:#fff;font-size:.65rem;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase}
+
+/* DATE BADGE */
+.date-bar{background:var(--cd);border-bottom:1px solid var(--br);padding:9px 20px;display:flex;gap:16px;flex-wrap:wrap}
+.date-item{font-size:.7rem;color:var(--t3)}
+.date-item span{font-weight:700;color:var(--t2)}
+
+/* CONTENT */
+.content{max-width:680px;margin:0 auto;padding:20px 18px 48px}
+
+.section{margin-bottom:28px;background:#fff;border-radius:var(--r);border:1px solid var(--br);overflow:hidden;box-shadow:0 2px 8px rgba(200,65,10,.05)}
+.sec-hdr{background:linear-gradient(135deg,var(--cs),#fff);padding:13px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:10px}
+.sec-icon{font-size:1.3rem}
+.sec-title{font-family:'Khand',sans-serif;font-size:1rem;font-weight:700;color:var(--sf)}
+.sec-body{padding:14px 16px}
+.sec-body p{font-size:.82rem;color:var(--t2);margin-bottom:10px}
+.sec-body ul{padding-left:18px;margin-bottom:10px}
+.sec-body ul li{font-size:.82rem;color:var(--t2);margin-bottom:6px}
+.sec-body h4{font-family:'Khand',sans-serif;font-size:.88rem;font-weight:700;color:var(--t1);margin-bottom:6px;margin-top:12px}
+
+/* HIGHLIGHT BOX */
+.highlight{background:linear-gradient(135deg,#FEF9EC,#FFF3E6);border:1.5px solid var(--gd2);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.highlight p{margin:0;font-size:.8rem;color:#78350F}
+
+/* CONTACT BOX */
+.contact-box{background:linear-gradient(135deg,#C8410A,#7B1616);border-radius:var(--r);padding:20px;text-align:center;margin-top:24px}
+.contact-box h3{font-family:'Khand',sans-serif;font-size:1.1rem;font-weight:700;color:#F0B429;margin-bottom:8px}
+.contact-box p{font-size:.78rem;color:rgba(255,255,255,.85);margin-bottom:12px}
+.contact-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.clink-btn{padding:8px 18px;border-radius:20px;font-size:.75rem;font-weight:700;font-family:var(--fn);cursor:pointer;text-decoration:none;border:none}
+.clink-wa{background:#25D366;color:#fff}
+.clink-mail{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)!important}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px 18px;border-top:1px solid var(--br);font-size:.68rem;color:var(--t3)}
+.footer strong{color:var(--sf)}
+
+/* LANGUAGE TABS */
+.lang-tabs{display:flex;gap:6px;padding:12px 18px;background:var(--cs);border-bottom:1px solid var(--br)}
+.ltab{padding:5px 14px;border-radius:16px;border:1.5px solid var(--br);background:#fff;color:var(--t2);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.ltab.on{background:var(--sf);color:#fff;border-color:var(--sf)}
+
+.lang-block{display:none}.lang-block.on{display:block}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="index.html" class="back-btn">← मागे</a><div><div class="topbar-title">Delete Account</div><div class="topbar-sub">KumbhConnect · खाते व डेटा डिलीशन</div></div></div>
+<div class="hero"><div class="hero-icon">🗑️</div><div class="hero-title">Account &amp; Data Deletion</div><div class="hero-sub">KumbhConnect (in.kumbhconnect.nashik) — developer: KumbhConnect Team</div></div>
+<div class="lang-tabs">
+  <button class="ltab on" onclick="setLang('mr',this)">मराठी</button>
+  <button class="ltab" onclick="setLang('hi',this)">हिंदी</button>
+  <button class="ltab" onclick="setLang('en',this)">English</button>
+</div>
+<div class="content">
+<div id="lang-mr" class="lang-block on"><div class="section"><div class="sec-hdr"><span class="sec-icon">📱</span><div class="sec-title">अ‍ॅपमधून खातं डिलीट करा</div></div><div class="sec-body"><ol style="padding-left:18px"><li style="font-size:.82rem;margin-bottom:6px">KumbhConnect अ‍ॅप उघडा व तुमच्या खात्याने Login करा.</li><li style="font-size:.82rem;margin-bottom:6px">"माझं खातं" (Profile) पेजवर खाली जा.</li><li style="font-size:.82rem;margin-bottom:6px">"माझं खातं कायमचं डिलीट करा" दाबा व पुष्टी करा.</li></ol><div class="highlight"><p>सुरक्षेसाठी अलीकडील Login आवश्यक आहे. विचारल्यास पुन्हा Login करून पुन्हा प्रयत्न करा. डिलीट केलेलं खातं परत मिळवता येत नाही.</p></div></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">✉️</span><div class="sec-title">अ‍ॅप न वापरता डिलीशन विनंती</div></div><div class="sec-body"><p>अ‍ॅपमध्ये Login करता येत नसेल, किंवा खालील "ठेवला जाणारा डेटा" हटवायचा असेल, तर नोंदणीकृत ई-मेलवरून <b>kumbhmelaconnect@gmail.com</b> ला विषय <b>"Delete my KumbhConnect data"</b> सह मेल करा. मेलमध्ये तुमचे नाव, नोंदणीकृत ई-मेल व हटवायचा डेटा (खातं / फोटो / Reviews / Service Requests / Volunteer नोंदणी) लिहा. आम्ही <b>३० दिवसांत</b> तो हटवू.</p><p><a class="clink-btn clink-mail" style="background:#C8410A;display:inline-block" href="mailto:kumbhmelaconnect@gmail.com?subject=Delete%20my%20KumbhConnect%20data">📧 डिलीशन विनंती मेल करा</a></p></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">🗑️</span><div class="sec-title">काय हटवले जाते</div></div><div class="sec-body"><ul><li>Login खातं (Firebase Authentication) व Profile</li><li>तुम्ही तयार केलेले Listings</li><li>तुमच्या सूचना (Notifications)</li><li>"प्रलंबित" असलेल्या जाहिरात विनंत्या</li><li>तुमचे Service Requests व Volunteer नोंदणी (सिस्टीम परवानगी देते तिथे; अन्यथा खालीलप्रमाणे विनंतीवर ३० दिवसांत)</li></ul></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">🗂️</span><div class="sec-title">काय ठेवले जाऊ शकते व किती काळ</div></div><div class="sec-body"><ul><li><b>Reviews, प्रलंबित नसलेल्या जाहिरात विनंत्या</b> — व्यवहार/मॉडरेशन नोंद म्हणून; विनंतीवर ३० दिवसांत हटवले/अनामिक केले जातात.</li><li><b>Media Center / Cloudinary वरील फोटो</b> (Listing व Volunteer ID Card सह) — खाते-डिलीशनने आपोआप हटत नाहीत; विनंतीवर ३० दिवसांत हटवले जातात.</li><li><b>अनामिक वापर आकडेवारी</b> — नाव/ई-मेल/मोबाईलशिवाय; तुमच्याशी जोडता येत नाही.</li><li><b>Volunteer नोंदणी क्रमांक रेकॉर्ड</b> (तुमचा uid + नोंदणी क्रमांक) — दुहेरी नोंदणी रोखण्यासाठी; विनंतीवर ३० दिवसांत हटवला जातो.</li><li>कायदेशीर बंधनासाठी आवश्यक असल्यास तेवढ्या काळासाठीच.</li></ul></div></div>
+</div>
+<div id="lang-hi" class="lang-block"><div class="section"><div class="sec-hdr"><span class="sec-icon">📱</span><div class="sec-title">ऐप से खाता डिलीट करें</div></div><div class="sec-body"><ol style="padding-left:18px"><li style="font-size:.82rem;margin-bottom:6px">KumbhConnect ऐप खोलें और अपने खाते से Login करें।</li><li style="font-size:.82rem;margin-bottom:6px">"मेरा खाता" (Profile) पेज पर नीचे जाएँ।</li><li style="font-size:.82rem;margin-bottom:6px">"मेरा खाता हमेशा के लिए डिलीट करें" दबाएँ और पुष्टि करें।</li></ol><div class="highlight"><p>सुरक्षा के लिए हाल का Login ज़रूरी है। कहा जाए तो दोबारा Login करके फिर कोशिश करें। डिलीट किया खाता वापस नहीं मिलता।</p></div></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">✉️</span><div class="sec-title">ऐप के बिना डिलीशन अनुरोध</div></div><div class="sec-body"><p>अगर Login नहीं हो पा रहा, या नीचे "रखा जाने वाला डेटा" हटवाना है, तो पंजीकृत ई-मेल से <b>kumbhmelaconnect@gmail.com</b> पर विषय <b>"Delete my KumbhConnect data"</b> के साथ मेल करें। मेल में नाम, पंजीकृत ई-मेल और हटवाने वाला डेटा (खाता / फोटो / Reviews / Service Requests / Volunteer पंजीकरण) लिखें। हम इसे <b>30 दिनों में</b> हटा देंगे।</p><p><a class="clink-btn clink-mail" style="background:#C8410A;display:inline-block" href="mailto:kumbhmelaconnect@gmail.com?subject=Delete%20my%20KumbhConnect%20data">📧 डिलीशन अनुरोध मेल करें</a></p></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">🗑️</span><div class="sec-title">क्या हटाया जाता है</div></div><div class="sec-body"><ul><li>Login खाता (Firebase Authentication) और Profile</li><li>आपके बनाए Listings</li><li>आपकी सूचनाएँ (Notifications)</li><li>"लंबित" विज्ञापन अनुरोध</li><li>आपके Service Requests और Volunteer पंजीकरण (जहाँ सिस्टम अनुमति दे; नहीं तो अनुरोध पर 30 दिनों में)</li></ul></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">🗂️</span><div class="sec-title">क्या रखा जा सकता है और कितने समय</div></div><div class="sec-body"><ul><li><b>Reviews, गैर-लंबित विज्ञापन अनुरोध</b> — लेन-देन/मॉडरेशन रिकॉर्ड के रूप में; अनुरोध पर 30 दिनों में हटाए/अनाम किए जाते हैं।</li><li><b>Media Center / Cloudinary पर फोटो</b> (Listing व Volunteer ID Card सहित) — खाता डिलीट करने से अपने-आप नहीं हटते; अनुरोध पर 30 दिनों में हटाए जाते हैं।</li><li><b>अनाम उपयोग आँकड़े</b> — नाम/ई-मेल/मोबाइल के बिना; आपसे जोड़े नहीं जा सकते।</li><li><b>Volunteer पंजीकरण क्रमांक रिकॉर्ड</b> (आपका uid + पंजीकरण क्रमांक) — दोहरा पंजीकरण रोकने के लिए; अनुरोध पर 30 दिनों में हटाया जाता है।</li><li>कानूनी बाध्यता हो तो केवल उतने समय के लिए।</li></ul></div></div>
+</div>
+<div id="lang-en" class="lang-block"><div class="section"><div class="sec-hdr"><span class="sec-icon">📱</span><div class="sec-title">Delete your account in the app</div></div><div class="sec-body"><ol style="padding-left:18px"><li style="font-size:.82rem;margin-bottom:6px">Open the KumbhConnect app and sign in.</li><li style="font-size:.82rem;margin-bottom:6px">Go to the "My Account" (Profile) page and scroll down.</li><li style="font-size:.82rem;margin-bottom:6px">Tap "Delete my account permanently" and confirm.</li></ol><div class="highlight"><p>For security you must have signed in recently — if asked, sign in again and retry. A deleted account cannot be restored.</p></div></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">✉️</span><div class="sec-title">Request deletion without the app</div></div><div class="sec-body"><p>If you cannot sign in, or you want the data listed under "What may be kept" removed, e-mail <b>kumbhmelaconnect@gmail.com</b> from your registered address with the subject <b>"Delete my KumbhConnect data"</b>. Include your name, registered e-mail, and what to delete (account / photos / reviews / service requests / volunteer registration). We will delete it within <b>30 days</b>.</p><p><a class="clink-btn clink-mail" style="background:#C8410A;display:inline-block" href="mailto:kumbhmelaconnect@gmail.com?subject=Delete%20my%20KumbhConnect%20data">📧 E-mail a deletion request</a></p></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">🗑️</span><div class="sec-title">What is deleted</div></div><div class="sec-body"><ul><li>Your login account (Firebase Authentication) and profile</li><li>Listings you created</li><li>Your notifications</li><li>Advertising requests that are still "pending"</li><li>Your service requests and volunteer registration (where the system allows it; otherwise on request within 30 days)</li></ul></div></div>
+<div class="section"><div class="sec-hdr"><span class="sec-icon">🗂️</span><div class="sec-title">What may be kept, and for how long</div></div><div class="sec-body"><ul><li><b>Reviews and non-pending advertising requests</b> — kept as transaction/moderation records; deleted or anonymised within 30 days of a request.</li><li><b>Photos in Media Center / Cloudinary</b> (including Listing and Volunteer ID Card photos) — not removed automatically by account deletion; deleted within 30 days of a request.</li><li><b>Anonymous usage statistics</b> — contain no name, e-mail or phone number and cannot be linked back to you.</li><li><b>Volunteer registration-number record</b> (your uid + registration number) — kept to prevent duplicate registrations; deleted within 30 days of a request.</li><li>Anything we are legally required to keep, only for as long as required.</li></ul></div></div>
+</div>
+<div class="contact-box"><h3>📧 Contact</h3><p>Privacy / deletion: kumbhmelaconnect@gmail.com</p><div class="contact-links"><a class="clink-btn clink-mail" href="privacy-policy.html">🔐 Privacy Policy</a></div></div>
+</div>
+<div class="footer"><strong>KumbhConnect</strong> · Account &amp; Data Deletion</div>
+<script>
+function setLang(lang, el) {
+  document.querySelectorAll('.lang-block').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.ltab').forEach(b => b.classList.remove('on'));
+  document.getElementById('lang-' + lang).classList.add('on');
+  if (el) el.classList.add('on');
+  try { localStorage.setItem('kc_lang', lang); } catch (e) {}
+  document.documentElement.lang = lang;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  let saved = null; try { saved = localStorage.getItem('kc_lang'); } catch (e) {}
+  if (saved && document.getElementById('lang-' + saved)) setLang(saved, document.querySelectorAll('.ltab')[{ mr: 0, hi: 1, en: 2 }[saved]]);
+});
+</script>
+</body>
+</html>
