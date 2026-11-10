@@ -23,15 +23,15 @@ concurrency:
 
 jobs:
   build:
-    name: Build Android App v1.6.0 (25, SDK 36)
+    name: Build Android App v1.6.2 (27, SDK 36)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     env:
       APP_ID: in.kumbhconnect.nashik
       APP_NAME: KumbhConnect
-      APP_VERSION: "1.6.1"
-      APP_VERSION_CODE: "26"
+      APP_VERSION: "1.6.2"
+      APP_VERSION_CODE: "27"
 
       ANDROID_COMPILE_SDK: "36"
       ANDROID_TARGET_SDK: "36"
