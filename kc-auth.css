@@ -1,0 +1,81 @@
+/* ================================================================
+   KumbhConnect — kc-auth.css (v1.7.0)
+   1. LAYERS: one z-index scale for every fixed element (fixes overlaps)
+   2. BOTTOM STACK: bottom nav < AI button < install/update bars < toast
+   3. Login gate (login / register / OTP / profile)
+   ================================================================ */
+
+/* ---------- 1. one layer scale (low → high) ----------
+   100 top/bottom nav · 120 AI button · 150 banners · 199/200 menus + modals
+   215 notifications · 220 AI chat · 9997 login gate · 9998 welcome/lightbox
+   9999 splash · 99999 offline bar · 100000 toast                          */
+:root{
+  --kc-nav-h:64px;
+  --kc-safe-b:env(safe-area-inset-bottom,0px);
+  --kc-safe-t:env(safe-area-inset-top,0px);
+}
+.topnav,.botnav{z-index:100}
+/* AI button used to sit ABOVE modals (210 > 200) and over the right side of the install bar */
+#ai-fab{z-index:120;bottom:calc(var(--kc-nav-h) + 14px + var(--kc-safe-b))}
+/* banners stop before the AI button instead of hiding under it */
+#ibar,#updatebar{z-index:150;bottom:calc(var(--kc-nav-h) + 12px + var(--kc-safe-b));right:84px}
+#more-hint{z-index:150;bottom:calc(var(--kc-nav-h) + var(--kc-safe-b)) !important}
+/* toast clears the AI button + banners, and wraps instead of being cut off */
+#toast{bottom:calc(var(--kc-nav-h) + 88px + var(--kc-safe-b)) !important;white-space:normal !important;width:max-content;max-width:min(88vw,420px) !important;line-height:1.4;pointer-events:none}
+/* map controls: keep above the legend, below any sheet */
+.map-fab{z-index:410}
+/* toast must also clear the gate's own bottom padding on tiny screens */
+#login-gate ~ #toast{z-index:100000 !important}
+
+/* ---------- 3. login gate ---------- */
+#login-gate{position:fixed;inset:0;z-index:9997;background:#FFFAF4;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  display:flex;padding:calc(var(--kc-safe-t) + 40px) 16px calc(var(--kc-safe-b) + 28px);transition:opacity .3s,visibility .3s}
+#login-gate.hide{opacity:0;visibility:hidden;pointer-events:none}
+/* margin:auto (not align-items:center) → tall steps scroll from the top instead of being clipped */
+.kca-wrap{margin:auto;width:100%;max-width:420px}
+[data-theme="dark"] #login-gate{background:var(--cr)}
+#login-gate .gate-logo{width:64px;height:64px;margin:6px auto 10px;display:block}
+#login-gate .gate-title{text-align:center;font-family:'Khand',sans-serif;font-size:1.35rem;font-weight:700;color:var(--t1);margin:0 0 2px;line-height:1.25}
+#login-gate .gate-sub{text-align:center;font-size:.78rem;color:var(--t3);margin:0 0 16px;line-height:1.5}
+
+.kca-langs{display:flex;justify-content:flex-end;gap:6px;margin-bottom:4px}
+.kca-lang{min-height:32px;min-width:44px;padding:0 10px;border-radius:16px;border:1px solid var(--br);background:var(--wh);color:var(--t2);font-size:.74rem;font-weight:700;font-family:var(--fn);cursor:pointer}
+.kca-lang.on{background:var(--sf);border-color:var(--sf);color:#fff}
+
+.kca-tabs{display:flex;gap:6px;background:var(--cs,#FFF3E6);border-radius:12px;padding:4px;margin-bottom:16px}
+.kca-tabs[hidden]{display:none}
+.kca-tab{flex:1;min-height:42px;border:none;border-radius:9px;background:transparent;color:var(--t2);font-family:var(--fn);font-weight:700;font-size:.88rem;cursor:pointer}
+.kca-tab.on{background:var(--wh);color:var(--sf);box-shadow:var(--sh)}
+
+.kca-step{display:none}
+.kca-step.on{display:block;animation:fi .25s ease}
+.kca-step .fg{margin-bottom:12px}
+.kca-step .btn-primary,.kca-step .btn-google{width:100%;min-height:48px}
+.kca-step .btn-google{display:flex;align-items:center;justify-content:center;gap:10px}
+.kca-h2{font-family:'Khand',sans-serif;font-size:1.15rem;color:var(--t1);text-align:center;margin:0 0 4px}
+.kca-note{font-size:.8rem;color:var(--t2);text-align:center;margin:0 0 14px;line-height:1.5;word-break:break-word}
+
+.kca-phone{display:flex;align-items:stretch;border:1.5px solid var(--br);border-radius:10px;background:var(--wh);overflow:hidden}
+.kca-phone:focus-within{border-color:var(--sf)}
+.kca-cc{display:flex;align-items:center;padding:0 12px;background:var(--cs,#FFF3E6);color:var(--t2);font-weight:700;font-size:.9rem;border-right:1px solid var(--br)}
+.kca-phone input{flex:1;min-width:0;border:none !important;outline:none;background:transparent;box-shadow:none !important;font-size:1rem}
+.kca-otp-input{text-align:center;letter-spacing:.5em;font-size:1.4rem !important;font-weight:700;padding-left:.5em}
+
+.kca-or{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:.76rem;margin:14px 0}
+.kca-or::before,.kca-or::after{content:'';flex:1;height:1px;background:var(--br)}
+.kca-link{display:block;margin:12px auto 0;padding:8px 10px;min-height:40px;background:none;border:none;color:var(--sf);text-decoration:underline;cursor:pointer;font-family:var(--fn);font-size:.84rem}
+.kca-link:disabled{color:var(--t3);text-decoration:none;cursor:default}
+.kca-row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.kca-row .kca-link{margin:8px 0 0}
+#kca-f-email-login{margin-top:6px;padding-top:10px;border-top:1px solid var(--br)}
+#kca-f-email-login[hidden]{display:none}
+.kca-terms{font-size:.7rem;color:var(--t3);text-align:center;margin:18px 0 0;line-height:1.55}
+.kca-terms a{color:var(--sf)}
+.kca-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#kca-recaptcha{height:0;overflow:visible}
+/* Google's reCAPTCHA badge must not cover the bottom of the gate */
+.grecaptcha-badge{visibility:hidden}
+
+@media (min-width:900px){#login-gate{padding-top:48px}}
+@media (max-height:560px){#login-gate{padding-top:calc(var(--kc-safe-t) + 34px)} #login-gate .gate-logo{display:none}}
+@media (prefers-reduced-motion:reduce){.kca-step.on{animation:none}}
