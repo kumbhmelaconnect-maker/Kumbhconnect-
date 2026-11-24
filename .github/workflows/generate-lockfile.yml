@@ -1,0 +1,27 @@
+name: Generate npm lockfile (manual, no commit)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Resolve dependencies (lockfile only, no scripts)
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Verify reproducibility with npm ci
+        run: npm ci --ignore-scripts
+      - name: Dependency advisories (informational)
+        run: npm audit --omit=dev || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-lock-json
+          path: package-lock.json
+          if-no-files-found: error
